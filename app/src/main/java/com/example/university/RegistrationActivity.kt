@@ -66,9 +66,8 @@ class RegistrationActivity : AppCompatActivity() {
             val context = LocalContext.current
             val keyboardController = LocalSoftwareKeyboardController.current
             val focusManager = LocalFocusManager.current
-
-
             val scrollState = rememberScrollState()
+
             Column(
                 Modifier
                     .fillMaxHeight()
