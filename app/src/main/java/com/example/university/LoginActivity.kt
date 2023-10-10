@@ -18,8 +18,10 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.Button
+import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.OutlinedTextField
 import androidx.compose.material.Text
+import androidx.compose.material.TextFieldDefaults
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -27,8 +29,10 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
+import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
@@ -37,6 +41,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.university.database.DBManager
+import com.example.university.usefull_stuff.showToast
 
 class LoginActivity : AppCompatActivity() {
     @OptIn(ExperimentalComposeUiApi::class)
@@ -47,7 +52,9 @@ class LoginActivity : AppCompatActivity() {
         val db = DBManager(this)
         super.onCreate(savedInstanceState)
 
+
         setContent() {
+            val mainColor = colorResource(id = R.color.main)
             val context = LocalContext.current
             val keyboardController = LocalSoftwareKeyboardController.current
 
@@ -91,14 +98,24 @@ class LoginActivity : AppCompatActivity() {
                                 onDone = {
                                     keyboardController?.hide()
                                     checkPassword(pass, db, context, sharedPreferences)
-                                })
+                                }),
+                            colors = TextFieldDefaults.outlinedTextFieldColors(
+                                    focusedBorderColor = mainColor,
+                                    unfocusedBorderColor = mainColor,
+                                    cursorColor = mainColor,
+                                    focusedLabelColor = Color.Black
+                            )
                         )
 
                         Button(
                             onClick = {
                                 checkPassword(pass, db, context, sharedPreferences)
                             },
-                            modifier = Modifier.fillMaxWidth()
+                            modifier = Modifier.fillMaxWidth(),
+                            colors = ButtonDefaults.buttonColors(
+                                backgroundColor = mainColor,
+                                contentColor = Color.White
+                            )
                         ) {
 
                             Text(text = "Войти")
@@ -108,7 +125,11 @@ class LoginActivity : AppCompatActivity() {
                             onClick = {
                                 toRegistration()
                             },
-                            modifier = Modifier.fillMaxWidth()
+                            modifier = Modifier.fillMaxWidth(),
+                            colors = ButtonDefaults.buttonColors(
+                                backgroundColor = mainColor,
+                                contentColor = Color.White
+                            )
                         ) {
 
                             Text(text = "Создать нового пользователя")
@@ -141,14 +162,6 @@ class LoginActivity : AppCompatActivity() {
         } else {
             showToast("Пароль не верен", context)
         }
-    }
-
-    fun showToast(text: String, context: Context) {
-        Toast.makeText(
-            context,
-            text,
-            Toast.LENGTH_SHORT
-        ).show()
     }
 
     fun toMain() {

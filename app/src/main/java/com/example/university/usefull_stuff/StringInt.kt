@@ -1,12 +1,18 @@
 package com.example.university.usefull_stuff
 
 class StringInt(str: String, i: Int) {
-    val string: String = str
+    var string: String = str
         get() {
             return field
         }
-    val int : Int = i
+        set(value){
+            field = value
+        }
+    var int : Int = i
         get() {
             return field
+        }
+        set(value){
+            field = value
         }
 }
