@@ -32,6 +32,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.vectorResource
@@ -42,21 +43,41 @@ import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.datastore.core.DataStore
+import androidx.datastore.preferences.core.Preferences
+import androidx.datastore.preferences.preferencesDataStore
+import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.lifecycleScope
+import com.example.university.ViewModel.LoginViewModel
+import com.example.university.ViewModel.LoginViewModelFactory
 import com.example.university.database.DBManager
+import com.example.university.theme.mainColor
 import com.example.university.usefull_stuff.showToast
 
+// private val Context.dataStore by preferencesDataStore("user_preferences")
+
 class LoginActivity : AppCompatActivity() {
+
     @OptIn(ExperimentalComposeUiApi::class, ExperimentalMaterialApi::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         val sharedPreferences =
             PreferenceManager.getDefaultSharedPreferences(this /* Activity context */)
         sharedPreferences.edit().putBoolean("session", false).apply()
-        val db = DBManager(this)
         super.onCreate(savedInstanceState)
+        val vm = ViewModelProvider(this, LoginViewModelFactory(this)).get(LoginViewModel::class.java)
+
+        vm.isGoingToMain.observe(this, Observer {
+            if(it) toMain()
+        })
+        vm.errorMesage.observe(this, Observer {
+            showToast(it, this)
+        })
+
 
 
         setContent() {
-            val mainColor = colorResource(id = R.color.main)
+            //val mainColor = colorResource(id = R.color.main)
             val context = LocalContext.current
             val keyboardController = LocalSoftwareKeyboardController.current
 
@@ -84,12 +105,17 @@ class LoginActivity : AppCompatActivity() {
                             fontSize = 20.sp,
                         )
 
+
                         var pass by remember { mutableStateOf("") }
                         var mColor by remember { mutableStateOf(mainColor) }
+                        vm.fieldColor.observe(LocalLifecycleOwner.current, Observer {
+                            mColor = it
+                        })
                         var isHidden by remember { mutableStateOf(true) }
+
                         OutlinedTextField(
                             value = pass,
-                            onValueChange = { pass = it; mColor = mainColor },
+                            onValueChange = { pass = it; vm.setNormalFieldColor() },
                             label = { Text("Введите пароль") },
                             singleLine = true,
                             visualTransformation = if (isHidden) PasswordVisualTransformation() else VisualTransformation.None,
@@ -112,8 +138,7 @@ class LoginActivity : AppCompatActivity() {
                             keyboardActions = KeyboardActions(
                                 onDone = {
                                     // keyboardController?.hide()
-                                    if (!checkPassword(pass, db, context, sharedPreferences))
-                                        mColor = Color.Red
+                                    vm.checkPassword(pass, sharedPreferences)
                                 }),
                             colors = TextFieldDefaults.outlinedTextFieldColors(
                                 focusedBorderColor = mColor,
@@ -125,8 +150,7 @@ class LoginActivity : AppCompatActivity() {
 
                         Button(
                             onClick = {
-                                if (!checkPassword(pass, db, context, sharedPreferences))
-                                    mColor = Color.Red
+                                vm.checkPassword(pass, sharedPreferences)
                             },
                             modifier = Modifier.fillMaxWidth(),
                             colors = ButtonDefaults.buttonColors(
@@ -159,29 +183,8 @@ class LoginActivity : AppCompatActivity() {
 
     }
 
-    private fun checkPassword(
-        pass: String,
-        db: DBManager,
-        context: Context,
-        sharedPreferences: SharedPreferences
-    ): Boolean {
-        if (sharedPreferences.getBoolean("needPassword", true))
-        if (pass.isEmpty()) {
-            showToast("Введите пароль", context)
-            return false
-        }
-        val passwords = db.getPasswords()
-        if (pass in passwords.keys) {
-            passwords.get(pass)?.let {
-                sharedPreferences.edit().putInt("user", it).apply()
-            }
-            sharedPreferences.edit().putBoolean("session", true).apply()
-            toMain()
-            return true
-        } else {
-            showToast("Пароль не верен", context)
-        }
-        return false
+    fun getDataStore(context: Context){
+
     }
 
     fun toMain() {

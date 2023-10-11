@@ -105,6 +105,8 @@ dependencies {
     // optional - Paging 3 Integration
     //implementation("androidx.room:room-paging:$room_version")
 
+    implementation("androidx.datastore:datastore-preferences:1.1.0-alpha05")
+
     implementation("androidx.core:core-ktx:1.12.0")
     implementation("androidx.appcompat:appcompat:1.6.1")
     implementation("com.google.android.material:material:1.9.0")
