@@ -40,7 +40,6 @@ import androidx.compose.ui.semantics.Role.Companion.Image
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.university.database.DBManager
-import com.example.university.theme.mainColor
 import com.example.university.usefull_stuff.StringInt
 
 class MainActivity : AppCompatActivity() {
@@ -63,7 +62,7 @@ class MainActivity : AppCompatActivity() {
             toLogin()
             finish()
         }
-        val user = sharedPreferences.getInt("user", 0)
+        val user = sharedPreferences.getInt("user", 1)
         Log.d(TAG, "Прошла проверка на авторизованность пользователя")
 
         super.onCreate(savedInstanceState)
@@ -76,6 +75,7 @@ class MainActivity : AppCompatActivity() {
         Log.d(TAG, "Инициализация прошла успешно")
 
         setContent() {
+            val mainColor = colorResource(id = R.color.main)
             //val scrollState = rememberScrollState()
             //val mainColor = colorResource(id = R.color.main)
 

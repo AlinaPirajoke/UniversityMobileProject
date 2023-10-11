@@ -6,12 +6,10 @@ import android.content.SharedPreferences
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.preference.PreferenceManager
-import android.widget.Toast
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -19,6 +17,9 @@ import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.Button
 import androidx.compose.material.ButtonDefaults
+import androidx.compose.material.ExperimentalMaterialApi
+import androidx.compose.material.Icon
+import androidx.compose.material.IconButton
 import androidx.compose.material.OutlinedTextField
 import androidx.compose.material.Text
 import androidx.compose.material.TextFieldDefaults
@@ -26,17 +27,18 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.colorResource
-import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -44,7 +46,7 @@ import com.example.university.database.DBManager
 import com.example.university.usefull_stuff.showToast
 
 class LoginActivity : AppCompatActivity() {
-    @OptIn(ExperimentalComposeUiApi::class)
+    @OptIn(ExperimentalComposeUiApi::class, ExperimentalMaterialApi::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         val sharedPreferences =
             PreferenceManager.getDefaultSharedPreferences(this /* Activity context */)
@@ -83,33 +85,48 @@ class LoginActivity : AppCompatActivity() {
                         )
 
                         var pass by remember { mutableStateOf("") }
+                        var mColor by remember { mutableStateOf(mainColor) }
+                        var isHidden by remember { mutableStateOf(true) }
                         OutlinedTextField(
                             value = pass,
-                            onValueChange = { pass = it },
-                            label = {
-                                Text("Введите пароль")
+                            onValueChange = { pass = it; mColor = mainColor },
+                            label = { Text("Введите пароль") },
+                            singleLine = true,
+                            visualTransformation = if (isHidden) PasswordVisualTransformation() else VisualTransformation.None,
+                            trailingIcon = {
+                                val image = if (isHidden)
+                                    ImageVector.vectorResource(R.drawable.show_pass)
+                                else
+                                    ImageVector.vectorResource(R.drawable.hide_pass)
+                                val description = if (isHidden) "Show password" else "Hide password"
+
+                                IconButton(onClick = {isHidden = !isHidden}){
+                                    Icon(imageVector  = image, description)
+                                }
                             },
-                            modifier = Modifier.padding(bottom = 20.dp),
+                            modifier = Modifier . padding (bottom = 20.dp),
                             keyboardOptions = KeyboardOptions(
                                 keyboardType = KeyboardType.Ascii,
                                 imeAction = ImeAction.Done
                             ),
                             keyboardActions = KeyboardActions(
                                 onDone = {
-                                    keyboardController?.hide()
-                                    checkPassword(pass, db, context, sharedPreferences)
+                                    // keyboardController?.hide()
+                                    if (!checkPassword(pass, db, context, sharedPreferences))
+                                        mColor = Color.Red
                                 }),
                             colors = TextFieldDefaults.outlinedTextFieldColors(
-                                    focusedBorderColor = mainColor,
-                                    unfocusedBorderColor = mainColor,
-                                    cursorColor = mainColor,
-                                    focusedLabelColor = Color.Black
+                                focusedBorderColor = mColor,
+                                unfocusedBorderColor = mColor,
+                                cursorColor = mColor,
+                                focusedLabelColor = Color.Black
                             )
                         )
 
                         Button(
                             onClick = {
-                                checkPassword(pass, db, context, sharedPreferences)
+                                if (!checkPassword(pass, db, context, sharedPreferences))
+                                    mColor = Color.Red
                             },
                             modifier = Modifier.fillMaxWidth(),
                             colors = ButtonDefaults.buttonColors(
@@ -147,10 +164,11 @@ class LoginActivity : AppCompatActivity() {
         db: DBManager,
         context: Context,
         sharedPreferences: SharedPreferences
-    ) {
+    ): Boolean {
+        if (sharedPreferences.getBoolean("needPassword", true))
         if (pass.isEmpty()) {
             showToast("Введите пароль", context)
-            return
+            return false
         }
         val passwords = db.getPasswords()
         if (pass in passwords.keys) {
@@ -159,9 +177,11 @@ class LoginActivity : AppCompatActivity() {
             }
             sharedPreferences.edit().putBoolean("session", true).apply()
             toMain()
+            return true
         } else {
             showToast("Пароль не верен", context)
         }
+        return false
     }
 
     fun toMain() {

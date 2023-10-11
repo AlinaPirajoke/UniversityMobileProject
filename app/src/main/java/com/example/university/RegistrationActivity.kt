@@ -23,6 +23,8 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.Button
 import androidx.compose.material.ButtonDefaults
+import androidx.compose.material.Icon
+import androidx.compose.material.IconButton
 import androidx.compose.material.OutlinedTextField
 import androidx.compose.material.Text
 import androidx.compose.material.TextFieldDefaults
@@ -38,14 +40,18 @@ import androidx.compose.ui.focus.FocusDirection
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.colorResource
+import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -55,6 +61,7 @@ import kotlinx.coroutines.launch
 
 class RegistrationActivity : AppCompatActivity() {
     val TAG = "RegistrationActivity"
+
 
     @OptIn(ExperimentalComposeUiApi::class)
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -93,11 +100,26 @@ class RegistrationActivity : AppCompatActivity() {
                     fontSize = 20.sp,
                 )
 
+                var mColor by remember { mutableStateOf(mainColor) }
+                var isHidden by remember { mutableStateOf(true) }
                 var pass1 by remember { mutableStateOf("") }
                 OutlinedTextField(
                     value = pass1,
-                    onValueChange = { pass1 = it },
+                    onValueChange = { pass1 = it; mColor = mainColor },
                     label = { Text("Придумайте пароль") },
+                    singleLine = true,
+                    visualTransformation = if (isHidden) PasswordVisualTransformation() else VisualTransformation.None,
+                    trailingIcon = {
+                        val image = if (isHidden)
+                            ImageVector.vectorResource(R.drawable.show_pass)
+                        else
+                            ImageVector.vectorResource(R.drawable.hide_pass)
+                        val description = if (isHidden) "Show password" else "Hide password"
+
+                        IconButton(onClick = {isHidden = !isHidden}){
+                            Icon(imageVector  = image, description)
+                        }
+                    },
                     modifier = Modifier
                         .fillMaxWidth(),
                     keyboardOptions = KeyboardOptions(
@@ -108,18 +130,33 @@ class RegistrationActivity : AppCompatActivity() {
                         focusManager.moveFocus(FocusDirection.Down)
                     }),
                     colors = TextFieldDefaults.outlinedTextFieldColors(
-                        focusedBorderColor = mainColor,
-                        unfocusedBorderColor = mainColor,
-                        cursorColor = mainColor,
+                        focusedBorderColor = mColor,
+                        unfocusedBorderColor = mColor,
+                        cursorColor = mColor,
                         focusedLabelColor = Color.Black
                     )
                 )
 
+                var isHidden2 by remember { mutableStateOf(true) }
+                var mColor2 by remember { mutableStateOf(mainColor) }
                 var pass2 by remember { mutableStateOf("") }
                 OutlinedTextField(
                     value = pass2,
-                    onValueChange = { pass2 = it },
+                    onValueChange = { pass2 = it; mColor2 = mainColor },
                     label = { Text("Повторите пароль") },
+                    singleLine = true,
+                    visualTransformation = if (isHidden2) PasswordVisualTransformation() else VisualTransformation.None,
+                    trailingIcon = {
+                        val image = if (isHidden2)
+                            ImageVector.vectorResource(R.drawable.show_pass)
+                        else
+                            ImageVector.vectorResource(R.drawable.hide_pass)
+                        val description = if (isHidden2) "Show password" else "Hide password"
+
+                        IconButton(onClick = {isHidden2 = !isHidden2}){
+                            Icon(imageVector  = image, description)
+                        }
+                    },
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(bottom = 20.dp),
@@ -129,20 +166,25 @@ class RegistrationActivity : AppCompatActivity() {
                     ),
                     keyboardActions = KeyboardActions(
                         onDone = {
-                            keyboardController?.hide()
-                            addUser(pass1, pass2, db, context, sharedPreferences)
+                            // keyboardController?.hide()
+                            if (addUser(pass1, pass2, db, context, sharedPreferences))
+                                mColor2 = Color.Red
+                            else mColor = Color.Red
                         }),
                     colors = TextFieldDefaults.outlinedTextFieldColors(
-                        focusedBorderColor = mainColor,
-                        unfocusedBorderColor = mainColor,
-                        cursorColor = mainColor,
+                        focusedBorderColor = mColor2,
+                        unfocusedBorderColor = mColor2,
+                        cursorColor = mColor2,
                         focusedLabelColor = Color.Black
                     )
                 )
 
                 Button(
                     onClick = {
-                        addUser(pass1, pass2, db, context, sharedPreferences)
+                        if (addUser(pass1, pass2, db, context, sharedPreferences)) {
+                            mColor2 = Color.Red
+                        }
+                        else mColor = Color.Red
                     },
                     modifier = Modifier.fillMaxWidth(),
                     colors = ButtonDefaults.buttonColors(
@@ -178,32 +220,42 @@ class RegistrationActivity : AppCompatActivity() {
         db: DBManager,
         context: Context,
         sharedPreferences: SharedPreferences
-    ) {
-        if (pass1 == pass2) {
-            if ((pass1 in db.getPasswords().keys) == false && isValidSymbols(pass1)) {
-                db.insertPassword(pass1)
-                val newId = db.getPasswords().get(pass1)
-                sharedPreferences.edit().putBoolean("session", true).apply()
-                newId?.let {
-                    sharedPreferences.edit().putInt("user", it).apply()
-                }
-                toMain()
-            } else {
-                showToast("Пароль не подходит, придумайте другой", context)
-                Log.w(TAG, "Пароль не подошел, контекст: pass: $pass1, " +
-                            "совпадение паролей: ${(pass1 in db.getPasswords().keys)}, " +
-                            "Валидность пароля: ${isValidSymbols(pass1)}")
-            }
-        } else {
+    ): Boolean {
+        if (pass1 != pass2) {
             showToast("Пароли не совпадают", context)
+            return true
         }
+        if (!isValidSymbols(pass1)) {
+            showToast("Использованы недопустимые символы", context)
+            return false
+        }
+        if ((pass1 in db.getPasswords().keys) != false) {
+            showToast("Пароль не подходит, придумайте другой", context)
+            Log.w(
+                TAG, "Пароль не подошел, контекст: pass: $pass1, " +
+                        "совпадение паролей: ${(pass1 in db.getPasswords().keys)}, " +
+                        "Валидность пароля: ${isValidSymbols(pass1)}"
+            )
+            return false
+        }
+        db.insertPassword(pass1)
+        val newId = db.getPasswords().get(pass1)
+        sharedPreferences.edit().putBoolean("session", true).apply()
+        newId?.let {
+            sharedPreferences.edit().putInt("user", it).apply()
+        }
+        toMain()
+
+        return false
     }
 
     private fun isValidSymbols(password: String): Boolean {
         val passwordRegex = Regex("^[a-zA-Z0-9]*$")
-        Log.d(TAG, "Проверка пароля: " +
-                "валидность символов: ${password.matches(passwordRegex)}, " +
-                "длинна: ${password.length}")
+        Log.d(
+            TAG, "Проверка пароля: " +
+                    "валидность символов: ${password.matches(passwordRegex)}, " +
+                    "длинна: ${password.length}"
+        )
         return (password.matches(passwordRegex) && password.length >= 6)
     }
 
