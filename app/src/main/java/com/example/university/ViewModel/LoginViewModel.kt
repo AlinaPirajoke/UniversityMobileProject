@@ -3,22 +3,27 @@ package com.example.university.ViewModel
 import android.content.SharedPreferences
 import android.util.Log
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.res.colorResource
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import com.example.university.R
 import com.example.university.database.DBManager
 import com.example.university.theme.mainColor
 
-class LoginViewModel(val db: DBManager): ViewModel() {
+class LoginViewModel(val db: DBManager, val sharedPreferences: SharedPreferences): ViewModel() {
     val TAG = "LoginViewModel"
 
     var fieldColor = MutableLiveData<Color>()
     var isGoingToMain = MutableLiveData<Boolean>()
-    var errorMesage = MutableLiveData<String>()
+    var errorMessage = MutableLiveData<String>()
+    var pass = MutableLiveData<String>()
 
     init {
         Log.d(TAG, "Создано")
+        sharedPreferences.edit().putBoolean("session", false).apply()
+    }
+
+    fun setPassValue(pass: String){
+        this.pass.value = pass
+        setNormalFieldColor()
     }
 
     fun setErrorFieldColor(){
@@ -34,15 +39,13 @@ class LoginViewModel(val db: DBManager): ViewModel() {
     }
 
     fun setErrorMessage(text: String){
-        errorMesage.value = text
+        errorMessage.value = text
     }
 
-    fun checkPassword(
-        pass: String,
-        sharedPreferences: SharedPreferences
-    ) {
+    fun checkPassword() {
+        val pass = this.pass.value
         if (sharedPreferences.getBoolean("needPassword", true))
-            if (pass.isEmpty()) {
+            if (pass?.isEmpty() == true) {
                 setErrorMessage("Введите пароль")
                 setErrorFieldColor()
             }

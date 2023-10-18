@@ -1,11 +1,8 @@
 package com.example.university
 
-import android.content.Context
 import android.content.Intent
-import android.content.SharedPreferences
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.preference.PreferenceManager
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -34,7 +31,6 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
-import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
@@ -43,15 +39,10 @@ import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.datastore.core.DataStore
-import androidx.datastore.preferences.core.Preferences
-import androidx.datastore.preferences.preferencesDataStore
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.lifecycleScope
 import com.example.university.ViewModel.LoginViewModel
 import com.example.university.ViewModel.LoginViewModelFactory
-import com.example.university.database.DBManager
 import com.example.university.theme.mainColor
 import com.example.university.usefull_stuff.showToast
 
@@ -61,16 +52,14 @@ class LoginActivity : AppCompatActivity() {
 
     @OptIn(ExperimentalComposeUiApi::class, ExperimentalMaterialApi::class)
     override fun onCreate(savedInstanceState: Bundle?) {
-        val sharedPreferences =
-            PreferenceManager.getDefaultSharedPreferences(this /* Activity context */)
-        sharedPreferences.edit().putBoolean("session", false).apply()
+
         super.onCreate(savedInstanceState)
         val vm = ViewModelProvider(this, LoginViewModelFactory(this)).get(LoginViewModel::class.java)
 
         vm.isGoingToMain.observe(this, Observer {
             if(it) toMain()
         })
-        vm.errorMesage.observe(this, Observer {
+        vm.errorMessage.observe(this, Observer {
             showToast(it, this)
         })
 
@@ -78,8 +67,8 @@ class LoginActivity : AppCompatActivity() {
 
         setContent() {
             //val mainColor = colorResource(id = R.color.main)
-            val context = LocalContext.current
-            val keyboardController = LocalSoftwareKeyboardController.current
+            //val context = LocalContext.current
+            //val keyboardController = LocalSoftwareKeyboardController.current
 
             Column(
                 Modifier
@@ -107,6 +96,9 @@ class LoginActivity : AppCompatActivity() {
 
 
                         var pass by remember { mutableStateOf("") }
+                        vm.pass.observe(LocalLifecycleOwner.current, Observer {
+                            pass = it
+                        })
                         var mColor by remember { mutableStateOf(mainColor) }
                         vm.fieldColor.observe(LocalLifecycleOwner.current, Observer {
                             mColor = it
@@ -115,7 +107,7 @@ class LoginActivity : AppCompatActivity() {
 
                         OutlinedTextField(
                             value = pass,
-                            onValueChange = { pass = it; vm.setNormalFieldColor() },
+                            onValueChange = { vm.setPassValue(it) },
                             label = { Text("Введите пароль") },
                             singleLine = true,
                             visualTransformation = if (isHidden) PasswordVisualTransformation() else VisualTransformation.None,
@@ -138,7 +130,7 @@ class LoginActivity : AppCompatActivity() {
                             keyboardActions = KeyboardActions(
                                 onDone = {
                                     // keyboardController?.hide()
-                                    vm.checkPassword(pass, sharedPreferences)
+                                    vm.checkPassword()
                                 }),
                             colors = TextFieldDefaults.outlinedTextFieldColors(
                                 focusedBorderColor = mColor,
@@ -150,7 +142,7 @@ class LoginActivity : AppCompatActivity() {
 
                         Button(
                             onClick = {
-                                vm.checkPassword(pass, sharedPreferences)
+                                vm.checkPassword()
                             },
                             modifier = Modifier.fillMaxWidth(),
                             colors = ButtonDefaults.buttonColors(
@@ -180,10 +172,6 @@ class LoginActivity : AppCompatActivity() {
 
             }
         }
-
-    }
-
-    fun getDataStore(context: Context){
 
     }
 
