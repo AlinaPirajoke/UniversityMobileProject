@@ -5,8 +5,10 @@ import android.util.Log
 import androidx.compose.ui.graphics.Color
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.example.university.database.DBManager
 import com.example.university.theme.mainColor
+import kotlinx.coroutines.launch
 
 class RegistrationViewModel (val db: DBManager, val sharedPreferences: SharedPreferences): ViewModel() {
     val TAG = "RegistrationViewModel"
@@ -25,11 +27,13 @@ class RegistrationViewModel (val db: DBManager, val sharedPreferences: SharedPre
     fun setPass1Value(pass: String){
         pass1.value = pass
         // Здесь лучше запустить в корутине
-        if(isValidSymbols(pass))
-            setNormalField1Color()
-        else {
-            setErrorField1Color()
-            setErrorMessage("Вы вводите некорректные символы!")
+        viewModelScope.launch {
+            if(isValidSymbols(pass))
+                setNormalField1Color()
+            else {
+                setErrorField1Color()
+                setErrorMessage("Вы вводите некорректные символы!")
+            }
         }
     }
 
@@ -69,24 +73,29 @@ class RegistrationViewModel (val db: DBManager, val sharedPreferences: SharedPre
         if (pass1 != pass2) {
             setErrorMessage("Пароли не совпадают")
             setErrorField2Color()
+            return
         }
         if (!(pass1?.let { isValidSymbols(it)} == true && pass1.let { isValidLength(it) })) {
             setErrorMessage("Использованы недопустимые символы")
             setErrorField1Color()
             setErrorField2Color()
+            return
         }
         if ((pass1 in db.getPasswords().keys) != false) {
             setErrorMessage("Пароль не подходит, придумайте другой")
             setErrorField1Color()
             setErrorField2Color()
+            return
         }
-        db.insertPassword(pass1.toString())
-        val newId = db.getPasswords().get(pass1)
-        sharedPreferences.edit().putBoolean("session", true).apply()
-        newId?.let {
-            sharedPreferences.edit().putInt("user", it).apply()
+        viewModelScope.launch {
+            db.insertPassword(pass1.toString())
+            val newId = db.getPasswords().get(pass1)
+            sharedPreferences.edit().putBoolean("session", true).apply()
+            newId?.let {
+                sharedPreferences.edit().putInt("user", it).apply()
+            }
+            sendToHomePage()
         }
-        sendToHomePage()
     }
 
     private fun isValidSymbols(password: String): Boolean {

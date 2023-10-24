@@ -1,14 +1,23 @@
 package com.example.university
 
+import android.graphics.Color
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.preference.PreferenceManager
 import android.util.Log
 import androidx.activity.compose.setContent
+import androidx.compose.foundation.border
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.Card
 import androidx.compose.material.Slider
 import androidx.compose.material.Text
 import androidx.compose.runtime.getValue
@@ -16,9 +25,11 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.university.database.DBManager
+import com.example.university.theme.mainColor
 import com.example.university.usefull_stuff.formatDate
 import com.example.university.usefull_stuff.simpleFormatter
 import com.example.university.usefull_stuff.simpleFormatterWithYear
@@ -35,7 +46,10 @@ class PickActivity : AppCompatActivity() {
         val extras = intent.extras
         var dateString = extras?.getString("date")
         dateString = dateString?.replace(" (сегодня)", "")
-        val date = LocalDate.parse(dateString + " " + LocalDate.now().year.toString(), simpleFormatterWithYear)
+        val date = LocalDate.parse(
+            dateString + " " + LocalDate.now().year.toString(),
+            simpleFormatterWithYear
+        )
         Log.i(TAG, "Выбранная дата: ${formatDate(date)}")
 
         // not MVVM
@@ -48,19 +62,47 @@ class PickActivity : AppCompatActivity() {
                 Modifier
                     .fillMaxWidth()
                     .fillMaxHeight()
-                    .padding(20.dp, 10.dp)
             ) {
-                Text(text = "Выберите количество слов, которые хотите пройти", fontSize = 20.sp)
+                Card(
+                    Modifier
+                        .fillMaxWidth()
+                        .height(250.dp),
+                    shape = RoundedCornerShape(0.dp, 0.dp, 30.dp, 30.dp),
+                    elevation = 4.dp,
+                    backgroundColor = mainColor,
+                ) {
+                    Column(
+                        Modifier.fillMaxSize().padding(20.dp, 30.dp),
+                        verticalArrangement = Arrangement.SpaceAround) {
+                        var pickedCount by remember { mutableStateOf((count?.div(2))) }
 
-                var pickedCount by remember { mutableStateOf((count?.div(2))) }
-                Text(text = "$pickedCount из $count", fontSize = 20.sp)
-                Slider(
-                    value = pickedCount?.toFloat()!!,
-                    onValueChange = {
-                        pickedCount = it.toInt()
+                        Text(
+                            text = "Выберите количество слов, которое хотите повторить",
+                            fontSize = 20.sp,
+                            color = androidx.compose.ui.graphics.Color.White
+                        )
 
-                    },
-                    valueRange = 0f..count?.toFloat()!!)
+                        Text(text = "$pickedCount из $count", fontSize = 30.sp, color = androidx.compose.ui.graphics.Color.White)
+                        Slider(
+                            value = pickedCount?.toFloat()!!,
+                            onValueChange = {
+                                pickedCount = it.toInt()
+                            },
+                            valueRange = 0f..count?.toFloat()!!
+                        )
+
+                        Row(
+                            Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.SpaceBetween
+                        ) {
+                            Text(text = "Выбрать 5", color = androidx.compose.ui.graphics.Color.White, fontSize = 20.sp)
+                            Text(text = "Выбрать 10", color = androidx.compose.ui.graphics.Color.White, fontSize = 20.sp)
+                            Text(text = "Выбрать 15", color = androidx.compose.ui.graphics.Color.White, fontSize = 20.sp)
+                        }
+                    }
+
+                }
+
             }
         }
     }
