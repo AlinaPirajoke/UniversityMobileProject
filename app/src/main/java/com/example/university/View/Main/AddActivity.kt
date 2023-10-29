@@ -1,11 +1,10 @@
-package com.example.university
+package com.example.university.View.Main
 
 import android.content.Context
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.preference.PreferenceManager
-import android.widget.Toast
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -39,7 +38,8 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.university.database.DBManager
+import com.example.university.Model.DBManager
+import com.example.university.R
 import com.example.university.usefull_stuff.showToast
 
 class AddActivity : AppCompatActivity() {

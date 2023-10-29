@@ -2,89 +2,110 @@ package com.example.university.ViewModel
 
 import android.content.SharedPreferences
 import android.util.Log
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.graphics.Color
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.university.database.DBManager
+import com.example.university.Model.DBManager
+import com.example.university.ViewModel.States.LoginUiState
+import com.example.university.ViewModel.States.RegistrationUiState
 import com.example.university.theme.mainColor
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 class RegistrationViewModel (val db: DBManager, val sharedPreferences: SharedPreferences): ViewModel() {
     val TAG = "RegistrationViewModel"
 
-    var field1Color = MutableLiveData<Color>()
-    var field2Color = MutableLiveData<Color>()
-    var pass1 = MutableLiveData<String>()
-    var pass2 = MutableLiveData<String>()
-    var isGoingToMain = MutableLiveData<Boolean>()
-    var errorMessage = MutableLiveData<String>()
+    private val _uiState = MutableStateFlow(RegistrationUiState())
+    val uiState: StateFlow<RegistrationUiState> = _uiState.asStateFlow()
+
+    var enteredPass1 by mutableStateOf("")
+        private set
+    var enteredPass2 by mutableStateOf("")
+        private set
 
     init {
         Log.d(TAG, "Создано")
     }
 
     fun setPass1Value(pass: String){
-        pass1.value = pass
+        enteredPass1 = pass
         // Здесь лучше запустить в корутине
         viewModelScope.launch {
             if(isValidSymbols(pass))
-                setNormalField1Color()
+                setIsField1Wrong(false)
             else {
-                setErrorField1Color()
+                setIsField1Wrong(true)
                 setErrorMessage("Вы вводите некорректные символы!")
             }
         }
     }
 
     fun setPass2Value(pass: String){
-        pass2.value = pass
-        setNormalField2Color()
-
+        enteredPass2 = pass
+        setIsField2Wrong(false)
     }
 
-    fun setErrorField1Color(){
-        field1Color.value = Color.Red
+    fun setIsField1Wrong(condition: Boolean){
+        _uiState.update { state ->
+            state.copy(isField1Wrong = condition)
+        }
     }
 
-    fun setNormalField1Color(){
-        field1Color.value = mainColor
+    fun setIsField2Wrong(condition: Boolean){
+        _uiState.update { state ->
+            state.copy(isField2Wrong = condition)
+        }
     }
 
-    fun setErrorField2Color(){
-        field2Color.value = Color.Red
+    fun sendToHomePage(condition: Boolean = true){
+        _uiState.update { state ->
+            state.copy(isGoingToMain = condition)
+        }
     }
 
-    fun setNormalField2Color(){
-        field2Color.value = mainColor
-    }
-
-    fun sendToHomePage(){
-        isGoingToMain.value = true
+    fun sendToLoginPage(condition: Boolean = true){
+        _uiState.update { state ->
+            state.copy(isGoingToLogin = condition)
+        }
     }
 
     fun setErrorMessage(text: String){
-        errorMessage.value = text
+        _uiState.update { state ->
+            state.copy(errorMessage = text)
+        }
+        if(!text.isEmpty())
+            Log.w(TAG, "Ошибка ввода: ${uiState.value.errorMessage}")
+    }
+
+    fun clearErrorMessage(){
+        setErrorMessage("")
     }
 
     fun addUser() {
-        val pass1 = this.pass1.value
-        val pass2 = this.pass2.value
+        val pass1 = enteredPass1
+        val pass2 = enteredPass2
         if (pass1 != pass2) {
             setErrorMessage("Пароли не совпадают")
-            setErrorField2Color()
+            setIsField2Wrong(true)
             return
         }
-        if (!(pass1?.let { isValidSymbols(it)} == true && pass1.let { isValidLength(it) })) {
+        if (!(isValidSymbols(pass1) == true && isValidLength(pass1))) {
             setErrorMessage("Использованы недопустимые символы")
-            setErrorField1Color()
-            setErrorField2Color()
+            setIsField1Wrong(true)
+            setIsField2Wrong(true)
             return
         }
         if ((pass1 in db.getPasswords().keys) != false) {
             setErrorMessage("Пароль не подходит, придумайте другой")
-            setErrorField1Color()
-            setErrorField2Color()
+            setIsField1Wrong(true)
+            setIsField2Wrong(true)
             return
         }
         viewModelScope.launch {

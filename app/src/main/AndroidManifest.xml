@@ -15,26 +15,22 @@
         android:screenOrientation="portrait"
         tools:targetApi="31">
         <activity
-            android:name=".SettingsActivity"
+            android:name=".View.Main.SettingsActivity"
             android:exported="false" />
         <activity
-            android:name=".AddActivity"
+            android:name=".View.Main.AddActivity"
             android:exported="false"
             android:windowSoftInputMode="adjustResize" />
         <activity
-            android:name=".PickActivity"
+            android:name=".View.Main.PickActivity"
             android:exported="false"
             android:windowSoftInputMode="adjustResize" />
         <activity
-            android:name=".RegistrationActivity"
+            android:name=".View.Auth.AuthActivity"
             android:exported="false"
             android:windowSoftInputMode="adjustResize" />
         <activity
-            android:name=".LoginActivity"
-            android:exported="false"
-            android:windowSoftInputMode="adjustResize" />
-        <activity
-            android:name=".MainActivity"
+            android:name=".View.Main.MainActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

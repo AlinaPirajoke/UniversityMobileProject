@@ -105,6 +105,7 @@ dependencies {
     // optional - Paging 3 Integration
     //implementation("androidx.room:room-paging:$room_version")
 
+    implementation("androidx.navigation:navigation-compose:2.7.4")
 
     implementation("androidx.datastore:datastore-preferences:1.1.0-alpha05")
 

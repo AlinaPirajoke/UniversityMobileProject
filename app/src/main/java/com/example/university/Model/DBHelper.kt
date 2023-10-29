@@ -1,18 +1,18 @@
-package com.example.university.database
+package com.example.university.Model
 
 import android.content.Context
 import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteOpenHelper
-import com.example.university.database.DBNames.CREATE_TABLE_EXAMPLE
-import com.example.university.database.DBNames.CREATE_TABLE_PASSWORD
-import com.example.university.database.DBNames.CREATE_TABLE_WORD
-import com.example.university.database.DBNames.CREATE_TABLE_WORD_EXAMPLE
-import com.example.university.database.DBNames.DATABASE_NAME
-import com.example.university.database.DBNames.DATABASE_VERSION
-import com.example.university.database.DBNames.DELETE_TABLE_EXAMPLE
-import com.example.university.database.DBNames.DELETE_TABLE_PASSWORD
-import com.example.university.database.DBNames.DELETE_TABLE_WORD
-import com.example.university.database.DBNames.DELETE_TABLE_WORD_EXAMPLE
+import com.example.university.Model.DBNames.CREATE_TABLE_EXAMPLE
+import com.example.university.Model.DBNames.CREATE_TABLE_PASSWORD
+import com.example.university.Model.DBNames.CREATE_TABLE_WORD
+import com.example.university.Model.DBNames.CREATE_TABLE_WORD_EXAMPLE
+import com.example.university.Model.DBNames.DATABASE_NAME
+import com.example.university.Model.DBNames.DATABASE_VERSION
+import com.example.university.Model.DBNames.DELETE_TABLE_EXAMPLE
+import com.example.university.Model.DBNames.DELETE_TABLE_PASSWORD
+import com.example.university.Model.DBNames.DELETE_TABLE_WORD
+import com.example.university.Model.DBNames.DELETE_TABLE_WORD_EXAMPLE
 
 
 class DBHelper(context: Context) :

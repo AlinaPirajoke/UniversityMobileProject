@@ -5,7 +5,7 @@ import android.preference.PreferenceManager
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
-import com.example.university.database.DBManager
+import com.example.university.Model.DBManager
 
 class RegistrationViewModelFactory(context: Context) : ViewModelProvider.Factory {
 

@@ -2,66 +2,91 @@ package com.example.university.ViewModel
 
 import android.content.SharedPreferences
 import android.util.Log
-import androidx.compose.ui.graphics.Color
-import androidx.lifecycle.MutableLiveData
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
-import com.example.university.database.DBManager
-import com.example.university.theme.mainColor
+import androidx.lifecycle.viewModelScope
+import com.example.university.ViewModel.States.LoginUiState
+import com.example.university.Model.DBManager
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
 
-class LoginViewModel(val db: DBManager, val sharedPreferences: SharedPreferences): ViewModel() {
+class LoginViewModel(val db: DBManager, val sharedPreferences: SharedPreferences) : ViewModel() {
     val TAG = "LoginViewModel"
 
-    var fieldColor = MutableLiveData<Color>()
-    var isGoingToMain = MutableLiveData<Boolean>()
-    var errorMessage = MutableLiveData<String>()
-    var pass = MutableLiveData<String>()
+    private val _uiState = MutableStateFlow(LoginUiState())
+    val uiState: StateFlow<LoginUiState> = _uiState.asStateFlow()
+
+    var enteredPass by mutableStateOf("")
+        private set
 
     init {
         Log.d(TAG, "Создано")
         sharedPreferences.edit().putBoolean("session", false).apply()
     }
 
-    fun setPassValue(pass: String){
-        this.pass.value = pass
-        setNormalFieldColor()
+    fun editUserEnter(enteredPass: String) {
+        this.enteredPass = enteredPass
+        setIsPassWrong(false)
+
     }
 
-    fun setErrorFieldColor(){
-        fieldColor.value = Color.Red
+    fun sendToHomePage(condition: Boolean = true) {
+        _uiState.update { state ->
+            state.copy(isGoingToMain = condition)
+        }
     }
 
-    fun setNormalFieldColor(){
-        fieldColor.value = mainColor
+    fun sendToRegisterPage(condition: Boolean = true) {
+        _uiState.update { state ->
+            state.copy(isGoingToRegister = condition)
+        }
     }
 
-    fun sendToHomePage(){
-        isGoingToMain.value = true
+    fun setErrorMessage(text: String) {
+        _uiState.update { state ->
+            state.copy(errorMessage = text)
+        }
+        if(!text.isEmpty())
+            Log.w(TAG, "Ошибка ввода: ${uiState.value.errorMessage}")
     }
 
-    fun setErrorMessage(text: String){
-        errorMessage.value = text
+    fun clearErrorMessage(){
+        setErrorMessage("")
+    }
+
+    fun setIsPassWrong(condition: Boolean){
+        _uiState.update { state ->
+            state.copy(isFieldWrong = condition)
+        }
     }
 
     fun checkPassword() {
-        val pass = this.pass.value
-        if (sharedPreferences.getBoolean("needPassword", true))
-            if (pass?.isEmpty() == true) {
-                setErrorMessage("Введите пароль")
-                setErrorFieldColor()
-            }
-        val passwords = db.getPasswords()
-        if (pass in passwords.keys) {
-            passwords.get(pass)?.let {
+        Log.d(TAG, "Проверка пароля $enteredPass")
+        viewModelScope.launch {
+            val enteredPass = enteredPass
+            if (!sharedPreferences.getBoolean("needPassword", true))
+                if (enteredPass?.isEmpty() == true) {
+                    setErrorMessage("Введите пароль")
+                    setIsPassWrong(true)
+                    return@launch
+                }
+                val passwords = db.getPasswords()
+                if (!(enteredPass in passwords.keys)) {
+                    setErrorMessage("Пароль не верен")
+                    setIsPassWrong(true)
+                    return@launch
+                }
+
+            passwords.get(enteredPass)?.let {
                 sharedPreferences.edit().putInt("user", it).apply()
+                sharedPreferences.edit().putBoolean("session", true).apply()
+                sendToHomePage()
             }
-            sharedPreferences.edit().putBoolean("session", true).apply()
-            sendToHomePage()
-
-        } else {
-            setErrorMessage("Пароль не верен")
-            setErrorFieldColor()
         }
-
     }
-
 }

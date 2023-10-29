@@ -1,14 +1,11 @@
-package com.example.university
+package com.example.university.View.Main
 
-import android.graphics.Color
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.preference.PreferenceManager
 import android.util.Log
 import androidx.activity.compose.setContent
-import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
@@ -25,15 +22,12 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.university.database.DBManager
+import com.example.university.Model.DBManager
 import com.example.university.theme.mainColor
 import com.example.university.usefull_stuff.formatDate
-import com.example.university.usefull_stuff.simpleFormatter
 import com.example.university.usefull_stuff.simpleFormatterWithYear
-import com.example.university.usefull_stuff.stdFormatter
 import java.time.LocalDate
 
 class PickActivity : AppCompatActivity() {
@@ -50,11 +44,12 @@ class PickActivity : AppCompatActivity() {
             dateString + " " + LocalDate.now().year.toString(),
             simpleFormatterWithYear
         )
-        Log.i(TAG, "Выбранная дата: ${formatDate(date)}")
+        dateString = formatDate(date)
+        Log.i(TAG, "Выбранная дата: ${dateString}")
 
         // not MVVM
         val db = DBManager(this)
-        val count = db.getSizeFromDate(date, user)
+        val count = db.getSizeFromDate(dateString, user)
         /////
 
         setContent() {

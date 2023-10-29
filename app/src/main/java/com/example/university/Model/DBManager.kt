@@ -1,16 +1,14 @@
-package com.example.university.database
+package com.example.university.Model
 
 import android.content.ContentValues
 import android.content.Context
 import android.database.sqlite.SQLiteDatabase
 import android.util.Log
 import com.example.university.usefull_stuff.StringInt
-import com.example.university.usefull_stuff.formatDate
 import com.example.university.usefull_stuff.getDateNDaysLater
 import com.example.university.usefull_stuff.getDaysFromToday
 import com.example.university.usefull_stuff.getTodayDate
 import com.example.university.usefull_stuff.simpleFormatter
-import java.time.LocalDate
 
 
 class DBManager (val context: Context){
@@ -23,8 +21,7 @@ class DBManager (val context: Context){
         if(db == null) Log.e(TAG, "Ошибка открытия бд")
         else{
             Log.d(TAG, "бд открыто")
-            dailyDateUpdate()
-            checkWord()
+            //checkWord()
         }
     }
 
@@ -57,11 +54,13 @@ class DBManager (val context: Context){
     }
 
     fun getListsSizeAndDays(n: Int, user: Int): ArrayList<StringInt>{
+        dailyDateUpdate()
+
         val datesCount = ArrayList<StringInt>()
         val dates = getDaysFromToday(n)
         for(date in dates){
             val dt = date.format(simpleFormatter)
-            val count = getSizeFromDate(date, user)
+            val count = getSizeFromDate(dt, user)
             count?.let { StringInt(dt, it) }?.let { datesCount.add(it) }
         }
         return datesCount
@@ -72,12 +71,35 @@ class DBManager (val context: Context){
         db!!.execSQL("UPDATE ${DBNames.WORD} SET ${DBNames.W_DATE} = $now WHERE ${DBNames.W_DATE} < $now")
     }
 
-    fun getSizeFromDate(date: LocalDate, user: Int): Int? {
-        val sDate = formatDate(date)
-        val cursor = db?.rawQuery("SELECT COUNT(*) FROM ${DBNames.WORD} WHERE ${DBNames.W_DATE} like \"$sDate\" AND ${DBNames.W_USER} = $user", null)
+    fun getSizeFromDate(date: String, user: Int): Int? {
+        val cursor = db?.rawQuery("SELECT COUNT(*) FROM ${DBNames.WORD} WHERE ${DBNames.W_DATE} like \"$date\" AND ${DBNames.W_USER} = $user", null)
         cursor?.moveToFirst()
         val size = cursor?.getInt(0)
         return size
+    }
+
+    // Доделать
+    fun getTodayLearnedCount(date: String, user: Int): Int? {
+        return 0
+    }
+
+    fun getLearnedCount(): Int {
+        val cursor = db?.rawQuery("SELECT COUNT(*) FROM ${DBNames.WORD} WHERE ${DBNames.W_LVL} < 50", null)
+        cursor?.moveToFirst()
+        val size = cursor?.getInt(0)
+        return size!!
+    }
+
+    fun getLerningCount(): Int {
+        val cursor = db?.rawQuery("SELECT COUNT(*) FROM ${DBNames.WORD} WHERE ${DBNames.W_LVL} >= 50", null)
+        cursor?.moveToFirst()
+        val size = cursor?.getInt(0)
+        return size!!
+    }
+
+    // Доделать
+    fun getAverage(): Int {
+        return 7
     }
 
     fun addNewWord(enWord: String, transc: String, ruWord: String, days: Int, user: Int){
@@ -92,4 +114,6 @@ class DBManager (val context: Context){
         }
         db?.insert(DBNames.WORD, null, values)
     }
+
+
 }

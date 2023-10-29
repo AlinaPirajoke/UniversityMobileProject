@@ -1,4 +1,4 @@
-package com.example.university.database
+package com.example.university.Model
 
 import android.provider.BaseColumns
 

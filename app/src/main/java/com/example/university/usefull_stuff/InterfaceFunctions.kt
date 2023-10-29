@@ -9,6 +9,9 @@ import com.example.university.R
 
 
 fun showToast(text: String, context: Context) {
+    //if(text.isEmpty())
+    //    return
+
     Toast.makeText(
         context,
         text,
