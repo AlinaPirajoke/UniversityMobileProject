@@ -55,7 +55,6 @@ fun loginInit(context: AuthActivity, navController: NavHostController) {
 fun loginScreen(context: AuthActivity, navController: NavHostController, vm: LoginViewModel) {
     // Такие аргументы использовать не зашкварно?
     // Нигде не видел, чтобы так делали, но как иначе не придумал
-    // Наверно че нить из SOLID нарушает
 
     val uiState by vm.uiState.collectAsState()
 
