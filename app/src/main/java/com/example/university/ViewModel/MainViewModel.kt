@@ -5,20 +5,21 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.university.Model.DBManager
+import com.example.university.ViewModel.States.MainUiState
+import com.example.university.ViewModel.States.RegistrationUiState
 import com.example.university.usefull_stuff.getTodayDate
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 class MainViewModel(val db: DBManager, val sharedPreferences: SharedPreferences): ViewModel(){
-    var user = sharedPreferences.getInt("user", 1)
+    val TAG = "MainViewModel"
+    val user = sharedPreferences.getInt("user", 1)
 
-    var isGoingToLogin = MutableLiveData<Boolean>() // отправляет пользователя на логин
-
-    var todayTest = MutableLiveData<Int>() // количество слов для теста на сегодня
-    var todayLearn = MutableLiveData<Int>() // оставшееся количество слов для изучения на сегодня
-
-    var statLearned = MutableLiveData<Int>() // количество изученных слов
-    var statLearning = MutableLiveData<Int>() // количество изучающихся слов
-    var statAverage = MutableLiveData<Int>() // Среднее количество изучаемых слов в день
+    private val _uiState = MutableStateFlow(MainUiState())
+    val uiState: StateFlow<MainUiState> = _uiState.asStateFlow()
 
     init {
         var session = sharedPreferences.getBoolean("session", false)
@@ -27,41 +28,46 @@ class MainViewModel(val db: DBManager, val sharedPreferences: SharedPreferences)
         if (!needPass)
             session = true
         if (!session)
-            toLogin()
-
-
+            sendToLogin()
+        
+        getStatistic()
+        checkTodayWords()
     }
 
-    fun toLogin(){
-        isGoingToLogin.value = true
+    fun sendToLogin(condition: Boolean = true){
+        _uiState.update { state ->
+            state.copy(isGoingToLogin = condition)
+        }
     }
 
-    fun setSLearned(count: Int){
-        statLearned.value = count
+    fun setStatLearned(count: Int){
+        _uiState.update { state ->
+            state.copy(statLearned = count)
+        }
     }
 
-    fun setSLearning(count: Int){
-        statLearning.value = count
+    fun setStatLearning(count: Int){
+        _uiState.update { state ->
+            state.copy(statLearning = count)
+        }
     }
 
-    fun setSAverage(count: Int){
-        statAverage.value = count
-    }
-
-    fun getStatistic(){
-        viewModelScope.launch {
-            setSLearned(db.getLearnedCount())
-            setSLearning(db.getLerningCount())
-            setSAverage(db.getAverage())
+    fun setStatAverage(count: Int){
+        _uiState.update { state ->
+            state.copy(statAverage = count)
         }
     }
 
     fun setTest(count: Int){
-        todayTest.value = count
+        _uiState.update { state ->
+            state.copy(todayTest = count)
+        }
     }
 
     fun setLearn(count: Int){
-        todayLearn.value = count
+        _uiState.update { state ->
+            state.copy(todayLearn = count)
+        }
     }
 
     fun checkTodayWords(){
@@ -71,6 +77,14 @@ class MainViewModel(val db: DBManager, val sharedPreferences: SharedPreferences)
             if(learnCount < 0)
                 learnCount = 0
             setLearn(learnCount)
+        }
+    }
+
+    fun getStatistic(){
+        viewModelScope.launch {
+            setStatLearned(db.getLearnedCount())
+            setStatLearning(db.getLerningCount())
+            setStatAverage(db.getAverage())
         }
     }
 }

@@ -102,12 +102,12 @@ class DBManager (val context: Context){
         return 7
     }
 
+    // Переписать
     fun addNewWord(enWord: String, transc: String, ruWord: String, days: Int, user: Int){
         val date = getDateNDaysLater(days)
         val values = ContentValues().apply {
             put(DBNames.W_WORD, enWord)
             put(DBNames.W_SOUND, transc)
-            put(DBNames.W_TRNSL, ruWord)
             put(DBNames.W_LVL, days)
             put(DBNames.W_DATE, date)
             put(DBNames.W_USER, user)

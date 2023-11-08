@@ -15,6 +15,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Card
+import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Slider
 import androidx.compose.material.Text
 import androidx.compose.runtime.getValue
@@ -25,7 +26,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.university.Model.DBManager
-import com.example.university.theme.mainColor
+import com.example.university.theme.ColorScheme
+import com.example.university.theme.KotobaCustomTheme
 import com.example.university.usefull_stuff.formatDate
 import com.example.university.usefull_stuff.simpleFormatterWithYear
 import java.time.LocalDate
@@ -53,51 +55,73 @@ class PickActivity : AppCompatActivity() {
         /////
 
         setContent() {
-            Column(
-                Modifier
-                    .fillMaxWidth()
-                    .fillMaxHeight()
-            ) {
-                Card(
+            KotobaCustomTheme(schemeId = ColorScheme.PH.id) {
+
+                Column(
                     Modifier
                         .fillMaxWidth()
-                        .height(250.dp),
-                    shape = RoundedCornerShape(0.dp, 0.dp, 30.dp, 30.dp),
-                    elevation = 4.dp,
-                    backgroundColor = mainColor,
+                        .fillMaxHeight()
                 ) {
-                    Column(
-                        Modifier.fillMaxSize().padding(20.dp, 30.dp),
-                        verticalArrangement = Arrangement.SpaceAround) {
-                        var pickedCount by remember { mutableStateOf((count?.div(2))) }
-
-                        Text(
-                            text = "Выберите количество слов, которое хотите повторить",
-                            fontSize = 20.sp,
-                            color = androidx.compose.ui.graphics.Color.White
-                        )
-
-                        Text(text = "$pickedCount из $count", fontSize = 30.sp, color = androidx.compose.ui.graphics.Color.White)
-                        Slider(
-                            value = pickedCount?.toFloat()!!,
-                            onValueChange = {
-                                pickedCount = it.toInt()
-                            },
-                            valueRange = 0f..count?.toFloat()!!
-                        )
-
-                        Row(
-                            Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.SpaceBetween
+                    Card(
+                        Modifier
+                            .fillMaxWidth()
+                            .height(250.dp),
+                        shape = RoundedCornerShape(0.dp, 0.dp, 30.dp, 30.dp),
+                        elevation = 4.dp,
+                        backgroundColor = MaterialTheme.colors.primary,
+                    ) {
+                        Column(
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .padding(20.dp, 30.dp),
+                            verticalArrangement = Arrangement.SpaceAround
                         ) {
-                            Text(text = "Выбрать 5", color = androidx.compose.ui.graphics.Color.White, fontSize = 20.sp)
-                            Text(text = "Выбрать 10", color = androidx.compose.ui.graphics.Color.White, fontSize = 20.sp)
-                            Text(text = "Выбрать 15", color = androidx.compose.ui.graphics.Color.White, fontSize = 20.sp)
+                            var pickedCount by remember { mutableStateOf((count?.div(2))) }
+
+                            Text(
+                                text = "Выберите количество слов, которое хотите повторить",
+                                fontSize = 20.sp,
+                                color = MaterialTheme.colors.onPrimary,
+                            )
+
+                            Text(
+                                text = "$pickedCount из $count",
+                                fontSize = 30.sp,
+                                color = MaterialTheme.colors.onPrimary,
+                            )
+                            Slider(
+                                value = pickedCount?.toFloat()!!,
+                                onValueChange = {
+                                    pickedCount = it.toInt()
+                                },
+                                valueRange = 0f..count?.toFloat()!!
+                            )
+
+                            Row(
+                                Modifier.fillMaxWidth(),
+                                horizontalArrangement = Arrangement.SpaceBetween
+                            ) {
+                                Text(
+                                    text = "Выбрать 5",
+                                    color = MaterialTheme.colors.onPrimary,
+                                    fontSize = 20.sp
+                                )
+                                Text(
+                                    text = "Выбрать 10",
+                                    color = MaterialTheme.colors.onPrimary,
+                                    fontSize = 20.sp
+                                )
+                                Text(
+                                    text = "Выбрать 15",
+                                    color = MaterialTheme.colors.onPrimary,
+                                    fontSize = 20.sp
+                                )
+                            }
                         }
+
                     }
 
                 }
-
             }
         }
     }

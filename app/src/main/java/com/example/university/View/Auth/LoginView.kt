@@ -13,6 +13,7 @@ import androidx.compose.material.Button
 import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
+import androidx.compose.material.MaterialTheme
 import androidx.compose.material.OutlinedTextField
 import androidx.compose.material.Text
 import androidx.compose.material.TextFieldDefaults
@@ -40,7 +41,6 @@ import com.example.university.ViewModel.LoginViewModel
 import com.example.university.ViewModel.LoginViewModelFactory
 import com.example.university.ViewModel.RegistrationViewModel
 import com.example.university.ViewModel.RegistrationViewModelFactory
-import com.example.university.theme.mainColor
 import com.example.university.usefull_stuff.showToast
 
 
@@ -147,10 +147,10 @@ fun loginView(
                             onPassConfirm()
                         }),
                     colors = TextFieldDefaults.outlinedTextFieldColors(
-                        focusedBorderColor = mainColor,
-                        unfocusedBorderColor = mainColor,
-                        cursorColor = mainColor,
-                        focusedLabelColor = Color.Black
+                        focusedBorderColor = MaterialTheme.colors.primary,
+                        unfocusedBorderColor = MaterialTheme.colors.primary,
+                        cursorColor = MaterialTheme.colors.primary,
+                        focusedLabelColor = MaterialTheme.colors.secondary,
                     )
                 )
 
@@ -160,7 +160,7 @@ fun loginView(
                     },
                     modifier = Modifier.fillMaxWidth(),
                     colors = ButtonDefaults.buttonColors(
-                        backgroundColor = mainColor,
+                        backgroundColor = MaterialTheme.colors.primary,
                         contentColor = Color.White
                     )
                 ) {
@@ -174,8 +174,8 @@ fun loginView(
                     },
                     modifier = Modifier.fillMaxWidth(),
                     colors = ButtonDefaults.buttonColors(
-                        backgroundColor = mainColor,
-                        contentColor = Color.White
+                        backgroundColor = MaterialTheme.colors.primary,
+                        contentColor = MaterialTheme.colors.onPrimary
                     )
                 ) {
 

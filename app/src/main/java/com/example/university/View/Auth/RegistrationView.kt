@@ -14,6 +14,7 @@ import androidx.compose.material.Button
 import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
+import androidx.compose.material.MaterialTheme
 import androidx.compose.material.OutlinedTextField
 import androidx.compose.material.Text
 import androidx.compose.material.TextFieldDefaults
@@ -101,7 +102,6 @@ fun registrationView(
 
     val focusManager = LocalFocusManager.current
     val scrollState = rememberScrollState()
-    val mainColor = colorResource(id = R.color.main)
 
     Column(
         Modifier
@@ -154,10 +154,10 @@ fun registrationView(
                 focusManager.moveFocus(FocusDirection.Down)
             }),
             colors = TextFieldDefaults.outlinedTextFieldColors(
-                focusedBorderColor = mainColor,
-                unfocusedBorderColor = mainColor,
-                cursorColor = mainColor,
-                focusedLabelColor = Color.Black
+                focusedBorderColor = MaterialTheme.colors.primary,
+                unfocusedBorderColor = MaterialTheme.colors.primary,
+                cursorColor = MaterialTheme.colors.primary,
+                focusedLabelColor = MaterialTheme.colors.secondary,
             )
         )
 
@@ -198,10 +198,10 @@ fun registrationView(
                     onPassConfirm()
                 }),
             colors = TextFieldDefaults.outlinedTextFieldColors(
-                focusedBorderColor = mainColor,
-                unfocusedBorderColor = mainColor,
-                cursorColor = mainColor,
-                focusedLabelColor = Color.Black
+                focusedBorderColor = MaterialTheme.colors.primary,
+                unfocusedBorderColor = MaterialTheme.colors.primary,
+                cursorColor = MaterialTheme.colors.primary,
+                focusedLabelColor = MaterialTheme.colors.secondary,
             )
         )
 
@@ -211,8 +211,8 @@ fun registrationView(
             },
             modifier = Modifier.fillMaxWidth(),
             colors = ButtonDefaults.buttonColors(
-                backgroundColor = mainColor,
-                contentColor = Color.White
+                backgroundColor = MaterialTheme.colors.primary,
+                contentColor = MaterialTheme.colors.onPrimary,
             )
         ) {
 
@@ -225,7 +225,7 @@ fun registrationView(
             },
             modifier = Modifier.fillMaxWidth(),
             colors = ButtonDefaults.buttonColors(
-                backgroundColor = mainColor,
+                backgroundColor = MaterialTheme.colors.onPrimary,
                 contentColor = Color.White
             )
         ) {

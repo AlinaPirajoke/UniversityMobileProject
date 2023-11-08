@@ -19,102 +19,102 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.Card
 import androidx.compose.material.ExperimentalMaterialApi
+import androidx.compose.material.Icon
+import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.example.university.R
 import com.example.university.View.Auth.AuthActivity
 import com.example.university.ViewModel.MainViewModel
 import com.example.university.ViewModel.MainViewModelFactory
-import com.example.university.theme.grayColor
-import com.example.university.theme.mainColor
+import com.example.university.theme.ColorScheme
+import com.example.university.theme.KotobaCustomTheme
 import com.example.university.usefull_stuff.StringInt
 
 class MainActivity : AppCompatActivity() {
     val TAG = "MainActivity"
     val N = 17
+    val BORDER_PADDING = 12.dp
 
     override fun onCreate(savedInstanceState: Bundle?) {
         Log.d(TAG, "Инициализация...")
 
         val vm = ViewModelProvider(this, MainViewModelFactory(this)).get(MainViewModel::class.java)
 
-        vm.isGoingToLogin.observe(this, Observer {
-            if (it == true) {
-                toLogin()
-                finish()
-            }
-        })
-
         super.onCreate(savedInstanceState)
 
         setContent() {
-            val scrollState = rememberScrollState()
+            KotobaCustomTheme(schemeId = ColorScheme.PH.id) {
+                val scrollState = rememberScrollState()
+                val uiState by vm.uiState.collectAsState()
+                if (uiState.isGoingToLogin)
+                    this.toLogin()
 
-            Column(
-                Modifier
-                    .fillMaxSize()
-                    .padding(0.dp, 0.dp, 0.dp, 0.dp)
-                    .verticalScroll(scrollState),
-            ) {
-                statisticBlock(vm = vm)
-                todayBlock(vm = vm)
-                otherBlock(vm = vm)
+                Column(
+                    Modifier
+                        .fillMaxSize()
+                        .padding(0.dp, 0.dp, 0.dp, 0.dp)
+                        .verticalScroll(scrollState),
+                ) {
+                    statisticBlock(
+                        learned = uiState.statLearned,
+                        learning = uiState.statLearning,
+                        average = uiState.statAverage,
+                    )
+                    todayBlock(
+                        todayTest = uiState.todayTest,
+                        todayLearn = uiState.todayLearn,
+                        onGoingToTest = {  },
+                        onGoingToLearn = {  },
+                    )
+                    otherBlock(
+                        onGoingToSettings = { toSettings() },
+                        onGoingToAddNew = { toAddNew() },
+                        onGoingToLogin = { toLogin() },
+                        )
+                }
             }
         }
     }
 
     @Composable
-    fun statisticBlock(vm: MainViewModel) {
-
-        var learned by remember {
-            mutableStateOf(0)
-        }
-        vm.statLearned.observe(this, Observer {
-            learned = it
-        })
-
-        var learning by remember {
-            mutableStateOf(0)
-        }
-        vm.statLearning.observe(this, Observer {
-            learning = it
-        })
-
-        var average by remember {
-            mutableStateOf(0)
-        }
-        vm.statAverage.observe(this, Observer {
-            average = it
-        })
-
-        vm.getStatistic()
+    fun statisticBlock(
+        learned: Int = 0,
+        learning: Int = 0,
+        average: Int = 0,
+    ) {
 
         Column {
             Text(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(top = 20.dp),
-                text = "Статистика",
+                text = "Статистика изучения",
                 fontSize = 15.sp,
-                color = grayColor,
+                color = MaterialTheme.colors.secondaryVariant,
                 textAlign = TextAlign.Center
             )
             Card(
                 Modifier
                     .fillMaxWidth()
-                    .padding(20.dp),
+                    .padding(BORDER_PADDING, 20.dp),
                 shape = RoundedCornerShape(10.dp),
                 elevation = 4.dp,
             ) {
@@ -129,76 +129,80 @@ class MainActivity : AppCompatActivity() {
                     statisticLine(text = "Среднее изучаемое в день", value = average)
                 }
             }
-
         }
     }
 
     @Composable
-    fun todayBlock(vm: MainViewModel) {
-        var todayTest by remember {
-            mutableStateOf(0)
-        }
-        vm.todayTest.observe(this, Observer {
-            todayTest = it
-        })
-
-        var todayLearn by remember {
-            mutableStateOf(0)
-        }
-        vm.todayLearn.observe(this, Observer {
-            todayLearn = it
-        })
+    fun todayBlock(
+        todayTest: Int = 0,
+        todayLearn: Int = 0,
+        onGoingToTest: () -> (Unit),
+        onGoingToLearn: () -> (Unit),
+    ) {
 
         Column(
             Modifier
                 .fillMaxWidth()
-                .padding(20.dp), verticalArrangement = Arrangement.SpaceBetween
+                .padding(BORDER_PADDING, 50.dp), verticalArrangement = Arrangement.SpaceBetween
         ) {
             Text(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(top = 20.dp),
-                text = "Сегодня",
+                text = "План на сегодня",
                 fontSize = 15.sp,
-                color = grayColor,
+                color = MaterialTheme.colors.secondaryVariant,
                 textAlign = TextAlign.Center
             )
-            todayAction(text = "$todayTest слов готовы к повторению", ::toTest)
-            todayAction(text = "$todayLearn слов осталось изучить", ::toLearn)
+            todayAction(text = "$todayTest осталось повторить", onGoingToLearn)
+            todayAction(text = "$todayLearn слов осталось изучить", onGoingToTest)
             Text(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(top = 20.dp),
                 text = "Посмотреть другие даты",
                 fontSize = 15.sp,
-                color = mainColor,
+                color = MaterialTheme.colors.primary,
                 textAlign = TextAlign.Right
             )
         }
     }
 
     @Composable
-    fun otherBlock(vm: MainViewModel) {
-        Card(
+    fun otherBlock(
+        onGoingToSettings: () -> (Unit),
+        onGoingToAddNew: () -> (Unit),
+        onGoingToLogin: () -> (Unit),
+    ) {
+        Text(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(top = 50.dp),
+            text = "Другие действия",
+            fontSize = 15.sp,
+            color = MaterialTheme.colors.secondaryVariant,
+            textAlign = TextAlign.Center
+        )
+        Card(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(top = 20.dp),
             shape = RoundedCornerShape(30.dp, 30.dp, 0.dp, 0.dp),
             elevation = 4.dp,
-            backgroundColor = mainColor,
+            backgroundColor = MaterialTheme.colors.primaryVariant,
         ) {
             Column(
                 Modifier
                     .fillMaxWidth()
-                    .padding(horizontal = 20.dp, vertical = 40.dp),
+                    .padding(BORDER_PADDING, 28.dp),
                 verticalArrangement = Arrangement.spacedBy(15.dp),
             ) {
                 /*Row(
                     Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.spacedBy(15.dp),) {}*/
-                createImgCard(imgId = R.drawable.setings, descr = "Настройки", ::toSettings)
-                createImgCard(imgId = R.drawable.add, descr = "Внести слово", ::toAddNew)
-                createImgCard(imgId = R.drawable.logout, descr = "Разлогиниться", ::toLogin)
+                createImgCard(imgId = R.drawable.setings, descr = "Настройки", onGoingToSettings)
+                createImgCard(imgId = R.drawable.add, descr = "Добавить слово", onGoingToAddNew)
+                createImgCard(imgId = R.drawable.logout, descr = "Разлогиниться", onGoingToLogin)
             }
         }
     }
@@ -211,8 +215,8 @@ class MainActivity : AppCompatActivity() {
                 .padding(top = 5.dp, bottom = 5.dp),
             Arrangement.SpaceBetween,
         ) {
-            Text(text = text, fontSize = 20.sp)
-            Text(text = value.toString(), fontSize = 20.sp)
+            Text(modifier = Modifier.alpha(0.8f), text = text, fontSize = 20.sp)
+            Text(modifier = Modifier.alpha(0.9f), text = value.toString(), fontSize = 20.sp)
         }
     }
 
@@ -228,7 +232,7 @@ class MainActivity : AppCompatActivity() {
             Text(
                 modifier = Modifier.padding(15.dp, 20.dp),
                 text = text,
-                color = mainColor,
+                color = MaterialTheme.colors.primary,
                 fontSize = 25.sp
             )
         }
@@ -278,17 +282,25 @@ class MainActivity : AppCompatActivity() {
                     Modifier.fillMaxSize(), verticalArrangement = Arrangement.SpaceBetween
                 ) {
 
-                    Image(
+                    /*Image(
                         painter = painterResource(id = imgId),
                         contentDescription = descr,
                         modifier = Modifier.size(40.dp),
+                    )*/
+                    Icon(
+                        modifier = Modifier.size(30.dp),
+                        imageVector = ImageVector.vectorResource(imgId),
+                        contentDescription = descr,
+                        tint = MaterialTheme.colors.primary,
                     )
+
                     Text(
                         text = descr,
                         Modifier
-                            .alpha(0.5f)
+                            .alpha(0.8f)
                             .padding(top = 5.dp, bottom = 0.dp),
                         fontSize = 20.sp,
+                        color = MaterialTheme.colors.secondaryVariant
                     )
                 }
             }

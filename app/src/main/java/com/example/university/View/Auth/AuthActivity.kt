@@ -17,6 +17,8 @@ import com.example.university.ViewModel.LoginViewModel
 import com.example.university.ViewModel.LoginViewModelFactory
 import com.example.university.ViewModel.RegistrationViewModel
 import com.example.university.ViewModel.RegistrationViewModelFactory
+import com.example.university.theme.ColorScheme
+import com.example.university.theme.KotobaCustomTheme
 import com.example.university.usefull_stuff.showToast
 
 // private val Context.dataStore by preferencesDataStore("user_preferences")
@@ -31,8 +33,10 @@ class AuthActivity : AppCompatActivity() {
 
 
         setContent {
-            val navController = rememberNavController()
-            AuthNavGraph(navController = navController, this)
+            KotobaCustomTheme(schemeId = ColorScheme.PH.id) {
+                val navController = rememberNavController()
+                AuthNavGraph(navController = navController, this)
+            }
         }
     }
 

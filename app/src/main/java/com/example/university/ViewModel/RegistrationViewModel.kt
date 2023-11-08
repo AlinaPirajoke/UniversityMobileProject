@@ -12,7 +12,6 @@ import androidx.lifecycle.viewModelScope
 import com.example.university.Model.DBManager
 import com.example.university.ViewModel.States.LoginUiState
 import com.example.university.ViewModel.States.RegistrationUiState
-import com.example.university.theme.mainColor
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
