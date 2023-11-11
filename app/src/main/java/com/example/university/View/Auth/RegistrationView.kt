@@ -47,24 +47,23 @@ import com.example.university.usefull_stuff.showToast
 
 @Composable
 fun registrationInit(context: AuthActivity, navController: NavHostController) {
-    val vm = ViewModelProvider(context, RegistrationViewModelFactory(context))
-        .get(RegistrationViewModel::class.java)
+    val vm = ViewModelProvider(
+        context,
+        RegistrationViewModelFactory(context)
+    ).get(RegistrationViewModel::class.java)
     registrationScreen(context = context, navController = navController, vm = vm)
 }
 
 @Composable
 fun registrationScreen(
-    context: AuthActivity,
-    navController: NavHostController,
-    vm: RegistrationViewModel
+    context: AuthActivity, navController: NavHostController, vm: RegistrationViewModel
 ) {
     // Мня за такие аргументы не опустят?
 
 
     val uiState by vm.uiState.collectAsState()
 
-    if (uiState.isGoingToMain)
-        context.toMain()
+    if (uiState.isGoingToMain) context.toMain()
     if (uiState.isGoingToLogin) {
         Log.i("registrationView", "Перенаправление на логин: ${uiState.isGoingToLogin}")
         vm.sendToLoginPage(false)
@@ -121,34 +120,27 @@ fun registrationView(
         )
         var isHidden1 by remember { mutableStateOf(true) }
 
-        OutlinedTextField(
-            value = pass1,
+        OutlinedTextField(value = pass1,
             onValueChange = { onUserInput1Changed(it) },
             label = {
-                if (isField1Error)
-                    Text("Такой пароль не подойдёт")
-                else
-                    Text("Придумайте пароль")
+                if (isField1Error) Text("Такой пароль не подойдёт")
+                else Text("Придумайте пароль")
             },
             singleLine = true,
             visualTransformation = if (isHidden1) PasswordVisualTransformation() else VisualTransformation.None,
             trailingIcon = {
-                val image = if (isHidden1)
-                    ImageVector.vectorResource(R.drawable.show_pass)
-                else
-                    ImageVector.vectorResource(R.drawable.hide_pass)
+                val image = if (isHidden1) ImageVector.vectorResource(R.drawable.show_pass)
+                else ImageVector.vectorResource(R.drawable.hide_pass)
                 val description = if (isHidden1) "Show password" else "Hide password"
 
                 IconButton(onClick = { isHidden1 = !isHidden1 }) {
                     Icon(imageVector = image, description)
                 }
             },
-            modifier = Modifier
-                .fillMaxWidth(),
+            modifier = Modifier.fillMaxWidth(),
             isError = isField1Error,
             keyboardOptions = KeyboardOptions(
-                keyboardType = KeyboardType.Ascii,
-                imeAction = ImeAction.Next
+                keyboardType = KeyboardType.Ascii, imeAction = ImeAction.Next
             ),
             keyboardActions = KeyboardActions(onNext = {
                 focusManager.moveFocus(FocusDirection.Down)
@@ -162,22 +154,17 @@ fun registrationView(
         )
 
         var isHidden2 by remember { mutableStateOf(true) }
-        OutlinedTextField(
-            value = pass2,
+        OutlinedTextField(value = pass2,
             onValueChange = { onUserInput2Changed(it) },
             label = {
-                if (isField2Error)
-                    Text("Такой пароль не подойдёт")
-                else
-                    Text("Повторите пароль")
+                if (isField2Error) Text("Такой пароль не подойдёт")
+                else Text("Повторите пароль")
             },
             singleLine = true,
             visualTransformation = if (isHidden2) PasswordVisualTransformation() else VisualTransformation.None,
             trailingIcon = {
-                val image = if (isHidden2)
-                    ImageVector.vectorResource(R.drawable.show_pass)
-                else
-                    ImageVector.vectorResource(R.drawable.hide_pass)
+                val image = if (isHidden2) ImageVector.vectorResource(R.drawable.show_pass)
+                else ImageVector.vectorResource(R.drawable.hide_pass)
                 val description = if (isHidden2) "Show password" else "Hide password"
 
                 IconButton(onClick = { isHidden2 = !isHidden2 }) {
@@ -189,14 +176,12 @@ fun registrationView(
                 .padding(bottom = 20.dp),
             isError = isField2Error,
             keyboardOptions = KeyboardOptions(
-                keyboardType = KeyboardType.Ascii,
-                imeAction = ImeAction.Done
+                keyboardType = KeyboardType.Ascii, imeAction = ImeAction.Done
             ),
-            keyboardActions = KeyboardActions(
-                onDone = {
-                    // keyboardController?.hide()
-                    onPassConfirm()
-                }),
+            keyboardActions = KeyboardActions(onDone = {
+                // keyboardController?.hide()
+                onPassConfirm()
+            }),
             colors = TextFieldDefaults.outlinedTextFieldColors(
                 focusedBorderColor = MaterialTheme.colors.primary,
                 unfocusedBorderColor = MaterialTheme.colors.primary,
@@ -208,9 +193,7 @@ fun registrationView(
         Button(
             onClick = {
                 onPassConfirm()
-            },
-            modifier = Modifier.fillMaxWidth(),
-            colors = ButtonDefaults.buttonColors(
+            }, modifier = Modifier.fillMaxWidth(), colors = ButtonDefaults.buttonColors(
                 backgroundColor = MaterialTheme.colors.primary,
                 contentColor = MaterialTheme.colors.onPrimary,
             )
@@ -222,11 +205,8 @@ fun registrationView(
         Button(
             onClick = {
                 onGoingToLogin()
-            },
-            modifier = Modifier.fillMaxWidth(),
-            colors = ButtonDefaults.buttonColors(
-                backgroundColor = MaterialTheme.colors.onPrimary,
-                contentColor = Color.White
+            }, modifier = Modifier.fillMaxWidth(), colors = ButtonDefaults.buttonColors(
+                backgroundColor = MaterialTheme.colors.onPrimary, contentColor = Color.White
             )
         ) {
 

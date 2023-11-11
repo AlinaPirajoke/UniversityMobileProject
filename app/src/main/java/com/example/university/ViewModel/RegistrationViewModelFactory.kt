@@ -14,7 +14,7 @@ class RegistrationViewModelFactory(context: Context) : ViewModelProvider.Factory
     val sharedPreferences =
         PreferenceManager.getDefaultSharedPreferences(context /* Activity context */)
 
-    override fun <T: ViewModel> create(modelClass: Class<T>): T {
+    override fun <T : ViewModel> create(modelClass: Class<T>): T {
         Log.d(TAG, "Создание RegistrationViewModel")
         return RegistrationViewModel(db, sharedPreferences) as T
     }

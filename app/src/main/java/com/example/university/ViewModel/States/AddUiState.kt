@@ -6,7 +6,7 @@ import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.snapshots.SnapshotStateList
 
-data class AddUiState (
+data class AddUiState(
     val isGoingToMain: Boolean = false, // Отправляет на Главную
     val isWordFieldWrong: Boolean = false, // Устанавливает ошибку в поле для иностранного слова
     val isTranslFieldWrong: Boolean = false, // Устанавливает ошибку в поле для перевода
@@ -15,6 +15,6 @@ data class AddUiState (
     val wordValue: String = "",
     val transcrValue: String = "",
     val lvlValue: String = "",
-    val translValues: SnapshotStateList<String> =  mutableStateListOf(("")),
+    val translValues: SnapshotStateList<String> = mutableStateListOf(("")),
     //val translCount: Int = 1
 )

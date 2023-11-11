@@ -13,7 +13,7 @@ class LoginViewModelFactory(context: Context) : ViewModelProvider.Factory {
     val sharedPreferences =
         PreferenceManager.getDefaultSharedPreferences(context /* Activity context */)
 
-    override fun <T: ViewModel> create(modelClass: Class<T>): T {
+    override fun <T : ViewModel> create(modelClass: Class<T>): T {
         Log.d(TAG, "Создание LoginViewModel")
         return LoginViewModel(db, sharedPreferences) as T
     }

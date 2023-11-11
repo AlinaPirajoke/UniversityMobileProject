@@ -14,7 +14,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
-class MainViewModel(val db: DBManager, val sharedPreferences: SharedPreferences): ViewModel(){
+class MainViewModel(val db: DBManager, val sharedPreferences: SharedPreferences) : ViewModel() {
     val TAG = "MainViewModel"
     val user = sharedPreferences.getInt("user", 1)
 
@@ -23,64 +23,66 @@ class MainViewModel(val db: DBManager, val sharedPreferences: SharedPreferences)
 
     init {
         var session = sharedPreferences.getBoolean("session", false)
-        val needPass = sharedPreferences.getBoolean("needPassword", false)
+        val needPass = sharedPreferences.getBoolean("isPasswordNeeded", false)
 
         if (!needPass)
             session = true
         if (!session)
             sendToLogin()
-        
         getStatistic()
         checkTodayWords()
     }
 
-    fun sendToLogin(condition: Boolean = true){
+    fun sendToLogin(condition: Boolean = true) {
         _uiState.update { state ->
             state.copy(isGoingToLogin = condition)
         }
     }
 
-    fun setStatLearned(count: Int){
+    fun setStatLearned(count: Int) {
         _uiState.update { state ->
             state.copy(statLearned = count)
         }
     }
 
-    fun setStatLearning(count: Int){
+    fun setStatLearning(count: Int) {
         _uiState.update { state ->
             state.copy(statLearning = count)
         }
     }
 
-    fun setStatAverage(count: Int){
+    fun setStatAverage(count: Int) {
         _uiState.update { state ->
             state.copy(statAverage = count)
         }
     }
 
-    fun setTest(count: Int){
+    fun setTest(count: Int) {
         _uiState.update { state ->
             state.copy(todayTest = count)
         }
     }
 
-    fun setLearn(count: Int){
+    fun setLearn(count: Int) {
         _uiState.update { state ->
             state.copy(todayLearn = count)
         }
     }
 
-    fun checkTodayWords(){
+    fun checkTodayWords() {
         viewModelScope.launch {
             setTest(db.getSizeFromDate(getTodayDate(), user)!!)
-            var learnCount = db.getTodayLearnedCount(getTodayDate(), user)!! - sharedPreferences.getInt("studiedPerDay", 10)
-            if(learnCount < 0)
+            var learnCount = db.getTodayLearnedCount(
+                getTodayDate(),
+                user
+            )!! - sharedPreferences.getInt("studiedPerDay", 10)
+            if (learnCount < 0)
                 learnCount = 0
             setLearn(learnCount)
         }
     }
 
-    fun getStatistic(){
+    fun getStatistic() {
         viewModelScope.launch {
             setStatLearned(db.getLearnedCount())
             setStatLearning(db.getLerningCount())

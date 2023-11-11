@@ -18,7 +18,8 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
-class RegistrationViewModel (val db: DBManager, val sharedPreferences: SharedPreferences): ViewModel() {
+class RegistrationViewModel(val db: DBManager, val sharedPreferences: SharedPreferences) :
+    ViewModel() {
     val TAG = "RegistrationViewModel"
 
     private val _uiState = MutableStateFlow(RegistrationUiState())
@@ -33,11 +34,11 @@ class RegistrationViewModel (val db: DBManager, val sharedPreferences: SharedPre
         Log.d(TAG, "Создано")
     }
 
-    fun setPass1Value(pass: String){
+    fun setPass1Value(pass: String) {
         enteredPass1 = pass
         // Здесь лучше запустить в корутине
         viewModelScope.launch {
-            if(isValidSymbols(pass))
+            if (isValidSymbols(pass))
                 setIsField1Wrong(false)
             else {
                 setIsField1Wrong(true)
@@ -46,44 +47,44 @@ class RegistrationViewModel (val db: DBManager, val sharedPreferences: SharedPre
         }
     }
 
-    fun setPass2Value(pass: String){
+    fun setPass2Value(pass: String) {
         enteredPass2 = pass
         setIsField2Wrong(false)
     }
 
-    fun setIsField1Wrong(condition: Boolean){
+    fun setIsField1Wrong(condition: Boolean) {
         _uiState.update { state ->
             state.copy(isField1Wrong = condition)
         }
     }
 
-    fun setIsField2Wrong(condition: Boolean){
+    fun setIsField2Wrong(condition: Boolean) {
         _uiState.update { state ->
             state.copy(isField2Wrong = condition)
         }
     }
 
-    fun sendToHomePage(condition: Boolean = true){
+    fun sendToHomePage(condition: Boolean = true) {
         _uiState.update { state ->
             state.copy(isGoingToMain = condition)
         }
     }
 
-    fun sendToLoginPage(condition: Boolean = true){
+    fun sendToLoginPage(condition: Boolean = true) {
         _uiState.update { state ->
             state.copy(isGoingToLogin = condition)
         }
     }
 
-    fun setErrorMessage(text: String){
+    fun setErrorMessage(text: String) {
         _uiState.update { state ->
             state.copy(errorMessage = text)
         }
-        if(!text.isEmpty())
+        if (!text.isEmpty())
             Log.w(TAG, "Ошибка ввода: ${uiState.value.errorMessage}")
     }
 
-    fun clearErrorMessage(){
+    fun clearErrorMessage() {
         setErrorMessage("")
     }
 
@@ -128,7 +129,7 @@ class RegistrationViewModel (val db: DBManager, val sharedPreferences: SharedPre
         return password.matches(passwordRegex)
     }
 
-    private fun isValidLength(password: String): Boolean{
+    private fun isValidLength(password: String): Boolean {
         return password.length >= 6
     }
 }

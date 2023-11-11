@@ -9,12 +9,13 @@ import androidx.navigation.compose.composable
 fun AuthNavGraph(navController: NavHostController, context: AuthActivity) {
     NavHost(
         navController = navController,
-        startDestination = AuthScreens.Login.route)
+        startDestination = AuthScreens.Login.route
+    )
     {
-        composable(route = AuthScreens.Login.route){
+        composable(route = AuthScreens.Login.route) {
             loginInit(context = context, navController = navController)
         }
-        composable(route = AuthScreens.Registration.route){
+        composable(route = AuthScreens.Registration.route) {
             registrationInit(context = context, navController = navController)
         }
 

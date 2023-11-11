@@ -55,7 +55,7 @@ class PickActivity : AppCompatActivity() {
         /////
 
         setContent() {
-            KotobaCustomTheme(schemeId = ColorScheme.PH.id) {
+            KotobaCustomTheme(colorScheme = ColorScheme.PH.colors) {
 
                 Column(
                     Modifier

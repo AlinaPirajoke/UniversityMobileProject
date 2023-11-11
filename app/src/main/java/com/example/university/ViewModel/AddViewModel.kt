@@ -25,25 +25,25 @@ class AddViewModel(val db: DBManager, val sharedPreferences: SharedPreferences) 
     }
 
     // Флаги ошибок
-    fun setWordFieldWrong(condition: Boolean = true){
+    fun setWordFieldWrong(condition: Boolean = true) {
         _uiState.update { state ->
             state.copy(isWordFieldWrong = condition)
         }
     }
 
-    fun setLvlFieldWrong(condition: Boolean = true){
+    fun setLvlFieldWrong(condition: Boolean = true) {
         _uiState.update { state ->
             state.copy(isLvlFieldWrong = condition)
         }
     }
 
-    fun setTranslFieldWrong(condition: Boolean = true){
+    fun setTranslFieldWrong(condition: Boolean = true) {
         _uiState.update { state ->
             state.copy(isTranslFieldWrong = condition)
         }
     }
 
-    fun setErrorMessage(text: String){
+    fun setErrorMessage(text: String) {
         _uiState.update { state ->
             state.copy(errorMessage = text)
         }
@@ -65,13 +65,12 @@ class AddViewModel(val db: DBManager, val sharedPreferences: SharedPreferences) 
     }
 
     fun editLvlValue(value: String) {
-        if (value.isDigitsOnly()){
+        if (value.isDigitsOnly()) {
             setLvlFieldWrong(false)
             _uiState.update { state ->
                 state.copy(lvlValue = value)
             }
-        }
-        else {
+        } else {
             setErrorMessage("Значение должно быть целочисленным")
             setLvlFieldWrong()
         }
@@ -86,7 +85,7 @@ class AddViewModel(val db: DBManager, val sharedPreferences: SharedPreferences) 
         }
     }
 
-    fun addTranslation(){
+    fun addTranslation() {
         _uiState.update { state ->
             val newTranslValues = state.translValues
             newTranslValues.add("")
@@ -97,19 +96,19 @@ class AddViewModel(val db: DBManager, val sharedPreferences: SharedPreferences) 
     // Добавление нового слова
     fun addWord() {
 
-        if(uiState.value.wordValue.isBlank()){
+        if (uiState.value.wordValue.isBlank()) {
             setErrorMessage("Слово не должно быть пустым")
             setWordFieldWrong()
             return
         }
 
-        if(uiState.value.translValues.all { it.isBlank() }){
+        if (uiState.value.translValues.all { it.isBlank() }) {
             setErrorMessage("Перевод не должен быть пустым")
             setTranslFieldWrong()
             return
         }
 
-        if(uiState.value.lvlValue.toInt() < 0){
+        if (uiState.value.lvlValue.toInt() < 0) {
             setErrorMessage("Период появления должен быть положительным")
             setLvlFieldWrong()
             return
