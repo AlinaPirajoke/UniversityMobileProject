@@ -27,13 +27,13 @@ val KotobaTypography = Typography(
     */
     h5 = TextStyle(
         //fontFamily = Montserrat,
-        fontWeight = FontWeight.W600,
+        fontWeight = FontWeight.Normal,
         fontSize = 20.sp
     ),
 
     subtitle1 = TextStyle(
         //fontFamily = Montserrat,
-        fontWeight = FontWeight.W600,
+        fontWeight = FontWeight.Normal,
         fontSize = 16.sp
     ),
 

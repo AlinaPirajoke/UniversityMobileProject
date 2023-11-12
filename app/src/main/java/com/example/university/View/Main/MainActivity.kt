@@ -34,33 +34,34 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.ViewModelProvider
+import com.example.university.Model.MySharedPreferences
 import com.example.university.R
 import com.example.university.View.Auth.AuthActivity
 import com.example.university.ViewModel.MainViewModel
 import com.example.university.ViewModel.MainViewModelFactory
+import com.example.university.ViewModel.SettingsViewModel
 import com.example.university.theme.ColorScheme
 import com.example.university.theme.KotobaCustomTheme
 import com.example.university.usefull_stuff.StringInt
+import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class MainActivity : AppCompatActivity() {
     val TAG = "MainActivity"
-    val N = 17
     val BORDER_PADDING = 12.dp
+    val vm by viewModel<MainViewModel>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         Log.d(TAG, "Инициализация...")
-
-        val vm = ViewModelProvider(this, MainViewModelFactory(this)).get(MainViewModel::class.java)
         super.onCreate(savedInstanceState)
 
         setContent {
-            KotobaCustomTheme(colorScheme = ColorScheme.PH.colors) {
-                window.statusBarColor = MaterialTheme.colors.primaryVariant.toArgb()
-                val scrollState = rememberScrollState()
-                val uiState by vm.uiState.collectAsState()
-                if (uiState.isGoingToLogin)
-                    this.toLogin()
-
+            val scrollState = rememberScrollState()
+            val uiState by vm.uiState.collectAsState()
+            if (uiState.isGoingToLogin)
+                this.toLogin()
+            
+            KotobaCustomTheme(colorScheme = uiState.colorScheme) {
+                window.statusBarColor = MaterialTheme.colors.primary.toArgb()
                 Column(
                     Modifier
                         .fillMaxSize()
@@ -348,6 +349,11 @@ class MainActivity : AppCompatActivity() {
             }
         }
     }*/
+
+    override fun onResume() {
+        super.onResume()
+        vm.updateColorScheme()
+    }
 
     fun toLogin() {
         val intent = Intent(this@MainActivity, AuthActivity::class.java)

@@ -1,6 +1,7 @@
 package com.example.university.View.Main
 
 import android.content.Context
+import android.graphics.Paint.Align
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.preference.PreferenceManager
@@ -36,6 +37,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -46,6 +48,7 @@ import com.example.university.ViewModel.SettingsViewModel
 import com.example.university.theme.ColorScheme
 import com.example.university.theme.KotobaCustomTheme
 import com.example.university.theme.PH
+import com.example.university.theme.pink
 import com.example.university.usefull_stuff.showToast
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
@@ -57,8 +60,9 @@ class SettingsActivity : AppCompatActivity() {
         val vm by viewModel<SettingsViewModel>()
 
         setContent {
-            KotobaCustomTheme(colorScheme = ColorScheme.PH.colors) {
-                val uiState by vm.uiState.collectAsState()
+            val uiState by vm.uiState.collectAsState()
+            KotobaCustomTheme(colorScheme = uiState.colorScheme) {
+                window.statusBarColor = MaterialTheme.colors.primary.toArgb()
                 settingsView(
                     isPassNeeded = uiState.isPasswordNeeded,
                     onIsPassNeededChange = { vm.setIsPasswordNeeded(it) },
@@ -122,18 +126,18 @@ class SettingsActivity : AppCompatActivity() {
                             .fillMaxWidth()
                             .padding(top = 20.dp),
                         textAlign = TextAlign.Center,
-                        style = MaterialTheme.typography.h6
+                        style = MaterialTheme.typography.h5
                     )
                     Row(
                         Modifier
                             .fillMaxWidth()
-                            .padding(top = 10.dp),
-                        horizontalArrangement = Arrangement.SpaceBetween
+                            .padding(top = 15.dp),
+                        horizontalArrangement = Arrangement.SpaceAround
                     ) {
                         // PH тема
-                        colorTile(bcColor = PH, onClick = {onColorSchemeChange(0)})
+                        colorTile(bcColor = PH, onClick = { onColorSchemeChange(0) })
                         // pink тема
-                        colorTile(bcColor = PH, onClick = {onColorSchemeChange(1)})
+                        colorTile(bcColor = pink, onClick = { onColorSchemeChange(1) })
                     }
                 }
             }
@@ -146,30 +150,36 @@ class SettingsActivity : AppCompatActivity() {
         description: String,
         action: (Boolean) -> (Unit),
     ) {
-        val mainColor = colorResource(id = R.color.main)
-        var checked by remember { mutableStateOf(currentState) }
+        // var checked by remember { mutableStateOf(currentState) }
 
         Row(
             Modifier.fillMaxWidth(),
             verticalAlignment = Alignment.CenterVertically
         ) {
 
+            Text(
+                text = description,
+                Modifier.fillMaxWidth(),
+                style = MaterialTheme.typography.subtitle1,
+                textAlign = TextAlign.Left
+            )
+
             Switch(
-                checked = checked,
+                checked = currentState,
                 onCheckedChange = {
                     Log.d(TAG, "Попытка установить настройку \"$description\" в состояние $it")
                     action(it)
                 },
                 colors = SwitchDefaults.colors(
-                    checkedThumbColor = colorResource(id = R.color.mainLight),
-                    checkedTrackColor = mainColor,
-                    uncheckedThumbColor = colorResource(id = R.color.light),
-                    uncheckedTrackColor = colorResource(id = R.color.grey)
+                    checkedThumbColor = MaterialTheme.colors.primary,
+                    checkedTrackColor = MaterialTheme.colors.primaryVariant,
+                    uncheckedThumbColor = MaterialTheme.colors.secondary,
+                    uncheckedTrackColor = MaterialTheme.colors.secondaryVariant
                 ),
-                modifier = Modifier.padding(end = 10.dp)
+                modifier = Modifier.padding(top = 10.dp)
             )
 
-            Text(text = description, style = MaterialTheme.typography.subtitle1)
+
         }
     }
 
@@ -177,15 +187,15 @@ class SettingsActivity : AppCompatActivity() {
     fun colorTile(
         bcColor: Color,
         onClick: () -> (Unit),
-    ){
+    ) {
         Surface(
             Modifier
-                .size(width = 40.dp, height = 40.dp)
+                .size(width = 60.dp, height = 60.dp)
                 .clickable { onClick() },
             shape = RoundedCornerShape(10.dp),
             color = bcColor,
             elevation = 4.dp
-        ){}
+        ) {}
     }
 
     fun toMain() {

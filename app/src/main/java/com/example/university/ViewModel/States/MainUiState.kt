@@ -1,6 +1,7 @@
 package com.example.university.ViewModel.States
 
-import androidx.lifecycle.MutableLiveData
+import androidx.compose.material.Colors
+import com.example.university.theme.ColorScheme
 
 data class MainUiState(
     val isGoingToLogin: Boolean = false, // Отправляет на Главную
@@ -9,4 +10,5 @@ data class MainUiState(
     val statLearned: Int = 0,  // количество изученных слов
     val statLearning: Int = 0, // количество изучающихся слов
     val statAverage: Int = 0, // Среднее количество изучаемых слов в день
+    val colorScheme: Colors = ColorScheme.PH.colors // Цветовая тема
 )

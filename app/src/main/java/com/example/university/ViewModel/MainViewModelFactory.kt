@@ -13,9 +13,9 @@ class MainViewModelFactory(context: Context) : ViewModelProvider.Factory {
     val db = DBManager(context)
     val sharedPreferences =
         PreferenceManager.getDefaultSharedPreferences(context /* Activity context */)
-
+    /*
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         Log.d(TAG, "Создание")
         return MainViewModel(db, sharedPreferences) as T
-    }
+    }*/
 }
