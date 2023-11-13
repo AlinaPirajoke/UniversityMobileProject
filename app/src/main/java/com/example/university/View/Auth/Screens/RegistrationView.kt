@@ -1,4 +1,4 @@
-package com.example.university.View.Auth
+package com.example.university.View.Auth.Screens
 
 import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
@@ -29,7 +29,6 @@ import androidx.compose.ui.focus.FocusDirection
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalFocusManager
-import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
@@ -41,6 +40,8 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.NavHostController
 import com.example.university.R
+import com.example.university.View.Auth.AuthActivity
+import com.example.university.View.Auth.AuthScreens
 import com.example.university.ViewModel.RegistrationViewModel
 import com.example.university.ViewModel.RegistrationViewModelFactory
 import com.example.university.usefull_stuff.showToast
@@ -206,7 +207,8 @@ fun registrationView(
             onClick = {
                 onGoingToLogin()
             }, modifier = Modifier.fillMaxWidth(), colors = ButtonDefaults.buttonColors(
-                backgroundColor = MaterialTheme.colors.onPrimary, contentColor = Color.White
+                backgroundColor = MaterialTheme.colors.onPrimary,
+                contentColor = MaterialTheme.colors.primary
             )
         ) {
 

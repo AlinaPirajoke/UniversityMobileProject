@@ -4,7 +4,6 @@ import androidx.compose.material.Colors
 import com.example.university.theme.ColorScheme
 
 data class MainUiState(
-    val isGoingToLogin: Boolean = false, // Отправляет на Главную
     val todayTest: Int = 0, // количество слов для теста на сегодня
     val todayLearn: Int = 0, // оставшееся количество слов для изучения на сегодня
     val statLearned: Int = 0,  // количество изученных слов

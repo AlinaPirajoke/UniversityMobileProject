@@ -16,13 +16,6 @@
         android:screenOrientation="portrait"
         tools:targetApi="31">
         <activity
-            android:name=".View.Main.SettingsActivity"
-            android:exported="false" />
-        <activity
-            android:name=".View.Main.AddActivity"
-            android:exported="false"
-            android:windowSoftInputMode="adjustResize" />
-        <activity
             android:name=".View.Main.PickActivity"
             android:exported="false"
             android:windowSoftInputMode="adjustResize" />

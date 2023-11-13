@@ -1,4 +1,4 @@
-package com.example.university.View.Auth
+package com.example.university.View.Auth.Screens
 
 import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
@@ -37,10 +37,10 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.NavHostController
 import com.example.university.R
+import com.example.university.View.Auth.AuthActivity
+import com.example.university.View.Auth.AuthScreens
 import com.example.university.ViewModel.LoginViewModel
 import com.example.university.ViewModel.LoginViewModelFactory
-import com.example.university.ViewModel.RegistrationViewModel
-import com.example.university.ViewModel.RegistrationViewModelFactory
 import com.example.university.usefull_stuff.showToast
 
 
@@ -174,8 +174,8 @@ fun loginView(
                     },
                     modifier = Modifier.fillMaxWidth(),
                     colors = ButtonDefaults.buttonColors(
-                        backgroundColor = MaterialTheme.colors.primary,
-                        contentColor = MaterialTheme.colors.onPrimary
+                        backgroundColor = MaterialTheme.colors.onPrimary,
+                        contentColor = MaterialTheme.colors.primary
                     )
                 ) {
 

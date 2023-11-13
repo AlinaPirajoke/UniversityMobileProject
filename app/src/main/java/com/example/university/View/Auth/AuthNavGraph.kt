@@ -4,6 +4,8 @@ import androidx.compose.runtime.Composable
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import com.example.university.View.Auth.Screens.loginInit
+import com.example.university.View.Auth.Screens.registrationInit
 
 @Composable
 fun AuthNavGraph(navController: NavHostController, context: AuthActivity) {

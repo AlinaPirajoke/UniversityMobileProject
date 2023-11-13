@@ -7,7 +7,9 @@ import androidx.activity.compose.setContent
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.navigation.compose.rememberNavController
+import com.example.university.Model.MySharedPreferences
 import com.example.university.View.Main.MainActivity
+import com.example.university.View.Main.MainNavGraph
 import com.example.university.theme.ColorScheme
 import com.example.university.theme.KotobaCustomTheme
 

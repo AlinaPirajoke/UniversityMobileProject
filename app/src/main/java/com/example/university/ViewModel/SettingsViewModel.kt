@@ -34,6 +34,10 @@ class SettingsViewModel(val db: DBManager, val msp: MySharedPreferences) : ViewM
         }
     }
 
+    fun clearErrorMessage() {
+        setErrorMessage("")
+    }
+
     fun setIsPasswordNeeded(condition: Boolean) {
         if (db.getPasswords().size > 1) {
             setErrorMessage("Для изменения этого параметра, пользователь должен быть только один!")
@@ -47,7 +51,7 @@ class SettingsViewModel(val db: DBManager, val msp: MySharedPreferences) : ViewM
         /*sp.edit().putBoolean("isPasswordNeeded", condition).apply()*/
     }
 
-    fun setCurrentColorScheme(id: Int){
+    fun setCurrentColorScheme(id: Int) {
         msp.currentColorSchemeId = id
         _uiState.update { state ->
             state.copy(

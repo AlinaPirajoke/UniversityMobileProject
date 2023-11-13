@@ -6,6 +6,7 @@ import android.util.Log
 import androidx.core.text.isDigitsOnly
 import androidx.lifecycle.ViewModel
 import com.example.university.Model.DBManager
+import com.example.university.Model.MySharedPreferences
 import com.example.university.ViewModel.States.AddUiState
 import com.example.university.ViewModel.States.LoginUiState
 import com.example.university.usefull_stuff.showToast
@@ -14,10 +15,10 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 
-class AddViewModel(val db: DBManager, val sharedPreferences: SharedPreferences) : ViewModel() {
+class AddViewModel(val db: DBManager, val msp: MySharedPreferences) : ViewModel() {
     val TAG = "LoginViewModel"
 
-    private val _uiState = MutableStateFlow(AddUiState())
+    private val _uiState = MutableStateFlow(AddUiState(colorScheme = msp.getColorScheme()))
     val uiState: StateFlow<AddUiState> = _uiState.asStateFlow()
 
     init {
@@ -46,6 +47,12 @@ class AddViewModel(val db: DBManager, val sharedPreferences: SharedPreferences) 
     fun setErrorMessage(text: String) {
         _uiState.update { state ->
             state.copy(errorMessage = text)
+        }
+    }
+
+    fun updateColorScheme() {
+        _uiState.update { state ->
+            state.copy(colorScheme = msp.getColorScheme())
         }
     }
 

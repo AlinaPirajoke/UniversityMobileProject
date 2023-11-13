@@ -20,21 +20,8 @@ class MainViewModel(val db: DBManager, val msp: MySharedPreferences) : ViewModel
     val uiState: StateFlow<MainUiState> = _uiState.asStateFlow()
 
     init {
-        var session = msp.session
-        val needPass = msp.isPasswordNeeded
-
-        if (!needPass)
-            session = true
-        if (!session)
-            sendToLogin()
         getStatistic()
         checkTodayWords()
-    }
-
-    fun sendToLogin(condition: Boolean = true) {
-        _uiState.update { state ->
-            state.copy(isGoingToLogin = condition)
-        }
     }
 
     fun setStatLearned(count: Int) {
@@ -71,7 +58,7 @@ class MainViewModel(val db: DBManager, val msp: MySharedPreferences) : ViewModel
         viewModelScope.launch {
             setTest(db.getSizeFromDate(getTodayDate(), user)!!)
             var learnCount = db.getTodayLearnedCount(getTodayDate(), user)!!
-            learnCount -= msp.studyQuantityPerDay
+            learnCount = msp.studyQuantityPerDay - learnCount
             if (learnCount < 0)
                 learnCount = 0
             setLearn(learnCount)
@@ -86,7 +73,7 @@ class MainViewModel(val db: DBManager, val msp: MySharedPreferences) : ViewModel
         }
     }
 
-    fun updateColorScheme(){
+    fun updateColorScheme() {
         _uiState.update { state ->
             state.copy(colorScheme = msp.getColorScheme())
         }
