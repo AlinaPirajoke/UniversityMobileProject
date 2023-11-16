@@ -11,10 +11,9 @@ import org.koin.androidx.viewmodel.ext.android.viewModel
 @Composable
 fun MainNavGraph(navController: NavHostController, context: MainActivity) {
     NavHost(
-    navController = navController,
-    startDestination = MainScreens.Main.route
-    )
-    {
+        navController = navController,
+        startDestination = MainScreens.Main.route
+    ) {
         composable(route = MainScreens.Main.route) {
             context.mainInit(context = context, navController = navController)
         }

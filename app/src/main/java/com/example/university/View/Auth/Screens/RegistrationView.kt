@@ -38,6 +38,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavHostController
 import com.example.university.R
 import com.example.university.View.Auth.AuthActivity
@@ -45,9 +46,13 @@ import com.example.university.View.Auth.AuthScreens
 import com.example.university.ViewModel.RegistrationViewModel
 import com.example.university.ViewModel.RegistrationViewModelFactory
 import com.example.university.usefull_stuff.showToast
+import kotlinx.coroutines.launch
+
+private const val TAG = "RegistrationView"
 
 @Composable
 fun registrationInit(context: AuthActivity, navController: NavHostController) {
+    Log.d(TAG, "Создание vm")
     val vm = ViewModelProvider(
         context,
         RegistrationViewModelFactory(context)
@@ -79,12 +84,16 @@ fun registrationScreen(
     registrationView(
         pass1 = vm.enteredPass1,
         pass2 = vm.enteredPass2,
-        onUserInput1Changed = { vm.setPass1Value(it) },
-        onUserInput2Changed = { vm.setPass2Value(it) },
-        onPassConfirm = { vm.addUser() },
-        onGoingToLogin = { vm.sendToLoginPage() },
+        onUserInput1Changed = vm::setPass1Value,
+        onUserInput2Changed = vm::setPass2Value,
+        onGoingToLogin = vm::sendToLoginPage,
         isField1Error = uiState.isField1Wrong,
         isField2Error = uiState.isField2Wrong,
+        onPassConfirm = {
+            context.lifecycleScope.launch {
+                vm.addUser()
+            }
+        },
     )
 }
 
@@ -121,7 +130,8 @@ fun registrationView(
         )
         var isHidden1 by remember { mutableStateOf(true) }
 
-        OutlinedTextField(value = pass1,
+        OutlinedTextField(
+            value = pass1,
             onValueChange = { onUserInput1Changed(it) },
             label = {
                 if (isField1Error) Text("Такой пароль не подойдёт")
@@ -155,7 +165,8 @@ fun registrationView(
         )
 
         var isHidden2 by remember { mutableStateOf(true) }
-        OutlinedTextField(value = pass2,
+        OutlinedTextField(
+            value = pass2,
             onValueChange = { onUserInput2Changed(it) },
             label = {
                 if (isField2Error) Text("Такой пароль не подойдёт")

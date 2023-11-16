@@ -30,6 +30,7 @@ import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavHostController
 import com.example.university.View.Main.MainActivity
 import com.example.university.View.Main.MainScreens
@@ -39,6 +40,7 @@ import com.example.university.theme.KotobaCustomTheme
 import com.example.university.theme.PH
 import com.example.university.theme.pink
 import com.example.university.usefull_stuff.showToast
+import kotlinx.coroutines.launch
 
 private val TAG = "SettingsView"
 
@@ -54,9 +56,11 @@ fun settingsScreen(context: MainActivity, navController: NavHostController, vm: 
         context.window.statusBarColor = MaterialTheme.colors.primary.toArgb()
         settingsView(
             isPassNeeded = uiState.isPasswordNeeded,
-            onIsPassNeededChange = { vm.setIsPasswordNeeded(it) },
+            onIsPassNeededChange = {
+                context.lifecycleScope.launch{ vm.setIsPasswordNeeded(it) }
+            },
             currentColorScheme = uiState.currentColorScheme,
-            onColorSchemeChange = { vm.setCurrentColorScheme(it) },
+            onColorSchemeChange = vm::setCurrentColorScheme,
             onGoingToMain = {
                 Log.i(TAG, "Перенаправление на главный экран")
                 navController.navigate(MainScreens.Main.route)

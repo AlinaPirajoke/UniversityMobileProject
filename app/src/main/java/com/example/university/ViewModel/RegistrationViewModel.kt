@@ -88,7 +88,7 @@ class RegistrationViewModel(val db: DBManager, val sharedPreferences: SharedPref
         setErrorMessage("")
     }
 
-    fun addUser() {
+    suspend fun addUser() {
         val pass1 = enteredPass1
         val pass2 = enteredPass2
         if (pass1 != pass2) {

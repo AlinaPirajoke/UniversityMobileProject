@@ -101,7 +101,7 @@ class AddViewModel(val db: DBManager, val msp: MySharedPreferences) : ViewModel(
     }
 
     // Добавление нового слова
-    fun addWord() {
+     suspend fun addWord() {
 
         if (uiState.value.wordValue.isBlank()) {
             setErrorMessage("Слово не должно быть пустым")

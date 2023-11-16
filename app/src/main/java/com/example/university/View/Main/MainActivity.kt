@@ -53,7 +53,6 @@ class MainActivity : AppCompatActivity() {
         val avm by viewModel<AddViewModel>()
         avm.updateColorScheme()
         addScreen(context = context, navController = navController, vm = avm)
-
     }
 
     @Composable

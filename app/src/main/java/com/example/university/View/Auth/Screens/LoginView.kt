@@ -35,6 +35,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavHostController
 import com.example.university.R
 import com.example.university.View.Auth.AuthActivity
@@ -42,7 +43,12 @@ import com.example.university.View.Auth.AuthScreens
 import com.example.university.ViewModel.LoginViewModel
 import com.example.university.ViewModel.LoginViewModelFactory
 import com.example.university.usefull_stuff.showToast
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.launch
 
+private const val TAG = "LoginView"
 
 @Composable
 fun loginInit(context: AuthActivity, navController: NavHostController) {
@@ -68,14 +74,19 @@ fun loginScreen(context: AuthActivity, navController: NavHostController, vm: Log
     if (!uiState.errorMessage.isEmpty()) {
         showToast(uiState.errorMessage, context)
         vm.clearErrorMessage()
-        Log.w("LoginView", "Получена ошибка: ${uiState.errorMessage}")
+        Log.w(TAG, "Получена ошибка: ${uiState.errorMessage}")
     }
 
     loginView(
         pass = vm.enteredPass,
-        onUserInputChanged = { vm.editUserEnter(it) },
-        onPassConfirm = { vm.checkPassword() },
-        onGoingToRegister = { vm.sendToRegisterPage() },
+        onUserInputChanged = vm::editUserEnter,
+        onPassConfirm = {
+            context.lifecycleScope.launch {
+                vm.checkPassword()
+            }
+            Log.i(TAG, "ПОЕХАЛИ!")
+        },
+        onGoingToRegister = vm::sendToRegisterPage,
         isError = uiState.isFieldWrong,
     )
 }

@@ -20,8 +20,10 @@ class MainViewModel(val db: DBManager, val msp: MySharedPreferences) : ViewModel
     val uiState: StateFlow<MainUiState> = _uiState.asStateFlow()
 
     init {
-        getStatistic()
-        checkTodayWords()
+        viewModelScope.launch {
+            getStatistic()
+            checkTodayWords()
+        }
     }
 
     fun setStatLearned(count: Int) {
@@ -54,7 +56,7 @@ class MainViewModel(val db: DBManager, val msp: MySharedPreferences) : ViewModel
         }
     }
 
-    fun checkTodayWords() {
+    suspend fun checkTodayWords() {
         viewModelScope.launch {
             setTest(db.getSizeFromDate(getTodayDate(), user)!!)
             var learnCount = db.getTodayLearnedCount(getTodayDate(), user)!!
@@ -65,7 +67,7 @@ class MainViewModel(val db: DBManager, val msp: MySharedPreferences) : ViewModel
         }
     }
 
-    fun getStatistic() {
+    suspend fun getStatistic() {
         viewModelScope.launch {
             setStatLearned(db.getLearnedCount())
             setStatLearning(db.getLerningCount())

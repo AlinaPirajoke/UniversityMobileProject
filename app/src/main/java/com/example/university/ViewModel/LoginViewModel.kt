@@ -65,28 +65,28 @@ class LoginViewModel(val db: DBManager, val sharedPreferences: SharedPreferences
         }
     }
 
-    fun checkPassword() {
-        Log.d(TAG, "Проверка пароля $enteredPass")
-        viewModelScope.launch {
-            val enteredPass = enteredPass
-            if (!sharedPreferences.getBoolean("isPasswordNeeded", true))
-                if (enteredPass?.isEmpty() == true) {
-                    setErrorMessage("Введите пароль")
-                    setIsPassWrong(true)
-                    return@launch
-                }
-            val passwords = db.getPasswords()
-            if (!(enteredPass in passwords.keys)) {
-                setErrorMessage("Пароль не верен")
+    suspend fun checkPassword() {
+        Log.i(TAG, "Проверка пароля $enteredPass")
+
+        val enteredPass = enteredPass
+        if (!sharedPreferences.getBoolean("isPasswordNeeded", true))
+            if (enteredPass?.isEmpty() == true) {
+                setErrorMessage("Введите пароль")
                 setIsPassWrong(true)
-                return@launch
+                return
             }
 
-            passwords.get(enteredPass)?.let {
-                sharedPreferences.edit().putInt("user", it).apply()
-                sharedPreferences.edit().putBoolean("session", true).apply()
-                sendToHomePage()
-            }
+        val passwords = db.getPasswords()
+        if (!(enteredPass in passwords.keys)) {
+            setErrorMessage("Пароль не верен")
+            setIsPassWrong(true)
+            return
+        }
+
+        passwords.get(enteredPass)?.let {
+            sharedPreferences.edit().putInt("user", it).apply()
+            sharedPreferences.edit().putBoolean("session", true).apply()
+            sendToHomePage()
         }
     }
 }

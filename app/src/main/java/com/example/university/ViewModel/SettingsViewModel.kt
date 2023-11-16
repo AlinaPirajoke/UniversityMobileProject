@@ -38,7 +38,7 @@ class SettingsViewModel(val db: DBManager, val msp: MySharedPreferences) : ViewM
         setErrorMessage("")
     }
 
-    fun setIsPasswordNeeded(condition: Boolean) {
+    suspend fun setIsPasswordNeeded(condition: Boolean) {
         if (db.getPasswords().size > 1) {
             setErrorMessage("Для изменения этого параметра, пользователь должен быть только один!")
             Log.w(TAG, "Отклонено")
