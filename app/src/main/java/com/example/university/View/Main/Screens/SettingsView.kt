@@ -34,18 +34,18 @@ import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavHostController
 import com.example.university.View.Main.MainActivity
 import com.example.university.View.Main.MainScreens
-import com.example.university.ViewModel.MainViewModel
 import com.example.university.ViewModel.SettingsViewModel
 import com.example.university.theme.KotobaCustomTheme
 import com.example.university.theme.PH
 import com.example.university.theme.pink
 import com.example.university.usefull_stuff.showToast
 import kotlinx.coroutines.launch
+import org.koin.androidx.compose.koinViewModel
 
 private val TAG = "SettingsView"
 
 @Composable
-fun settingsScreen(context: MainActivity, navController: NavHostController, vm: SettingsViewModel) {
+fun SettingsScreen(context: MainActivity, navController: NavHostController, vm: SettingsViewModel = koinViewModel()) {
     val uiState by vm.uiState.collectAsState()
     if (!uiState.errorMessage.isEmpty()) {
         showToast(uiState.errorMessage, context)
@@ -54,7 +54,7 @@ fun settingsScreen(context: MainActivity, navController: NavHostController, vm: 
     }
     KotobaCustomTheme(colorScheme = uiState.colorScheme) {
         context.window.statusBarColor = MaterialTheme.colors.primary.toArgb()
-        settingsView(
+        SettingsView(
             isPassNeeded = uiState.isPasswordNeeded,
             onIsPassNeededChange = {
                 context.lifecycleScope.launch{ vm.setIsPasswordNeeded(it) }
@@ -70,7 +70,7 @@ fun settingsScreen(context: MainActivity, navController: NavHostController, vm: 
 }
 
 @Composable
-fun settingsView(
+fun SettingsView(
     isPassNeeded: Boolean,
     onIsPassNeededChange: (Boolean) -> Unit,
     currentColorScheme: Int,

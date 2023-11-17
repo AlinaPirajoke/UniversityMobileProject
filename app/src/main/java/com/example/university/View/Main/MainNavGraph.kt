@@ -4,6 +4,9 @@ import androidx.compose.runtime.Composable
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import com.example.university.View.Main.Screens.AddScreen
+import com.example.university.View.Main.Screens.MainScreen
+import com.example.university.View.Main.Screens.SettingsScreen
 import com.example.university.ViewModel.MainViewModel
 import org.koin.androidx.compose.viewModel
 import org.koin.androidx.viewmodel.ext.android.viewModel
@@ -15,13 +18,13 @@ fun MainNavGraph(navController: NavHostController, context: MainActivity) {
         startDestination = MainScreens.Main.route
     ) {
         composable(route = MainScreens.Main.route) {
-            context.mainInit(context = context, navController = navController)
+            MainScreen(context = context, navController = navController)
         }
         composable(route = MainScreens.AddNew.route) {
-            context.addInit(context = context, navController = navController)
+            AddScreen(context = context, navController = navController)
         }
         composable(route = MainScreens.Settings.route) {
-            context.settingsInit(context = context, navController = navController)
+            SettingsScreen(context = context, navController = navController)
         }
     }
 }

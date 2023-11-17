@@ -26,7 +26,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusDirection
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.vectorResource
@@ -37,32 +36,21 @@ import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavHostController
 import com.example.university.R
 import com.example.university.View.Auth.AuthActivity
 import com.example.university.View.Auth.AuthScreens
 import com.example.university.ViewModel.RegistrationViewModel
-import com.example.university.ViewModel.RegistrationViewModelFactory
 import com.example.university.usefull_stuff.showToast
 import kotlinx.coroutines.launch
+import org.koin.androidx.compose.koinViewModel
 
 private const val TAG = "RegistrationView"
 
 @Composable
-fun registrationInit(context: AuthActivity, navController: NavHostController) {
-    Log.d(TAG, "Создание vm")
-    val vm = ViewModelProvider(
-        context,
-        RegistrationViewModelFactory(context)
-    ).get(RegistrationViewModel::class.java)
-    registrationScreen(context = context, navController = navController, vm = vm)
-}
-
-@Composable
-fun registrationScreen(
-    context: AuthActivity, navController: NavHostController, vm: RegistrationViewModel
+fun RegistrationScreen(
+    context: AuthActivity, navController: NavHostController, vm: RegistrationViewModel = koinViewModel()
 ) {
     // Мня за такие аргументы не опустят?
 
@@ -81,7 +69,7 @@ fun registrationScreen(
         Log.w("registrationView", "Получена ошибка: ${uiState.errorMessage}")
     }
 
-    registrationView(
+    RegistrationView(
         pass1 = vm.enteredPass1,
         pass2 = vm.enteredPass2,
         onUserInput1Changed = vm::setPass1Value,
@@ -98,7 +86,7 @@ fun registrationScreen(
 }
 
 @Composable
-fun registrationView(
+fun RegistrationView(
     pass1: String,
     pass2: String,
     onUserInput1Changed: (String) -> Unit,

@@ -34,31 +34,20 @@ import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavHostController
 import com.example.university.R
 import com.example.university.View.Auth.AuthActivity
 import com.example.university.View.Auth.AuthScreens
 import com.example.university.ViewModel.LoginViewModel
-import com.example.university.ViewModel.LoginViewModelFactory
 import com.example.university.usefull_stuff.showToast
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
+import org.koin.androidx.compose.koinViewModel
 
 private const val TAG = "LoginView"
 
 @Composable
-fun loginInit(context: AuthActivity, navController: NavHostController) {
-    val vm = ViewModelProvider(context, LoginViewModelFactory(context))
-        .get(LoginViewModel::class.java)
-    loginScreen(context = context, navController = navController, vm = vm)
-}
-
-@Composable
-fun loginScreen(context: AuthActivity, navController: NavHostController, vm: LoginViewModel) {
+fun LoginScreen(context: AuthActivity, navController: NavHostController, vm: LoginViewModel = koinViewModel()) {
     // Такие аргументы использовать не зашкварно?
     // Нигде не видел, чтобы так делали, но как иначе не придумал
 
@@ -77,7 +66,7 @@ fun loginScreen(context: AuthActivity, navController: NavHostController, vm: Log
         Log.w(TAG, "Получена ошибка: ${uiState.errorMessage}")
     }
 
-    loginView(
+    LoginView(
         pass = vm.enteredPass,
         onUserInputChanged = vm::editUserEnter,
         onPassConfirm = {
@@ -92,7 +81,7 @@ fun loginScreen(context: AuthActivity, navController: NavHostController, vm: Log
 }
 
 @Composable
-fun loginView(
+fun LoginView(
     pass: String,
     onUserInputChanged: (String) -> Unit,
     onPassConfirm: () -> Unit,

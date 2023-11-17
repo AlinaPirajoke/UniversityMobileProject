@@ -21,12 +21,9 @@ import androidx.compose.material.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusDirection
-import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
@@ -41,19 +38,19 @@ import androidx.navigation.NavHostController
 import com.example.university.View.Main.MainActivity
 import com.example.university.View.Main.MainScreens
 import com.example.university.ViewModel.AddViewModel
-import com.example.university.ViewModel.MainViewModel
 import com.example.university.theme.ColorScheme
 import com.example.university.theme.KotobaCustomTheme
 import kotlinx.coroutines.launch
+import org.koin.androidx.compose.koinViewModel
 
 private val TAG = "AddView"
 
 @Composable
-fun addScreen(context: MainActivity, navController: NavHostController, vm: AddViewModel) {
+fun AddScreen(context: MainActivity, navController: NavHostController, vm: AddViewModel = koinViewModel()) {
     val uiState by vm.uiState.collectAsState()
     KotobaCustomTheme(colorScheme = uiState.colorScheme) {
         context.window.statusBarColor = MaterialTheme.colors.primary.toArgb()
-        addView(word = uiState.wordValue,
+        AddView(word = uiState.wordValue,
             onWordChanged = vm::editWordValue,
             transcription = uiState.transcrValue,
             onTranscrChanged = vm::editTranscrValue,
@@ -78,7 +75,7 @@ fun addScreen(context: MainActivity, navController: NavHostController, vm: AddVi
 
 @OptIn(ExperimentalComposeUiApi::class, ExperimentalMaterialApi::class)
 @Composable
-fun addView(
+fun AddView(
     word: String,
     onWordChanged: (String) -> Unit,
     transcription: String,
@@ -266,7 +263,7 @@ fun addView(
 @Composable
 fun AddViewPreview() {
     KotobaCustomTheme(colorScheme = ColorScheme.pink.colors) {
-        addView(
+        AddView(
             word = "Example",
             onWordChanged = { },
             transcription = "Example",

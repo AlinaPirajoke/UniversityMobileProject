@@ -4,7 +4,9 @@ import com.example.university.Model.DBManager
 import com.example.university.Model.MySharedPreferences
 import com.example.university.ViewModel.MainActivityViewModel
 import com.example.university.ViewModel.AddViewModel
+import com.example.university.ViewModel.LoginViewModel
 import com.example.university.ViewModel.MainViewModel
+import com.example.university.ViewModel.RegistrationViewModel
 import com.example.university.ViewModel.SettingsViewModel
 import org.koin.androidx.viewmodel.dsl.viewModel
 import org.koin.core.module.Module
@@ -45,6 +47,18 @@ private fun Module.presentation(){
     }
     viewModel<AddViewModel>{
         AddViewModel(
+            db = get(),
+            msp = get()
+        )
+    }
+    viewModel<LoginViewModel>{
+        LoginViewModel(
+            db = get(),
+            msp = get()
+        )
+    }
+    viewModel<RegistrationViewModel>{
+        RegistrationViewModel(
             db = get(),
             msp = get()
         )

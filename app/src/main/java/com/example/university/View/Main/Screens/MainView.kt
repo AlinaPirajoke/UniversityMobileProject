@@ -29,23 +29,22 @@ import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.university.R
 import com.example.university.View.Main.MainScreens
-import com.example.university.theme.ColorScheme
 import com.example.university.theme.KotobaCustomTheme
+import org.koin.androidx.compose.koinViewModel
 
 private val TAG = "MainView"
 
 @Composable
-fun mainScreen(context: MainActivity, navController: NavHostController, vm: MainViewModel) {
+fun MainScreen(context: MainActivity, navController: NavHostController, vm: MainViewModel = koinViewModel()) {
     val uiState by vm.uiState.collectAsState()
 //  if (uiState.isGoingToTest) context.toTest()
     KotobaCustomTheme(colorScheme = uiState.colorScheme) {
         context.window.statusBarColor = MaterialTheme.colors.primary.toArgb()
-        mainView(
+        MainView(
             statLearned = uiState.statLearned,
             statLearning = uiState.statLearning,
             statAverage = uiState.statAverage,
@@ -70,7 +69,7 @@ fun mainScreen(context: MainActivity, navController: NavHostController, vm: Main
 val BORDER_PADDING = 12.dp
 
 @Composable
-fun mainView(
+fun MainView(
     statLearned: Int,
     statLearning: Int,
     statAverage: Int,

@@ -1,16 +1,13 @@
 package com.example.university.ViewModel
 
-import android.content.SharedPreferences
 import android.util.Log
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.graphics.Color
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.university.Model.DBManager
-import com.example.university.ViewModel.States.LoginUiState
+import com.example.university.Model.MySharedPreferences
 import com.example.university.ViewModel.States.RegistrationUiState
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -18,7 +15,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
-class RegistrationViewModel(val db: DBManager, val sharedPreferences: SharedPreferences) :
+class RegistrationViewModel(val db: DBManager, val msp: MySharedPreferences) :
     ViewModel() {
     val TAG = "RegistrationViewModel"
 
@@ -111,9 +108,9 @@ class RegistrationViewModel(val db: DBManager, val sharedPreferences: SharedPref
         viewModelScope.launch {
             db.insertPassword(pass1.toString())
             val newId = db.getPasswords().get(pass1)
-            sharedPreferences.edit().putBoolean("session", true).apply()
+            msp.session = true
             newId?.let {
-                sharedPreferences.edit().putInt("user", it).apply()
+                msp.user = it
             }
             sendToHomePage()
         }

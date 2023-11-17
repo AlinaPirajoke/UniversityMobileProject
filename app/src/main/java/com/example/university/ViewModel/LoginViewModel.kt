@@ -6,16 +6,15 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
 import com.example.university.ViewModel.States.LoginUiState
 import com.example.university.Model.DBManager
+import com.example.university.Model.MySharedPreferences
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
-import kotlinx.coroutines.launch
 
-class LoginViewModel(val db: DBManager, val sharedPreferences: SharedPreferences) : ViewModel() {
+class LoginViewModel(val db: DBManager, val msp: MySharedPreferences) : ViewModel() {
     val TAG = "LoginViewModel"
 
     private val _uiState = MutableStateFlow(LoginUiState())
@@ -26,7 +25,7 @@ class LoginViewModel(val db: DBManager, val sharedPreferences: SharedPreferences
 
     init {
         Log.d(TAG, "Создано")
-        sharedPreferences.edit().putBoolean("session", false).apply()
+        msp.session = false
     }
 
     fun editUserEnter(enteredPass: String) {
@@ -69,7 +68,7 @@ class LoginViewModel(val db: DBManager, val sharedPreferences: SharedPreferences
         Log.i(TAG, "Проверка пароля $enteredPass")
 
         val enteredPass = enteredPass
-        if (!sharedPreferences.getBoolean("isPasswordNeeded", true))
+        if (msp.isPasswordNeeded)
             if (enteredPass?.isEmpty() == true) {
                 setErrorMessage("Введите пароль")
                 setIsPassWrong(true)
@@ -84,8 +83,8 @@ class LoginViewModel(val db: DBManager, val sharedPreferences: SharedPreferences
         }
 
         passwords.get(enteredPass)?.let {
-            sharedPreferences.edit().putInt("user", it).apply()
-            sharedPreferences.edit().putBoolean("session", true).apply()
+            msp.user = it
+            msp.session = true
             sendToHomePage()
         }
     }
