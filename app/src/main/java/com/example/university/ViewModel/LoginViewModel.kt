@@ -51,15 +51,15 @@ class LoginViewModel(val db: DBManager, val sharedPreferences: SharedPreferences
         _uiState.update { state ->
             state.copy(errorMessage = text)
         }
-        if(!text.isEmpty())
+        if (!text.isEmpty())
             Log.w(TAG, "Ошибка ввода: ${uiState.value.errorMessage}")
     }
 
-    fun clearErrorMessage(){
+    fun clearErrorMessage() {
         setErrorMessage("")
     }
 
-    fun setIsPassWrong(condition: Boolean){
+    fun setIsPassWrong(condition: Boolean) {
         _uiState.update { state ->
             state.copy(isFieldWrong = condition)
         }
@@ -69,18 +69,18 @@ class LoginViewModel(val db: DBManager, val sharedPreferences: SharedPreferences
         Log.d(TAG, "Проверка пароля $enteredPass")
         viewModelScope.launch {
             val enteredPass = enteredPass
-            if (!sharedPreferences.getBoolean("needPassword", true))
+            if (!sharedPreferences.getBoolean("isPasswordNeeded", true))
                 if (enteredPass?.isEmpty() == true) {
                     setErrorMessage("Введите пароль")
                     setIsPassWrong(true)
                     return@launch
                 }
-                val passwords = db.getPasswords()
-                if (!(enteredPass in passwords.keys)) {
-                    setErrorMessage("Пароль не верен")
-                    setIsPassWrong(true)
-                    return@launch
-                }
+            val passwords = db.getPasswords()
+            if (!(enteredPass in passwords.keys)) {
+                setErrorMessage("Пароль не верен")
+                setIsPassWrong(true)
+                return@launch
+            }
 
             passwords.get(enteredPass)?.let {
                 sharedPreferences.edit().putInt("user", it).apply()

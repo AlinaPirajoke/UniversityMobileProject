@@ -1,6 +1,6 @@
 package com.example.university.ViewModel.States
 
-data class RegistrationUiState (
+data class RegistrationUiState(
     val isGoingToMain: Boolean = false, // Отправляет на Главную
     val isGoingToLogin: Boolean = false, // Отправляет на Логин
     val isField1Wrong: Boolean = false, // Устанавливает ошибку ввода поля 1

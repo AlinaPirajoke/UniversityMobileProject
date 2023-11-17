@@ -1,4 +1,4 @@
-package com.example.university.View.Auth
+package com.example.university.View.Auth.Screens
 
 import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
@@ -13,6 +13,7 @@ import androidx.compose.material.Button
 import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
+import androidx.compose.material.MaterialTheme
 import androidx.compose.material.OutlinedTextField
 import androidx.compose.material.Text
 import androidx.compose.material.TextFieldDefaults
@@ -36,11 +37,10 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.NavHostController
 import com.example.university.R
+import com.example.university.View.Auth.AuthActivity
+import com.example.university.View.Auth.AuthScreens
 import com.example.university.ViewModel.LoginViewModel
 import com.example.university.ViewModel.LoginViewModelFactory
-import com.example.university.ViewModel.RegistrationViewModel
-import com.example.university.ViewModel.RegistrationViewModelFactory
-import com.example.university.theme.mainColor
 import com.example.university.usefull_stuff.showToast
 
 
@@ -58,9 +58,9 @@ fun loginScreen(context: AuthActivity, navController: NavHostController, vm: Log
 
     val uiState by vm.uiState.collectAsState()
 
-    if(uiState.isGoingToMain)
+    if (uiState.isGoingToMain)
         context.toMain()
-    if(uiState.isGoingToRegister) {
+    if (uiState.isGoingToRegister) {
         Log.i("LoginView", "Перенаправление на регистрацию: ${uiState.isGoingToRegister}")
         vm.sendToRegisterPage(false)
         navController.navigate(AuthScreens.Registration.route)
@@ -147,10 +147,10 @@ fun loginView(
                             onPassConfirm()
                         }),
                     colors = TextFieldDefaults.outlinedTextFieldColors(
-                        focusedBorderColor = mainColor,
-                        unfocusedBorderColor = mainColor,
-                        cursorColor = mainColor,
-                        focusedLabelColor = Color.Black
+                        focusedBorderColor = MaterialTheme.colors.primary,
+                        unfocusedBorderColor = MaterialTheme.colors.primary,
+                        cursorColor = MaterialTheme.colors.primary,
+                        focusedLabelColor = MaterialTheme.colors.secondary,
                     )
                 )
 
@@ -160,7 +160,7 @@ fun loginView(
                     },
                     modifier = Modifier.fillMaxWidth(),
                     colors = ButtonDefaults.buttonColors(
-                        backgroundColor = mainColor,
+                        backgroundColor = MaterialTheme.colors.primary,
                         contentColor = Color.White
                     )
                 ) {
@@ -174,8 +174,8 @@ fun loginView(
                     },
                     modifier = Modifier.fillMaxWidth(),
                     colors = ButtonDefaults.buttonColors(
-                        backgroundColor = mainColor,
-                        contentColor = Color.White
+                        backgroundColor = MaterialTheme.colors.onPrimary,
+                        contentColor = MaterialTheme.colors.primary
                     )
                 ) {
 

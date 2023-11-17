@@ -3,6 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <application
+        android:name=".ViewModel.DI.App"
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:fullBackupContent="@xml/backup_rules"
@@ -14,13 +15,6 @@
         android:windowSoftInputMode="adjustResize"
         android:screenOrientation="portrait"
         tools:targetApi="31">
-        <activity
-            android:name=".View.Main.SettingsActivity"
-            android:exported="false" />
-        <activity
-            android:name=".View.Main.AddActivity"
-            android:exported="false"
-            android:windowSoftInputMode="adjustResize" />
         <activity
             android:name=".View.Main.PickActivity"
             android:exported="false"
