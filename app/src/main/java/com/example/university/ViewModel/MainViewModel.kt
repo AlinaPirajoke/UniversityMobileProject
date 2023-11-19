@@ -2,7 +2,7 @@ package com.example.university.ViewModel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.university.Model.DBManager
+import com.example.university.Model.AppDB.AppDbManager
 import com.example.university.Model.MySharedPreferences
 import com.example.university.ViewModel.States.MainUiState
 import com.example.university.usefull_stuff.getTodayDate
@@ -12,7 +12,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
-class MainViewModel(val db: DBManager, val msp: MySharedPreferences) : ViewModel() {
+class MainViewModel(val db: AppDbManager, val msp: MySharedPreferences) : ViewModel() {
     val TAG = "MainViewModel"
     val user = msp.user
 

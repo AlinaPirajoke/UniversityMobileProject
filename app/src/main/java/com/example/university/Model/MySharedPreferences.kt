@@ -66,6 +66,17 @@ class MySharedPreferences(context: Context) {
             sp.edit().putInt("studyQuantityPerDay", count).apply()
         }
 
+    var isRememberPresent: Boolean = false
+        get() {
+            val v = sp.getBoolean("isRememberPresent", false)
+            Log.i(TAG, "isRememberPresent: $v")
+            return v
+        }
+        set(condition: Boolean){
+            field = condition
+            sp.edit().putBoolean("isRememberPresent", condition).apply()
+        }
+
     fun getColorScheme(): Colors {
         val v = sp.getInt("currentColorSchemeId", 0)
         Log.i(TAG, "currentColorSchemeId: $v")

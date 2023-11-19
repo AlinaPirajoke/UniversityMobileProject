@@ -2,7 +2,7 @@ package com.example.university.ViewModel
 
 import android.util.Log
 import androidx.lifecycle.ViewModel
-import com.example.university.Model.DBManager
+import com.example.university.Model.AppDB.AppDbManager
 import com.example.university.Model.MySharedPreferences
 import com.example.university.ViewModel.States.SettingsUiState
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -10,7 +10,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 
-class SettingsViewModel(val db: DBManager, val msp: MySharedPreferences) : ViewModel() {
+class SettingsViewModel(val db: AppDbManager, val msp: MySharedPreferences) : ViewModel() {
     val TAG = "SettingsViewModel"
 
     private val _uiState = MutableStateFlow(SettingsUiState(colorScheme = msp.getColorScheme()))

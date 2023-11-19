@@ -1,4 +1,4 @@
-package com.example.university.Model
+package com.example.university.Model.AppDB
 
 import android.content.ContentValues
 import android.content.Context
@@ -11,9 +11,9 @@ import com.example.university.usefull_stuff.getTodayDate
 import com.example.university.usefull_stuff.simpleFormatter
 
 
-class DBManager(val context: Context) {
+class AppDbManager(val context: Context) {
     val TAG = "DBManager"
-    val dbHelper = DBHelper(context)
+    val dbHelper = AppDbHelper(context)
     var db: SQLiteDatabase? = null
 
     init {
@@ -27,24 +27,24 @@ class DBManager(val context: Context) {
 
     fun checkWord() {
         Log.d(TAG, "Проверка дб:")
-        val cursor = db?.rawQuery("SELECT ${DBNames.W_DATE} FROM ${DBNames.WORD}", null)
+        val cursor = db!!.rawQuery("SELECT ${AppDbNames.W_DATE} FROM ${AppDbNames.WORD}", null)
         while (cursor?.moveToNext() == true)
             Log.i(TAG, "${cursor.getString(0)}")
     }
 
     fun insertPassword(pass: String) {
         val values = ContentValues().apply {
-            put(DBNames.P_PASS, pass)
+            put(AppDbNames.P_PASS, pass)
         }
-        db?.insert(DBNames.PASSWORD, null, values)
+        db!!.insert(AppDbNames.PASSWORD, null, values)
     }
 
     fun getPasswords(): HashMap<String, Int> {
         Log.i(TAG, "Пользователи:")
         var values = HashMap<String, Int>()
-        val cursor = db?.rawQuery(
-            "SELECT ${DBNames.P_PASS}, ${DBNames.P_ID} " +
-                    "FROM ${DBNames.PASSWORD}", null
+        val cursor = db!!.rawQuery(
+            "SELECT ${AppDbNames.P_PASS}, ${AppDbNames.P_ID} " +
+                    "FROM ${AppDbNames.PASSWORD}", null
         )
         while (cursor?.moveToNext()!!) {
             val pass = cursor.getString(0)
@@ -70,12 +70,12 @@ class DBManager(val context: Context) {
 
     fun dailyDateUpdate() {
         val now = getTodayDate()
-        db!!.execSQL("UPDATE ${DBNames.WORD} SET ${DBNames.W_DATE} = $now WHERE ${DBNames.W_DATE} < $now")
+        db!!.execSQL("UPDATE ${AppDbNames.WORD} SET ${AppDbNames.W_DATE} = $now WHERE ${AppDbNames.W_DATE} < $now")
     }
 
     fun getSizeFromDate(date: String, user: Int): Int? {
-        val cursor = db?.rawQuery(
-            "SELECT COUNT(*) FROM ${DBNames.WORD} WHERE ${DBNames.W_DATE} like \"$date\" AND ${DBNames.W_USER} = $user",
+        val cursor = db!!.rawQuery(
+            "SELECT COUNT(*) FROM ${AppDbNames.WORD} WHERE ${AppDbNames.W_DATE} like \"$date\" AND ${AppDbNames.W_USER} = $user",
             null
         )
         cursor?.moveToFirst()
@@ -90,7 +90,10 @@ class DBManager(val context: Context) {
 
     fun getLearnedCount(): Int {
         val cursor =
-            db?.rawQuery("SELECT COUNT(*) FROM ${DBNames.WORD} WHERE ${DBNames.W_LVL} < 50", null)
+            db!!.rawQuery(
+                "SELECT COUNT(*) FROM ${AppDbNames.WORD} WHERE ${AppDbNames.W_LVL} < 50",
+                null
+            )
         cursor?.moveToFirst()
         val size = cursor?.getInt(0)
         return size!!
@@ -98,7 +101,10 @@ class DBManager(val context: Context) {
 
     fun getLerningCount(): Int {
         val cursor =
-            db?.rawQuery("SELECT COUNT(*) FROM ${DBNames.WORD} WHERE ${DBNames.W_LVL} >= 50", null)
+            db!!.rawQuery(
+                "SELECT COUNT(*) FROM ${AppDbNames.WORD} WHERE ${AppDbNames.W_LVL} >= 50",
+                null
+            )
         cursor?.moveToFirst()
         val size = cursor?.getInt(0)
         return size!!
@@ -110,15 +116,38 @@ class DBManager(val context: Context) {
     }
 
     // Переписать
-    fun addNewWord(enWord: String, transc: String, ruWord: String, days: Int, user: Int) {
+    fun addNewWord(word: String, transc: String, transl: List<String>, days: Int, user: Int) {
+        Log.d(TAG, "Добавление слова $word в бд")
         val date = getDateNDaysLater(days)
         val values = ContentValues().apply {
-            put(DBNames.W_WORD, enWord)
-            put(DBNames.W_SOUND, transc)
-            put(DBNames.W_LVL, days)
-            put(DBNames.W_DATE, date)
-            put(DBNames.W_USER, user)
+            put(AppDbNames.W_WORD, word)
+            put(AppDbNames.W_SOUND, transc)
+            put(AppDbNames.W_LVL, days)
+            put(AppDbNames.W_DATE, date)
+            put(AppDbNames.W_USER, user)
         }
-        db?.insert(DBNames.WORD, null, values)
+        db!!.insert(AppDbNames.WORD, null, values)
+        Log.d(TAG, "Слово добавлено")
+        val cursor = db!!.rawQuery(
+            "SELECT ${AppDbNames.W_ID} FROM ${AppDbNames.WORD} WHERE ${AppDbNames.W_WORD} = $word AND ${AppDbNames.W_LVL} = $days AND ${AppDbNames.W_USER} = user",
+            null
+        )
+        cursor?.moveToFirst()
+        val word_id = cursor?.getInt(0)
+        if (word_id != null) {
+            addNewTranslations(wordId = word_id, transl = transl)
+        }
+        else
+            Log.e(TAG, "Мы проебали id для слова $word")
+    }
+
+    fun addNewTranslations(wordId: Int, transl: List<String>){
+        val values = ContentValues().apply {
+            put(AppDbNames.T_WORD, wordId)
+            transl.forEach{
+                put(AppDbNames.T_TRANSL, it)
+            }
+        }
+        db!!.insert(AppDbNames.TRANSLATION, null, values)
     }
 }

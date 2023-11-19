@@ -46,8 +46,17 @@ import org.koin.androidx.compose.koinViewModel
 private val TAG = "AddView"
 
 @Composable
-fun AddScreen(context: MainActivity, navController: NavHostController, vm: AddViewModel = koinViewModel()) {
+fun AddScreen(
+    context: MainActivity,
+    navController: NavHostController,
+    vm: AddViewModel = koinViewModel()
+) {
     val uiState by vm.uiState.collectAsState()
+    if (uiState.isGoingToMain) {
+        Log.i(TAG, "Перенаправление на главный экран")
+        navController.navigate(MainScreens.Main.route)
+    }
+
     KotobaCustomTheme(colorScheme = uiState.colorScheme) {
         context.window.statusBarColor = MaterialTheme.colors.primary.toArgb()
         AddView(word = uiState.wordValue,
@@ -68,7 +77,7 @@ fun AddScreen(context: MainActivity, navController: NavHostController, vm: AddVi
             errorMessage = uiState.errorMessage,
             onGoingToMain = {
                 Log.i(TAG, "Перенаправление на главный экран")
-                navController.navigate(MainScreens.AddNew.route)
+                navController.navigate(MainScreens.Main.route)
             })
     }
 }
@@ -115,7 +124,8 @@ fun AddView(
             fontSize = 20.sp,
         )
 
-        OutlinedTextField(value = word,
+        OutlinedTextField(
+            value = word,
             onValueChange = { onWordChanged(it) },
             label = {
                 if (isWordFieldWrong) Text(text = errorMessage)
@@ -140,7 +150,8 @@ fun AddView(
             )
         )
 
-        OutlinedTextField(value = transcription,
+        OutlinedTextField(
+            value = transcription,
             onValueChange = { onTranscrChanged(it) },
             label = { Text("Транскрипция (необязательно)") },
             singleLine = true,
@@ -163,7 +174,8 @@ fun AddView(
 
         translations.forEachIndexed { index, translation ->
             Log.d(TAG, "Значение перевода $index - $translation")
-            OutlinedTextField(value = translation,
+            OutlinedTextField(
+                value = translation,
                 onValueChange = { onTranslChanged(it, index.toInt()) },
                 label = {
                     if (isTranslFieldWrong && index == 0) Text(text = errorMessage)
@@ -201,7 +213,8 @@ fun AddView(
         )
 
 
-        OutlinedTextField(value = lvl,
+        OutlinedTextField(
+            value = lvl,
             onValueChange = { onLvlChanged(it) },
             label = {
                 if (isLvlFieldWrong) Text(text = errorMessage)

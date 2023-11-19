@@ -1,20 +1,19 @@
 package com.example.university.ViewModel
 
-import android.content.SharedPreferences
 import android.util.Log
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import com.example.university.ViewModel.States.LoginUiState
-import com.example.university.Model.DBManager
+import com.example.university.Model.AppDB.AppDbManager
 import com.example.university.Model.MySharedPreferences
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 
-class LoginViewModel(val db: DBManager, val msp: MySharedPreferences) : ViewModel() {
+class LoginViewModel(val db: AppDbManager, val msp: MySharedPreferences) : ViewModel() {
     val TAG = "LoginViewModel"
 
     private val _uiState = MutableStateFlow(LoginUiState())

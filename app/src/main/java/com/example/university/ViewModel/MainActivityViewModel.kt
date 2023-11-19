@@ -1,16 +1,15 @@
 package com.example.university.ViewModel
 
 import androidx.lifecycle.ViewModel
-import com.example.university.Model.DBManager
+import com.example.university.Model.AppDB.AppDbManager
 import com.example.university.Model.MySharedPreferences
 import com.example.university.ViewModel.States.MainActivityUiState
-import com.example.university.ViewModel.States.MainUiState
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 
-class MainActivityViewModel(val db: DBManager, val msp: MySharedPreferences) : ViewModel() {
+class MainActivityViewModel(val db: AppDbManager, val msp: MySharedPreferences) : ViewModel() {
     val TAG = "MainActivityViewModel"
     val user = msp.user
 

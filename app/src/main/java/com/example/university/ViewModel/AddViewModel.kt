@@ -1,21 +1,17 @@
 package com.example.university.ViewModel
 
-import android.content.Context
-import android.content.SharedPreferences
 import android.util.Log
 import androidx.core.text.isDigitsOnly
 import androidx.lifecycle.ViewModel
-import com.example.university.Model.DBManager
+import com.example.university.Model.AppDB.AppDbManager
 import com.example.university.Model.MySharedPreferences
 import com.example.university.ViewModel.States.AddUiState
-import com.example.university.ViewModel.States.LoginUiState
-import com.example.university.usefull_stuff.showToast
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 
-class AddViewModel(val db: DBManager, val msp: MySharedPreferences) : ViewModel() {
+class AddViewModel(val db: AppDbManager, val msp: MySharedPreferences) : ViewModel() {
     val TAG = "LoginViewModel"
 
     private val _uiState = MutableStateFlow(AddUiState(colorScheme = msp.getColorScheme()))
@@ -23,6 +19,12 @@ class AddViewModel(val db: DBManager, val msp: MySharedPreferences) : ViewModel(
 
     init {
         Log.d(TAG, "Создано")
+    }
+
+    fun sendToMain(){
+        _uiState.update { state ->
+            state.copy(isGoingToMain = true)
+        }
     }
 
     // Флаги ошибок
@@ -102,43 +104,41 @@ class AddViewModel(val db: DBManager, val msp: MySharedPreferences) : ViewModel(
 
     // Добавление нового слова
      suspend fun addWord() {
+        val values = uiState.value
 
-        if (uiState.value.wordValue.isBlank()) {
+        if (values.wordValue.isBlank()) {
             setErrorMessage("Слово не должно быть пустым")
             setWordFieldWrong()
             return
         }
-
-        if (uiState.value.translValues.all { it.isBlank() }) {
+        if (values.translValues.all { it.isBlank() }) {
             setErrorMessage("Перевод не должен быть пустым")
             setTranslFieldWrong()
             return
         }
-
-        if (uiState.value.lvlValue.toInt() < 0) {
+        if (values.lvlValue.toInt() < 0) {
             setErrorMessage("Период появления должен быть положительным")
             setLvlFieldWrong()
             return
         }
-        /*
+
         try{
             val period: Int
-            if(days.isBlank())
+            if(values.lvlValue.isBlank())
                 period = 0
             else
-                period = days.toInt()
-            db.addNewWord(enWord, transc, ruWord, period, user)
+                period = values.lvlValue.toInt()
+            db.addNewWord(values.wordValue, values.transcrValue, values.translValues, period, msp.user)
         }
         catch (ex: NumberFormatException) {
-            showToast("Период должен быть целочисленным", context)
+            setErrorMessage("Период должен быть целочисленным")
             return
         }
         catch (ex: Exception) {
-            showToast("Ошибка добавления", context)
+            setErrorMessage("Ошибка добавления")
             return
         }
-
-        toExit()*/
+        sendToMain()
     }
 
 

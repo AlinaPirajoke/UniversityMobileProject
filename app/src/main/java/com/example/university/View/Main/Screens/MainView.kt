@@ -1,6 +1,7 @@
 package com.example.university.View.Main.Screens
 
 import android.util.Log
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -36,10 +37,14 @@ import com.example.university.View.Main.MainScreens
 import com.example.university.theme.KotobaCustomTheme
 import org.koin.androidx.compose.koinViewModel
 
-private val TAG = "MainView"
+private const val TAG = "MainView"
 
 @Composable
-fun MainScreen(context: MainActivity, navController: NavHostController, vm: MainViewModel = koinViewModel()) {
+fun MainScreen(
+    context: MainActivity,
+    navController: NavHostController,
+    vm: MainViewModel = koinViewModel()
+) {
     val uiState by vm.uiState.collectAsState()
 //  if (uiState.isGoingToTest) context.toTest()
     KotobaCustomTheme(colorScheme = uiState.colorScheme) {
@@ -50,7 +55,12 @@ fun MainScreen(context: MainActivity, navController: NavHostController, vm: Main
             statAverage = uiState.statAverage,
             todayTest = uiState.todayTest,
             todayLearn = uiState.todayLearn,
-            onGoingToPickCount = { },
+            onGoingToPickQuantity = {
+                if (uiState.todayTest > 0) {
+                    Log.i(TAG, "Перенаправление на экран выбора количества слов для тестирования")
+                    navController.navigate(MainScreens.PickQuantity.route)
+                }
+            },
             onGoingToPickWords = { },
             toAddNew = {
                 Log.i(TAG, "Перенаправление на экран добавления слов")
@@ -75,7 +85,7 @@ fun MainView(
     statAverage: Int,
     todayTest: Int,
     todayLearn: Int,
-    onGoingToPickCount: () -> Unit,
+    onGoingToPickQuantity: () -> Unit,
     onGoingToPickWords: () -> Unit,
     toAddNew: () -> Unit,
     toLogin: () -> Unit,
@@ -96,7 +106,7 @@ fun MainView(
         todayBlock(
             todayTest = todayTest,
             todayLearn = todayLearn,
-            onGoingToPickCount = onGoingToPickCount,
+            onGoingToPickCount = onGoingToPickQuantity,
             onGoingToPickWords = onGoingToPickWords,
         )
         otherBlock(
@@ -237,7 +247,8 @@ fun todayAction(text: String, action: () -> Unit) {
     Card(
         Modifier
             .fillMaxWidth()
-            .padding(top = 15.dp),
+            .padding(top = 15.dp)
+            .clickable { action() },
         shape = RoundedCornerShape(7.dp),
         elevation = 4.dp,
     ) {

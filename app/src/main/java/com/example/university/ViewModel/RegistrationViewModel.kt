@@ -6,7 +6,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.university.Model.DBManager
+import com.example.university.Model.AppDB.AppDbManager
 import com.example.university.Model.MySharedPreferences
 import com.example.university.ViewModel.States.RegistrationUiState
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -15,7 +15,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
-class RegistrationViewModel(val db: DBManager, val msp: MySharedPreferences) :
+class RegistrationViewModel(val db: AppDbManager, val msp: MySharedPreferences) :
     ViewModel() {
     val TAG = "RegistrationViewModel"
 

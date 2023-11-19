@@ -6,10 +6,8 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import com.example.university.View.Main.Screens.AddScreen
 import com.example.university.View.Main.Screens.MainScreen
+import com.example.university.View.Main.Screens.PickQuantityScreen
 import com.example.university.View.Main.Screens.SettingsScreen
-import com.example.university.ViewModel.MainViewModel
-import org.koin.androidx.compose.viewModel
-import org.koin.androidx.viewmodel.ext.android.viewModel
 
 @Composable
 fun MainNavGraph(navController: NavHostController, context: MainActivity) {
@@ -25,6 +23,9 @@ fun MainNavGraph(navController: NavHostController, context: MainActivity) {
         }
         composable(route = MainScreens.Settings.route) {
             SettingsScreen(context = context, navController = navController)
+        }
+        composable(route = MainScreens.PickQuantity.route) {
+            PickQuantityScreen(context = context, navController = navController)
         }
     }
 }
