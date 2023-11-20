@@ -5,7 +5,6 @@ import androidx.lifecycle.ViewModel
 import com.example.university.Model.AppDB.AppDbManager
 import com.example.university.Model.MySharedPreferences
 import com.example.university.ViewModel.States.PickQuantityUiState
-import com.example.university.ViewModel.States.RegistrationUiState
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow

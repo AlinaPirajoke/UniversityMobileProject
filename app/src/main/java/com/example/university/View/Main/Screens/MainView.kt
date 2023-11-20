@@ -98,18 +98,18 @@ fun MainView(
             .padding(0.dp, 0.dp, 0.dp, 0.dp)
             .verticalScroll(scrollState),
     ) {
-        statisticBlock(
+        StatisticBlock(
             learned = statLearned,
             learning = statLearning,
             average = statAverage,
         )
-        todayBlock(
+        TodayBlock(
             todayTest = todayTest,
             todayLearn = todayLearn,
             onGoingToPickCount = onGoingToPickQuantity,
             onGoingToPickWords = onGoingToPickWords,
         )
-        otherBlock(
+        OtherBlock(
             onGoingToSettings = { toSettings() },
             onGoingToAddNew = { toAddNew() },
             onGoingToLogin = { toLogin() },
@@ -118,7 +118,7 @@ fun MainView(
 }
 
 @Composable
-fun statisticBlock(
+fun StatisticBlock(
     learned: Int = 0,
     learning: Int = 0,
     average: Int = 0,
@@ -146,16 +146,16 @@ fun statisticBlock(
                     .padding(10.dp),
                 Arrangement.SpaceBetween,
             ) {
-                statisticLine(text = "Всего слов изучено", value = learned)
-                statisticLine(text = "Слов изучается", value = learning)
-                statisticLine(text = "Среднее изучаемое в день", value = average)
+                StatisticLine(text = "Всего слов изучено", value = learned)
+                StatisticLine(text = "Слов изучается", value = learning)
+                StatisticLine(text = "Среднее изучаемое в день", value = average)
             }
         }
     }
 }
 
 @Composable
-fun todayBlock(
+fun TodayBlock(
     todayTest: Int = 0,
     todayLearn: Int = 0,
     onGoingToPickCount: () -> Unit,
@@ -176,8 +176,8 @@ fun todayBlock(
             color = MaterialTheme.colors.secondaryVariant,
             textAlign = TextAlign.Center
         )
-        todayAction(text = "$todayTest осталось повторить", onGoingToPickWords)
-        todayAction(text = "$todayLearn слов осталось изучить", onGoingToPickCount)
+        TodayAction(text = "$todayTest осталось повторить", onGoingToPickCount)
+        TodayAction(text = "$todayLearn слов осталось изучить", onGoingToPickWords)
         Text(
             modifier = Modifier
                 .fillMaxWidth()
@@ -191,7 +191,7 @@ fun todayBlock(
 }
 
 @Composable
-fun otherBlock(
+fun OtherBlock(
     onGoingToSettings: () -> (Unit),
     onGoingToAddNew: () -> (Unit),
     onGoingToLogin: () -> (Unit),
@@ -222,15 +222,15 @@ fun otherBlock(
             /*Row(
                 Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.spacedBy(15.dp),) {}*/
-            createImgCard(imgId = R.drawable.setings, descr = "Настройки", onGoingToSettings)
-            createImgCard(imgId = R.drawable.add, descr = "Добавить слово", onGoingToAddNew)
-            createImgCard(imgId = R.drawable.logout, descr = "Разлогиниться", onGoingToLogin)
+            CreateImgCard(imgId = R.drawable.setings, descr = "Настройки", onGoingToSettings)
+            CreateImgCard(imgId = R.drawable.add, descr = "Добавить слово", onGoingToAddNew)
+            CreateImgCard(imgId = R.drawable.logout, descr = "Разлогиниться", onGoingToLogin)
         }
     }
 }
 
 @Composable
-fun statisticLine(text: String, value: Int) {
+fun StatisticLine(text: String, value: Int) {
     Row(
         Modifier
             .fillMaxWidth()
@@ -243,7 +243,7 @@ fun statisticLine(text: String, value: Int) {
 }
 
 @Composable
-fun todayAction(text: String, action: () -> Unit) {
+fun TodayAction(text: String, action: () -> Unit) {
     Card(
         Modifier
             .fillMaxWidth()
@@ -263,7 +263,7 @@ fun todayAction(text: String, action: () -> Unit) {
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
-fun createImgCard(imgId: Int, descr: String, action: () -> Unit) {
+fun CreateImgCard(imgId: Int, descr: String, action: () -> Unit) {
     Card(shape = RoundedCornerShape(10.dp), elevation = 4.dp, onClick = { action.invoke() }) {
 
         Box(Modifier.padding(20.dp)) {

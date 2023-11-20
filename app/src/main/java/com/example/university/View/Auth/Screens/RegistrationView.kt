@@ -57,7 +57,10 @@ fun RegistrationScreen(
 
     val uiState by vm.uiState.collectAsState()
 
-    if (uiState.isGoingToMain) context.toMain()
+    if (uiState.isGoingToMain){
+        vm.sendToHomePage(false)
+        context.toMain()
+    }
     if (uiState.isGoingToLogin) {
         Log.i("registrationView", "Перенаправление на логин: ${uiState.isGoingToLogin}")
         vm.sendToLoginPage(false)

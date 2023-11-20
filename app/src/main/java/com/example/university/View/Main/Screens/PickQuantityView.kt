@@ -12,9 +12,11 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Button
+import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.Card
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Slider
+import androidx.compose.material.SliderDefaults
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -22,13 +24,14 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.toArgb
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import com.example.university.View.Main.MainActivity
 import com.example.university.View.Main.MainScreens
-import com.example.university.ViewModel.MainViewModel
 import com.example.university.ViewModel.PickQuantityViewModel
+import com.example.university.theme.ColorScheme
 import com.example.university.theme.KotobaCustomTheme
 import org.koin.androidx.compose.koinViewModel
 
@@ -44,8 +47,7 @@ fun PickQuantityScreen(
 
     KotobaCustomTheme(colorScheme = uiState.colorScheme) {
         context.window.statusBarColor = MaterialTheme.colors.primary.toArgb()
-        PickQuantityView(
-            pickedQuantity = uiState.pickedQuantity,
+        PickQuantityView(pickedQuantity = uiState.pickedQuantity,
             wordsQuantity = uiState.wordsQuantity,
             onValueChange = vm::setQuantity,
             onGoingToTest = {
@@ -60,8 +62,7 @@ fun PickQuantityScreen(
             onGoingToRemember = {
                 Log.i(TAG, "Перенаправление на экран теста")
                 navController.navigate(MainScreens.Main.route)
-            }
-        )
+            })
     }
 }
 
@@ -78,8 +79,7 @@ fun PickQuantityView(
     Column(
         Modifier
             .fillMaxWidth()
-            .fillMaxHeight(),
-        verticalArrangement = Arrangement.SpaceBetween
+            .fillMaxHeight(), verticalArrangement = Arrangement.SpaceBetween
     ) {
         Card(
             Modifier
@@ -108,15 +108,20 @@ fun PickQuantityView(
                     color = MaterialTheme.colors.onPrimary,
                 )
                 Slider(
-                    value = pickedQuantity?.toFloat()!!,
-                    onValueChange = {
+                    value = pickedQuantity?.toFloat()!!, onValueChange = {
                         onValueChange(it.toInt())
                     },
-                    valueRange = 0f..wordsQuantity?.toFloat()!!
+                    valueRange = 0f..wordsQuantity?.toFloat()!!,
+                    colors = SliderDefaults.colors(
+                        thumbColor = MaterialTheme.colors.primaryVariant,
+                        activeTrackColor = MaterialTheme.colors.onPrimary,
+                        inactiveTrackColor = MaterialTheme.colors.secondary,
+                        inactiveTickColor = MaterialTheme.colors.onPrimary,
+                        activeTickColor = MaterialTheme.colors.secondary
+                    )
                 )
                 Row(
-                    Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween
+                    Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween
                 ) {
 
                     Text(
@@ -141,27 +146,62 @@ fun PickQuantityView(
             }
         }
         Column(
-            Modifier.fillMaxSize(),
+            Modifier.fillMaxWidth(),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center,
         ) {
 
-            Button(onClick = onGoingToTest) {
-                Text(text = "Сюды")
+            Button(
+                onClick = onGoingToTest,
+                Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 50.dp, vertical = 30.dp)
+                    .height(50.dp)
+            ) {
+                Text(text = "Пройти тест")
             }
-            if (isRememberPresent)
-                Button(onClick = onGoingToRemember) {
-                    Text(text = "Туды")
-                }
+            if (isRememberPresent) Button(
+                onClick = onGoingToRemember,
+                Modifier
+                    .fillMaxWidth()
+                    .height(50.dp)
+                    .padding(horizontal = 50.dp)
+            ) {
+                Text(text = "Только повторить")
+            }
         }
-        Button(
-            onClick = onGoingToMain,
+        Row(
             Modifier
                 .fillMaxWidth()
                 .padding(bottom = 20.dp),
         ) {
-            Text(text = "Домой")
+            Button(
+                onClick = onGoingToMain,
+                Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 50.dp)
+                    .height(50.dp),
+                colors = ButtonDefaults.buttonColors(
+                    backgroundColor = MaterialTheme.colors.onPrimary,
+                    contentColor = MaterialTheme.colors.primary
+                )
+            ) {
+                Text(text = "Домой")
+            }
         }
+    }
+}
 
+@Preview(showBackground = true)
+@Composable
+fun PickQuantityPreview() {
+    KotobaCustomTheme(colorScheme = ColorScheme.pink.colors) {
+        PickQuantityView(pickedQuantity = 10,
+            wordsQuantity = 20,
+            onValueChange = { },
+            onGoingToTest = { },
+            onGoingToMain = { },
+            isRememberPresent = true,
+            onGoingToRemember = { })
     }
 }

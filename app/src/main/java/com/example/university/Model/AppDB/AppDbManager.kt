@@ -129,7 +129,7 @@ class AppDbManager(val context: Context) {
         db!!.insert(AppDbNames.WORD, null, values)
         Log.d(TAG, "Слово добавлено")
         val cursor = db!!.rawQuery(
-            "SELECT ${AppDbNames.W_ID} FROM ${AppDbNames.WORD} WHERE ${AppDbNames.W_WORD} = $word AND ${AppDbNames.W_LVL} = $days AND ${AppDbNames.W_USER} = user",
+            "SELECT ${AppDbNames.W_ID} FROM ${AppDbNames.WORD} WHERE ${AppDbNames.W_WORD} = \"$word\" AND ${AppDbNames.W_LVL} = $days AND ${AppDbNames.W_USER} = ${user}",
             null
         )
         cursor?.moveToFirst()
@@ -149,5 +149,6 @@ class AppDbManager(val context: Context) {
             }
         }
         db!!.insert(AppDbNames.TRANSLATION, null, values)
+        Log.i(TAG, "Слово было добавленно под номером $wordId")
     }
 }

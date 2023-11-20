@@ -53,6 +53,7 @@ fun AddScreen(
 ) {
     val uiState by vm.uiState.collectAsState()
     if (uiState.isGoingToMain) {
+        vm.sendToMain(false)
         Log.i(TAG, "Перенаправление на главный экран")
         navController.navigate(MainScreens.Main.route)
     }

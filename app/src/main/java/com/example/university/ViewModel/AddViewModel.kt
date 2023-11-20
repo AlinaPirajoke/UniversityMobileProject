@@ -21,9 +21,9 @@ class AddViewModel(val db: AppDbManager, val msp: MySharedPreferences) : ViewMod
         Log.d(TAG, "Создано")
     }
 
-    fun sendToMain(){
+    fun sendToMain(condition: Boolean = true) {
         _uiState.update { state ->
-            state.copy(isGoingToMain = true)
+            state.copy(isGoingToMain = condition)
         }
     }
 
@@ -103,7 +103,7 @@ class AddViewModel(val db: AppDbManager, val msp: MySharedPreferences) : ViewMod
     }
 
     // Добавление нового слова
-     suspend fun addWord() {
+    suspend fun addWord() {
         val values = uiState.value
 
         if (values.wordValue.isBlank()) {
@@ -116,25 +116,28 @@ class AddViewModel(val db: AppDbManager, val msp: MySharedPreferences) : ViewMod
             setTranslFieldWrong()
             return
         }
-        if (values.lvlValue.toInt() < 0) {
+        if (values.lvlValue.isNotBlank() && values.lvlValue.toInt() < 0) {
             setErrorMessage("Период появления должен быть положительным")
             setLvlFieldWrong()
             return
         }
 
-        try{
-            val period: Int
-            if(values.lvlValue.isBlank())
-                period = 0
-            else
+        try {
+            var period = 0
+            if (values.lvlValue.isNotBlank())
                 period = values.lvlValue.toInt()
-            db.addNewWord(values.wordValue, values.transcrValue, values.translValues, period, msp.user)
-        }
-        catch (ex: NumberFormatException) {
+
+            db.addNewWord(
+                values.wordValue,
+                values.transcrValue,
+                values.translValues,
+                period,
+                msp.user
+            )
+        } catch (ex: NumberFormatException) {
             setErrorMessage("Период должен быть целочисленным")
             return
-        }
-        catch (ex: Exception) {
+        } catch (ex: Exception) {
             setErrorMessage("Ошибка добавления")
             return
         }

@@ -53,8 +53,10 @@ fun LoginScreen(context: AuthActivity, navController: NavHostController, vm: Log
 
     val uiState by vm.uiState.collectAsState()
 
-    if (uiState.isGoingToMain)
+    if (uiState.isGoingToMain) {
+        vm.sendToHomePage(false)
         context.toMain()
+    }
     if (uiState.isGoingToRegister) {
         Log.i("LoginView", "Перенаправление на регистрацию: ${uiState.isGoingToRegister}")
         vm.sendToRegisterPage(false)
