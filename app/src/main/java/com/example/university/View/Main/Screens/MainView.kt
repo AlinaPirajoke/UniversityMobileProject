@@ -35,6 +35,7 @@ import androidx.compose.ui.unit.sp
 import com.example.university.R
 import com.example.university.View.Main.MainScreens
 import com.example.university.theme.KotobaCustomTheme
+import com.example.university.UsefullStuff.getTodayDate
 import org.koin.androidx.compose.koinViewModel
 
 private const val TAG = "MainView"
@@ -58,7 +59,7 @@ fun MainScreen(
             onGoingToPickQuantity = {
                 if (uiState.todayTest > 0) {
                     Log.i(TAG, "Перенаправление на экран выбора количества слов для тестирования")
-                    navController.navigate(MainScreens.PickQuantity.route)
+                    navController.navigate("${MainScreens.PickQuantity.route}/${getTodayDate()}")
                 }
             },
             onGoingToPickWords = { },

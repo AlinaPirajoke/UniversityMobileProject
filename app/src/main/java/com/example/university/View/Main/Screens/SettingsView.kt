@@ -38,7 +38,7 @@ import com.example.university.ViewModel.SettingsViewModel
 import com.example.university.theme.KotobaCustomTheme
 import com.example.university.theme.PH
 import com.example.university.theme.pink
-import com.example.university.usefull_stuff.showToast
+import com.example.university.UsefullStuff.showToast
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
 

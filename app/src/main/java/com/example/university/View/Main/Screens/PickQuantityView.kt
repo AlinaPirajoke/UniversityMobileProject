@@ -1,5 +1,6 @@
 package com.example.university.View.Main.Screens
 
+import android.graphics.Paint.Align
 import android.util.Log
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -24,6 +25,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.toArgb
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -38,18 +40,31 @@ import org.koin.androidx.compose.koinViewModel
 private const val TAG = "PickQuantityView"
 
 @Composable
+fun PickQuantityInit(
+    context: MainActivity,
+    navController: NavHostController,
+    date: String,
+    vm: PickQuantityViewModel = koinViewModel()
+) {
+    Log.i(TAG, "Выбранная дата: $date")
+    vm.setDate(date)
+    PickQuantityScreen(context = context, navController = navController, vm = vm)
+}
+
+@Composable
 fun PickQuantityScreen(
     context: MainActivity,
     navController: NavHostController,
-    vm: PickQuantityViewModel = koinViewModel()
+    vm: PickQuantityViewModel,
 ) {
     val uiState by vm.uiState.collectAsState()
 
     KotobaCustomTheme(colorScheme = uiState.colorScheme) {
         context.window.statusBarColor = MaterialTheme.colors.primary.toArgb()
-        PickQuantityView(pickedQuantity = uiState.pickedQuantity,
+        PickQuantityView(
+            pickedQuantity = uiState.pickedQuantity,
             wordsQuantity = uiState.wordsQuantity,
-            onValueChange = vm::setQuantity,
+            onValueChange = vm::setPickedQuantity,
             onGoingToTest = {
                 Log.i(TAG, "Перенаправление на экран теста")
                 navController.navigate(MainScreens.AddNew.route)
@@ -62,7 +77,9 @@ fun PickQuantityScreen(
             onGoingToRemember = {
                 Log.i(TAG, "Перенаправление на экран теста")
                 navController.navigate(MainScreens.Main.route)
-            })
+            },
+            pickedWords = uiState.pickedWords
+        )
     }
 }
 
@@ -75,76 +92,112 @@ fun PickQuantityView(
     onGoingToMain: () -> Unit,
     isRememberPresent: Boolean,
     onGoingToRemember: () -> Unit,
+    pickedWords: String,
 ) {
     Column(
         Modifier
             .fillMaxWidth()
             .fillMaxHeight(), verticalArrangement = Arrangement.SpaceBetween
     ) {
-        Card(
-            Modifier
-                .fillMaxWidth()
-                .height(250.dp),
-            shape = RoundedCornerShape(0.dp, 0.dp, 30.dp, 30.dp),
-            elevation = 4.dp,
-            backgroundColor = MaterialTheme.colors.primary,
-        ) {
-            Column(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(20.dp, 30.dp),
-                verticalArrangement = Arrangement.SpaceAround
+        Column {
+
+            Card(
+                Modifier
+                    .fillMaxWidth()
+                    .height(250.dp),
+                shape = RoundedCornerShape(0.dp, 0.dp, 20.dp, 20.dp),
+                elevation = 4.dp,
+                backgroundColor = MaterialTheme.colors.primary,
             ) {
-
-                Text(
-                    text = "Выберите количество слов, которое хотите повторить",
-                    fontSize = 20.sp,
-                    color = MaterialTheme.colors.onPrimary,
-                )
-
-                Text(
-                    text = "$pickedQuantity из $wordsQuantity",
-                    fontSize = 30.sp,
-                    color = MaterialTheme.colors.onPrimary,
-                )
-                Slider(
-                    value = pickedQuantity?.toFloat()!!, onValueChange = {
-                        onValueChange(it.toInt())
-                    },
-                    valueRange = 0f..wordsQuantity?.toFloat()!!,
-                    colors = SliderDefaults.colors(
-                        thumbColor = MaterialTheme.colors.primaryVariant,
-                        activeTrackColor = MaterialTheme.colors.onPrimary,
-                        inactiveTrackColor = MaterialTheme.colors.secondary,
-                        inactiveTickColor = MaterialTheme.colors.onPrimary,
-                        activeTickColor = MaterialTheme.colors.secondary
-                    )
-                )
-                Row(
-                    Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween
+                Column(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(20.dp, 5.dp, 20.dp, 20.dp),
+                    verticalArrangement = Arrangement.SpaceAround
                 ) {
 
                     Text(
-                        text = "Выбрать 5",
-                        Modifier.clickable { onValueChange(5) },
+                        text = "Выберите количество слов, которое хотите повторить",
                         color = MaterialTheme.colors.onPrimary,
-                        fontSize = 20.sp,
+                        style = MaterialTheme.typography.h5,
                     )
+
                     Text(
-                        text = "Выбрать 10",
-                        Modifier.clickable { onValueChange(10) },
+                        text = "$pickedQuantity из $wordsQuantity",
+                        fontSize = 30.sp,
                         color = MaterialTheme.colors.onPrimary,
-                        fontSize = 20.sp
                     )
+                    Slider(
+                        value = pickedQuantity?.toFloat()!!, onValueChange = {
+                            onValueChange(it.toInt())
+                        },
+                        valueRange = 0f..wordsQuantity?.toFloat()!!,
+                        colors = SliderDefaults.colors(
+                            thumbColor = MaterialTheme.colors.primaryVariant,
+                            activeTrackColor = MaterialTheme.colors.onPrimary,
+                            inactiveTrackColor = MaterialTheme.colors.secondary,
+                            inactiveTickColor = MaterialTheme.colors.onPrimary,
+                            activeTickColor = MaterialTheme.colors.secondary
+                        )
+                    )
+                    Row(
+                        Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween
+                    ) {
+
+                        Text(
+                            text = "Выбрать 5",
+                            Modifier.clickable { onValueChange(5) },
+                            color = MaterialTheme.colors.onPrimary,
+                            fontSize = 20.sp,
+                        )
+                        Text(
+                            text = "Выбрать 10",
+                            Modifier.clickable { onValueChange(10) },
+                            color = MaterialTheme.colors.onPrimary,
+                            fontSize = 20.sp
+                        )
+                        Text(
+                            text = "Выбрать 15",
+                            Modifier.clickable { onValueChange(15) },
+                            color = MaterialTheme.colors.onPrimary,
+                            fontSize = 20.sp
+                        )
+                    }
+                }
+            }
+            Column(
+                Modifier
+                    .fillMaxWidth()
+//                .height(120.dp)
+                    .padding(top = 20.dp)
+            ) {
+                Text(
+                    text = "Выбранные слова:",
+                    Modifier
+                        .fillMaxWidth(),
+                    style = MaterialTheme.typography.subtitle1,
+                    color = MaterialTheme.colors.secondaryVariant
+                )
+                Card(
+                    Modifier
+                        .fillMaxWidth()
+                        .padding(25.dp, 10.dp, 25.dp, 50.dp),
+                    shape = RoundedCornerShape(10.dp),
+                    elevation = 4.dp,
+                ) {
                     Text(
-                        text = "Выбрать 15",
-                        Modifier.clickable { onValueChange(15) },
-                        color = MaterialTheme.colors.onPrimary,
-                        fontSize = 20.sp
+                        text = pickedWords,
+                        Modifier
+                            .fillMaxWidth()
+                            .height(120.dp)
+                            .padding(12.dp),
+                        style = MaterialTheme.typography.body1,
+                        color = MaterialTheme.colors.secondary
                     )
                 }
             }
         }
+
         Column(
             Modifier.fillMaxWidth(),
             horizontalAlignment = Alignment.CenterHorizontally,
@@ -186,7 +239,7 @@ fun PickQuantityView(
                     contentColor = MaterialTheme.colors.primary
                 )
             ) {
-                Text(text = "Домой")
+                Text(text = "Назад")
             }
         }
     }
@@ -202,6 +255,7 @@ fun PickQuantityPreview() {
             onGoingToTest = { },
             onGoingToMain = { },
             isRememberPresent = true,
-            onGoingToRemember = { })
+            onGoingToRemember = { },
+            pickedWords = "a, b, c, d, e, f, j")
     }
 }
