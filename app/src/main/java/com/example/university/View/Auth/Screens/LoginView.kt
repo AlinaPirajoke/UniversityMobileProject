@@ -40,7 +40,7 @@ import com.example.university.R
 import com.example.university.View.Auth.AuthActivity
 import com.example.university.View.Auth.AuthScreens
 import com.example.university.ViewModel.LoginViewModel
-import com.example.university.usefull_stuff.showToast
+import com.example.university.UsefullStuff.showToast
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
 

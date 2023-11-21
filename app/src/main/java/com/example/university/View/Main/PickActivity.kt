@@ -28,10 +28,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.university.Model.AppDB.AppDbManager
-import com.example.university.theme.ColorScheme
-import com.example.university.theme.KotobaCustomTheme
-import com.example.university.usefull_stuff.formatDate
-import com.example.university.usefull_stuff.simpleFormatterWithYear
+import com.example.university.Theme.ColorScheme
+import com.example.university.Theme.KotobaCustomTheme
+import com.example.university.UsefullStuff.formatDate
+import com.example.university.UsefullStuff.simpleFormatterWithYear
 import java.time.LocalDate
 
 class PickActivity : AppCompatActivity() {
@@ -53,7 +53,7 @@ class PickActivity : AppCompatActivity() {
 
         // not MVVM
         val db = AppDbManager(this)
-        val count = db.getSizeFromDate(dateString, user)
+        val count = db.getQuantityFromDate(dateString, user)
         /////
 
         setContent() {

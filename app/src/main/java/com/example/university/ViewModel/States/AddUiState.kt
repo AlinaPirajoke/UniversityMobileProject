@@ -1,12 +1,9 @@
 package com.example.university.ViewModel.States
 
 import androidx.compose.material.Colors
-import androidx.compose.runtime.MutableState
-import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateListOf
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.snapshots.SnapshotStateList
-import com.example.university.theme.ColorScheme
+import com.example.university.Theme.ColorScheme
 
 data class AddUiState(
     val isGoingToMain: Boolean = false, // Отправляет на Главную

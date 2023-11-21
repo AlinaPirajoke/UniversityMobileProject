@@ -6,6 +6,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import com.example.university.View.Main.Screens.AddScreen
 import com.example.university.View.Main.Screens.MainScreen
+import com.example.university.View.Main.Screens.PickQuantityInit
 import com.example.university.View.Main.Screens.PickQuantityScreen
 import com.example.university.View.Main.Screens.SettingsScreen
 
@@ -24,8 +25,8 @@ fun MainNavGraph(navController: NavHostController, context: MainActivity) {
         composable(route = MainScreens.Settings.route) {
             SettingsScreen(context = context, navController = navController)
         }
-        composable(route = MainScreens.PickQuantity.route) {
-            PickQuantityScreen(context = context, navController = navController)
+        composable(route = MainScreens.PickQuantity.route + "/{date}") {backStackEntry ->
+            PickQuantityInit(context = context, navController = navController, backStackEntry.arguments?.getString("date")!!)
         }
     }
 }

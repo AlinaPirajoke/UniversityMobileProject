@@ -5,7 +5,7 @@ import android.provider.BaseColumns
 object AppDbNames : BaseColumns {
     // Бд со словами пользователя
     const val DATABASE_NAME = "words_database.db"
-    const val DATABASE_VERSION = 5
+    const val DATABASE_VERSION = 7
 
     // Таблица с пользователями
     const val PASSWORD = "password"
@@ -72,20 +72,35 @@ object AppDbNames : BaseColumns {
                     "UNIQUE($WE_WORD, $WE_EXMPL))")
     const val DELETE_TABLE_WORD_EXAMPLE = "DROP TABLE IF EXISTS $WORD_EXAMPLE"
 
-    //  Таблица содержащая статистику
-    const val STATISTIC = "word_example"
-    const val S_WORD = "word_id"
-    const val S_RESULT = "result"
-    const val S_LIST = "list_number"
-    const val S_IS_NEW = "is_new"
-    const val CREATE_TABLE_STATISTIC = (
-            "CREATE TABLE IF NOT EXISTS $STATISTIC ( " +
-                    "$S_WORD INTEGER NOT NULL, " +
-                    "$S_RESULT INTEGER NOT NULL, " +
-                    "$S_IS_NEW INTEGER NOT NULL," +
-                    "$S_LIST INTEGER, " +
-                    "FOREIGN KEY($S_WORD) REFERENCES $WORD ($W_ID))")
-    const val DELETE_TABLE_STATISTIC = "DROP TABLE IF EXISTS $STATISTIC"
+    //  Таблица содержащая списки слов (пройденных вместе)
+    const val LIST = "list"
+    const val L_ID = BaseColumns._ID 
+    const val L_WORD = "word_id"
+    const val L_RESULT = "result"
+    const val L_IS_NEW = "is_new"
+    const val L_IS_FINISHED = "is_finished"
+    const val CREATE_TABLE_LIST = (
+            "CREATE TABLE IF NOT EXISTS $LIST ( " +
+                    "$L_ID INTEGER PRIMARY KEY, " +
+                    "$L_WORD INTEGER NOT NULL, " +
+                    "$L_RESULT INTEGER DEFAULT 0, " +
+                    "$L_IS_NEW INTEGER NOT NULL," +
+                    "$L_IS_FINISHED INTEGER NOT NULL DEFAULT 0," +
+                    "FOREIGN KEY($L_WORD) REFERENCES $WORD ($W_ID))")
+    const val DELETE_TABLE_LIST = "DROP TABLE IF EXISTS $LIST"
+
+    const val LIST_DATE = "list_date"
+    const val LD_LIST = "list_id"
+    const val LD_DATE = "date"
+    const val LD_USER = "user_id"
+    const val CREATE_TABLE_LIST_DATE = (
+            "CREATE TABLE IF NOT EXISTS $LIST_DATE ( " +
+                    "$LD_LIST INTEGER NOT NULL, " +
+                    "$LD_DATE DATE NOT NULL, " +
+                    "$LD_USER INTEGER NOT NULL," +
+                    "FOREIGN KEY($LD_LIST) REFERENCES $LIST ($L_ID)," +
+                    "FOREIGN KEY ($LD_USER) REFERENCES $PASSWORD ($P_ID))")
+    const val DELETE_TABLE_LIST_DATE = "DROP TABLE IF EXISTS $LIST_DATE"
 
     const val COLUMN_NAME_TITLE = "title"
     const val COLUMN_NAME_SUBTITLE = "subtitle"

@@ -35,10 +35,10 @@ import androidx.navigation.NavHostController
 import com.example.university.View.Main.MainActivity
 import com.example.university.View.Main.MainScreens
 import com.example.university.ViewModel.SettingsViewModel
-import com.example.university.theme.KotobaCustomTheme
-import com.example.university.theme.PH
-import com.example.university.theme.pink
-import com.example.university.usefull_stuff.showToast
+import com.example.university.Theme.KotobaCustomTheme
+import com.example.university.Theme.PH
+import com.example.university.Theme.pink
+import com.example.university.UsefullStuff.showToast
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
 

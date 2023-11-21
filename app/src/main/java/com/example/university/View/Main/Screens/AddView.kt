@@ -38,8 +38,8 @@ import androidx.navigation.NavHostController
 import com.example.university.View.Main.MainActivity
 import com.example.university.View.Main.MainScreens
 import com.example.university.ViewModel.AddViewModel
-import com.example.university.theme.ColorScheme
-import com.example.university.theme.KotobaCustomTheme
+import com.example.university.Theme.ColorScheme
+import com.example.university.Theme.KotobaCustomTheme
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
 
