@@ -5,7 +5,7 @@ import android.provider.BaseColumns
 object AppDbNames : BaseColumns {
     // Бд со словами пользователя
     const val DATABASE_NAME = "words_database.db"
-    const val DATABASE_VERSION = 7
+    const val DATABASE_VERSION = 8
 
     // Таблица с пользователями
     const val PASSWORD = "password"
@@ -81,11 +81,12 @@ object AppDbNames : BaseColumns {
     const val L_IS_FINISHED = "is_finished"
     const val CREATE_TABLE_LIST = (
             "CREATE TABLE IF NOT EXISTS $LIST ( " +
-                    "$L_ID INTEGER PRIMARY KEY, " +
+                    "$L_ID INTEGER NOT NULL, " +
                     "$L_WORD INTEGER NOT NULL, " +
                     "$L_RESULT INTEGER DEFAULT 0, " +
                     "$L_IS_NEW INTEGER NOT NULL," +
                     "$L_IS_FINISHED INTEGER NOT NULL DEFAULT 0," +
+                    "PRIMARY KEY($L_ID, $L_WORD)," +
                     "FOREIGN KEY($L_WORD) REFERENCES $WORD ($W_ID))")
     const val DELETE_TABLE_LIST = "DROP TABLE IF EXISTS $LIST"
 
@@ -99,7 +100,7 @@ object AppDbNames : BaseColumns {
                     "$LD_DATE DATE NOT NULL, " +
                     "$LD_USER INTEGER NOT NULL," +
                     "FOREIGN KEY($LD_LIST) REFERENCES $LIST ($L_ID)," +
-                    "FOREIGN KEY ($LD_USER) REFERENCES $PASSWORD ($P_ID))")
+                    "FOREIGN KEY($LD_USER) REFERENCES $PASSWORD ($P_ID))")
     const val DELETE_TABLE_LIST_DATA = "DROP TABLE IF EXISTS $LIST_DATA"
 
     const val COLUMN_NAME_TITLE = "title"

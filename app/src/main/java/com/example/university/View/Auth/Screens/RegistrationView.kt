@@ -50,14 +50,13 @@ private const val TAG = "RegistrationView"
 
 @Composable
 fun RegistrationScreen(
-    context: AuthActivity, navController: NavHostController, vm: RegistrationViewModel = koinViewModel()
+    context: AuthActivity,
+    navController: NavHostController,
+    vm: RegistrationViewModel = koinViewModel()
 ) {
-    // Мня за такие аргументы не опустят?
-
-
     val uiState by vm.uiState.collectAsState()
 
-    if (uiState.isGoingToMain){
+    if (uiState.isGoingToMain) {
         vm.sendToHomePage(false)
         context.toMain()
     }
@@ -66,11 +65,11 @@ fun RegistrationScreen(
         vm.sendToLoginPage(false)
         navController.navigate(AuthScreens.Login.route)
     }
-    if (!uiState.errorMessage.isEmpty()) {
-        showToast(uiState.errorMessage, context)
-        vm.clearErrorMessage()
-        Log.w("registrationView", "Получена ошибка: ${uiState.errorMessage}")
-    }
+//    if (!uiState.errorMessage.isEmpty()) {
+//        showToast(uiState.errorMessage, context)
+//        vm.clearErrorMessage()
+//        Log.w("registrationView", "Получена ошибка: ${uiState.errorMessage}")
+//    }
 
     RegistrationView(
         pass1 = vm.enteredPass1,
@@ -78,6 +77,7 @@ fun RegistrationScreen(
         onUserInput1Changed = vm::setPass1Value,
         onUserInput2Changed = vm::setPass2Value,
         onGoingToLogin = vm::sendToLoginPage,
+        errorMessage = uiState.errorMessage,
         isField1Error = uiState.isField1Wrong,
         isField2Error = uiState.isField2Wrong,
         onPassConfirm = {
@@ -94,6 +94,7 @@ fun RegistrationView(
     pass2: String,
     onUserInput1Changed: (String) -> Unit,
     onUserInput2Changed: (String) -> Unit,
+    errorMessage: String,
     onPassConfirm: () -> Unit,
     onGoingToLogin: () -> Unit,
     isField1Error: Boolean,
@@ -125,7 +126,7 @@ fun RegistrationView(
             value = pass1,
             onValueChange = { onUserInput1Changed(it) },
             label = {
-                if (isField1Error) Text("Такой пароль не подойдёт")
+                if (isField1Error) Text(text = errorMessage)
                 else Text("Придумайте пароль")
             },
             singleLine = true,
@@ -160,7 +161,7 @@ fun RegistrationView(
             value = pass2,
             onValueChange = { onUserInput2Changed(it) },
             label = {
-                if (isField2Error) Text("Такой пароль не подойдёт")
+                if (isField2Error) Text(text = errorMessage)
                 else Text("Повторите пароль")
             },
             singleLine = true,

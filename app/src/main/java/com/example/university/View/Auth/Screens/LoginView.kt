@@ -62,11 +62,11 @@ fun LoginScreen(context: AuthActivity, navController: NavHostController, vm: Log
         vm.sendToRegisterPage(false)
         navController.navigate(AuthScreens.Registration.route)
     }
-    if (!uiState.errorMessage.isEmpty()) {
-        showToast(uiState.errorMessage, context)
-        vm.clearErrorMessage()
-        Log.w(TAG, "Получена ошибка: ${uiState.errorMessage}")
-    }
+//    if (!uiState.errorMessage.isEmpty()) {
+//        showToast(uiState.errorMessage, context)
+//        vm.clearErrorMessage()
+//        Log.w(TAG, "Получена ошибка: ${uiState.errorMessage}")
+//    }
 
     LoginView(
         pass = vm.enteredPass,
@@ -79,6 +79,7 @@ fun LoginScreen(context: AuthActivity, navController: NavHostController, vm: Log
         },
         onGoingToRegister = vm::sendToRegisterPage,
         isError = uiState.isFieldWrong,
+        errorMessage = uiState.errorMessage,
     )
 }
 
@@ -89,6 +90,7 @@ fun LoginView(
     onPassConfirm: () -> Unit,
     onGoingToRegister: () -> Unit,
     isError: Boolean,
+    errorMessage: String,
 ) {
     Column(
         Modifier
@@ -121,7 +123,7 @@ fun LoginView(
                     onValueChange = { onUserInputChanged(it) },
                     label = {
                         if (isError)
-                            Text("Пароль не верен")
+                            Text(text = errorMessage)
                         else
                             Text("Введите пароль")
                     },

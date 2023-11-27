@@ -20,7 +20,6 @@ import com.example.university.Model.AppDB.AppDbNames.DELETE_TABLE_TRANSLATION
 import com.example.university.Model.AppDB.AppDbNames.DELETE_TABLE_WORD
 import com.example.university.Model.AppDB.AppDbNames.DELETE_TABLE_WORD_EXAMPLE
 
-
 class AppDbHelper(context: Context) :
     SQLiteOpenHelper(context, DATABASE_NAME, null, DATABASE_VERSION) {
 

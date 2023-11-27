@@ -7,11 +7,13 @@ import com.example.university.Model.AppDB.AppDbManager
 import com.example.university.Model.MySharedPreferences
 import com.example.university.UsefullStuff.Word
 import com.example.university.ViewModel.States.PickQuantityUiState
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class PickQuantityViewModel(val db: AppDbManager, val msp: MySharedPreferences) : ViewModel() {
     private val TAG = "PickQuantityViewModel"
@@ -63,13 +65,8 @@ class PickQuantityViewModel(val db: AppDbManager, val msp: MySharedPreferences) 
         }
     }
 
-    suspend fun toTest() {
-        val listId =
-            createList() // createList() (оба) возвращают номер списка слов для прохождения
-        // TODO(запуск экрана теста)
-    }
-
-    private suspend fun createList(): Int {
+    // createList() (оба) возвращают номер списка слов для прохождения
+    suspend fun createList(): Int {
         return db.createList(words = words, date = date, user = msp.user)
     }
 }

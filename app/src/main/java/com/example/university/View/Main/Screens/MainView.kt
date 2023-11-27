@@ -28,6 +28,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -42,38 +43,34 @@ private const val TAG = "MainView"
 
 @Composable
 fun MainScreen(
-    context: MainActivity,
+    onGoingToLogin: () -> Unit,
     navController: NavHostController,
     vm: MainViewModel = koinViewModel()
 ) {
     val uiState by vm.uiState.collectAsState()
-//  if (uiState.isGoingToTest) context.toTest()
-    KotobaCustomTheme(colorScheme = uiState.colorScheme) {
-        context.window.statusBarColor = MaterialTheme.colors.primary.toArgb()
-        MainView(
-            statLearned = uiState.statLearned,
-            statLearning = uiState.statLearning,
-            statAverage = uiState.statAverage,
-            todayTest = uiState.todayTest,
-            todayLearn = uiState.todayLearn,
-            onGoingToPickQuantity = {
-                if (uiState.todayTest > 0) {
-                    Log.i(TAG, "Перенаправление на экран выбора количества слов для тестирования")
-                    navController.navigate("${MainScreens.PickQuantity.route}/${getTodayDate()}")
-                }
-            },
-            onGoingToPickWords = { },
-            toAddNew = {
-                Log.i(TAG, "Перенаправление на экран добавления слов")
-                navController.navigate(MainScreens.AddNew.route)
-            },
-            toSettings = {
-                Log.i(TAG, "Перенаправление на экран настроек")
-                navController.navigate(MainScreens.Settings.route)
-            },
-            toLogin = context::toLogin,
-        )
-    }
+    MainView(
+        statLearned = uiState.statLearned,
+        statLearning = uiState.statLearning,
+        statAverage = uiState.statAverage,
+        todayTest = uiState.todayTest,
+        todayLearn = uiState.todayLearn,
+        onGoingToPickQuantity = {
+            if (uiState.todayTest > 0) {
+                Log.i(TAG, "Перенаправление на экран выбора количества слов для тестирования")
+                navController.navigate("${MainScreens.PickQuantity.route}/${getTodayDate()}")
+            }
+        },
+        onGoingToPickWords = { },
+        toAddNew = {
+            Log.i(TAG, "Перенаправление на экран добавления слов")
+            navController.navigate(MainScreens.AddNew.route)
+        },
+        toSettings = {
+            Log.i(TAG, "Перенаправление на экран настроек")
+            navController.navigate(MainScreens.Settings.route)
+        },
+        toLogin = onGoingToLogin,
+    )
 
 }
 

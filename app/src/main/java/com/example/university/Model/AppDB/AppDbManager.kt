@@ -11,7 +11,6 @@ import com.example.university.UsefullStuff.getDaysFromToday
 import com.example.university.UsefullStuff.getTodayDate
 import com.example.university.UsefullStuff.simpleFormatter
 
-
 class AppDbManager(val context: Context) {
     val TAG = "DBManager"
     val dbHelper = AppDbHelper(context)
@@ -117,8 +116,7 @@ class AppDbManager(val context: Context) {
     fun getWordsFromDate(date: String, user: Int): ArrayList<Word> {
         val words = ArrayList<Word>()
         val cursor = db!!.rawQuery(
-            "SELECT ${AppDbNames.W_ID}, ${AppDbNames.W_WORD}, ${AppDbNames.W_SOUND}, ${AppDbNames.W_LVL} " +
-                    "FROM ${AppDbNames.WORD} WHERE ${AppDbNames.W_DATE} = \"$date\"",
+            "SELECT ${AppDbNames.W_ID}, ${AppDbNames.W_WORD}, ${AppDbNames.W_SOUND}, ${AppDbNames.W_LVL} " + "FROM ${AppDbNames.WORD} WHERE ${AppDbNames.W_DATE} = \"$date\"",
             null
         )
 
@@ -141,13 +139,10 @@ class AppDbManager(val context: Context) {
         return words
     }
 
-    fun getTranslationsFromWord(wordId: Int): ArrayList<String>{
+    fun getTranslationsFromWord(wordId: Int): ArrayList<String> {
         val transl = ArrayList<String>()
         val cursor = db!!.rawQuery(
-            "SELECT ${AppDbNames.TRANSLATION}.${AppDbNames.T_TRANSL} " +
-                    "FROM ${AppDbNames.TRANSLATION} JOIN ${AppDbNames.WORD} " +
-                    "ON ${AppDbNames.TRANSLATION}.${AppDbNames.T_WORD} = ${AppDbNames.WORD}.${AppDbNames.W_ID}" +
-                    "WHERE ${AppDbNames.WORD}.${AppDbNames.W_ID} = $wordId",
+            "SELECT ${AppDbNames.TRANSLATION}.${AppDbNames.T_TRANSL} FROM ${AppDbNames.TRANSLATION} JOIN ${AppDbNames.WORD} ON ${AppDbNames.TRANSLATION}.${AppDbNames.T_WORD} = ${AppDbNames.WORD}.${AppDbNames.W_ID} WHERE ${AppDbNames.WORD}.${AppDbNames.W_ID} = $wordId",
             null
         )
 
@@ -192,6 +187,7 @@ class AppDbManager(val context: Context) {
     }
 
     fun createList(words: List<Word>, date: String, user: Int): Int {
+        // Получаем максимальный id из таблицы со списками
         var listId = 0
         try {
             val cursor = db!!.rawQuery(
@@ -203,6 +199,7 @@ class AppDbManager(val context: Context) {
             Log.e(TAG, "Ошибка добавления: ${e.javaClass}")
         }
 
+        // Создаём под вычисленным listId записи со словами в таблицу со списками
         words.forEach { word ->
             val listValues = ContentValues().apply {
                 put(AppDbNames.L_ID, listId)
@@ -212,6 +209,7 @@ class AppDbManager(val context: Context) {
             db!!.insert(AppDbNames.LIST, null, listValues)
         }
 
+        // Заносим даннае о списке в соответствующую таблицу (с данными о списках)
         val dataValues = ContentValues().apply {
             put(AppDbNames.LD_LIST, listId)
             put(AppDbNames.LD_USER, user)
@@ -225,11 +223,7 @@ class AppDbManager(val context: Context) {
     fun getWordsFromList(list: Int): ArrayList<Word> {
         val words = ArrayList<Word>()
         val cursor = db!!.rawQuery(
-            "SELECT ${AppDbNames.WORD}.${AppDbNames.W_ID}, ${AppDbNames.WORD}.${AppDbNames.W_WORD}," +
-                    "${AppDbNames.WORD}.${AppDbNames.W_SOUND}, ${AppDbNames.WORD}.${AppDbNames.W_LVL} " +
-                    "FROM ${AppDbNames.WORD} JOIN ${AppDbNames.LIST}" +
-                    "ON ${AppDbNames.WORD}.${AppDbNames.W_ID} = ${AppDbNames.LIST}.${AppDbNames.L_WORD}" +
-                    "WHERE ${AppDbNames.L_ID} = $list",
+            "SELECT ${AppDbNames.WORD}.${AppDbNames.W_ID}, ${AppDbNames.WORD}.${AppDbNames.W_WORD}, ${AppDbNames.WORD}.${AppDbNames.W_SOUND}, ${AppDbNames.WORD}.${AppDbNames.W_LVL} FROM ${AppDbNames.WORD} JOIN ${AppDbNames.LIST} ON ${AppDbNames.WORD}.${AppDbNames.W_ID} = ${AppDbNames.LIST}.${AppDbNames.L_WORD} WHERE ${AppDbNames.LIST}.${AppDbNames.L_ID} = $list",
             null
         )
 
@@ -248,4 +242,25 @@ class AppDbManager(val context: Context) {
         return words
     }
 
+    fun saveWordResult(word: Word, listId: Int) {
+        db!!.execSQL(
+            "UPDATE ${AppDbNames.LIST} SET ${AppDbNames.L_RESULT} = ${word.result}, ${AppDbNames.L_IS_FINISHED} = 1 WHERE ${AppDbNames.L_WORD} = ${word.id} AND ${AppDbNames.L_ID} = $listId"
+        )
+        Log.i(
+            TAG,
+            "Резильтат слова ${word.word} записан как ${AppDbNames.L_RESULT} = ${word.result}, ${AppDbNames.L_IS_FINISHED} = 1"
+        )
+        updateWordDate(word)
+    }
+
+    fun updateWordDate(word: Word) {
+        db!!.execSQL(
+            "UPDATE ${AppDbNames.WORD} SET ${AppDbNames.W_LVL} = ${word.lvl}, ${AppDbNames.W_DATE} = \"${
+                getDateNDaysLater(
+                    word.lvl
+                )
+            }\" WHERE ${AppDbNames.W_ID} = ${word.id}"
+        )
+        Log.i(TAG, "Слово ${word.word} отправлено на дату ${getDateNDaysLater(word.lvl)}")
+    }
 }

@@ -9,6 +9,7 @@ import com.example.university.ViewModel.MainViewModel
 import com.example.university.ViewModel.PickQuantityViewModel
 import com.example.university.ViewModel.RegistrationViewModel
 import com.example.university.ViewModel.SettingsViewModel
+import com.example.university.ViewModel.TestViewModel
 import org.koin.androidx.viewmodel.dsl.viewModel
 import org.koin.core.module.Module
 import org.koin.dsl.module
@@ -66,6 +67,12 @@ private fun Module.presentation(){
     }
     viewModel<PickQuantityViewModel>{
         PickQuantityViewModel(
+            db = get(),
+            msp = get()
+        )
+    }
+    viewModel<TestViewModel>{
+        TestViewModel(
             db = get(),
             msp = get()
         )

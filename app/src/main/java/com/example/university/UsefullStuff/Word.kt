@@ -8,8 +8,15 @@ class Word(
     var transcription: String,
     val translations: List<String>,
     var lvl: Int,
-    var result: Int = 0
 ) {
+    var result: Int = 0
+        set(value) {
+            field = value
+            when (value) {
+                0 -> lvl = (lvl * 0.8).toInt()
+                1 -> lvl = lvl * 2 + 1
+            }
+        }
     fun translationsToString(): String{
         /*var string = ""
         val iter = translations.listIterator()

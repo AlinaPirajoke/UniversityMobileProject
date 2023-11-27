@@ -93,8 +93,14 @@ class RegistrationViewModel(val db: AppDbManager, val msp: MySharedPreferences) 
             setIsField2Wrong(true)
             return
         }
-        if (!(isValidSymbols(pass1) == true && isValidLength(pass1))) {
+        if (!isValidSymbols(pass1)) {
             setErrorMessage("Использованы недопустимые символы")
+            setIsField1Wrong(true)
+            setIsField2Wrong(true)
+            return
+        }
+        if (!isValidLength(pass1)) {
+            setErrorMessage("Пароль слишком короткий")
             setIsField1Wrong(true)
             setIsField2Wrong(true)
             return

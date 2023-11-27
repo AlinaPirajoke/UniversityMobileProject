@@ -5,11 +5,14 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
 import androidx.activity.compose.setContent
+import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.graphics.toArgb
 import androidx.navigation.compose.rememberNavController
 import com.example.university.View.Auth.AuthActivity
 import com.example.university.ViewModel.MainActivityViewModel
+import com.example.university.theme.KotobaCustomTheme
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class MainActivity : AppCompatActivity() {
@@ -23,14 +26,26 @@ class MainActivity : AppCompatActivity() {
         setContent {
             val uiState by vm.uiState.collectAsState()
             if (uiState.isGoingToLogin) this.toLogin()
-            val navController = rememberNavController()
-            MainNavGraph(navController = navController, this)
+            KotobaCustomTheme(colorScheme = uiState.colorScheme) {
+                window.statusBarColor = MaterialTheme.colors.primary.toArgb()
+                val navController = rememberNavController()
+                MainNavGraph(
+                    navController = navController,
+                    this,
+                    onGoingToLogin = ::toLogin,
+                    onChangeColorScheme = ::updateColorScheme
+                )
+            }
         }
     }
-    
+
+    fun updateColorScheme() {
+        vm.updateColorScheme()
+    }
+
     override fun onResume() {
         super.onResume()
-        vm.updateColorScheme()
+        updateColorScheme()
     }
 
     fun toLogin() {

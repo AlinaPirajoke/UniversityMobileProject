@@ -21,7 +21,7 @@ val KotobaTypography = Typography(
 
     h6 = TextStyle(
         //fontFamily = Montserrat,
-        fontWeight = FontWeight.W600,
+        fontWeight = FontWeight.Normal,
         fontSize = 20.sp
     ),
 
@@ -34,7 +34,7 @@ val KotobaTypography = Typography(
 
     subtitle2 = TextStyle(
         //fontFamily = Montserrat,
-        fontWeight = FontWeight.W300,
+        fontWeight = FontWeight.Normal,
         fontSize = 14.sp
     ),
 

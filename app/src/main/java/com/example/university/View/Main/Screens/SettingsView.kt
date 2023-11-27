@@ -27,6 +27,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -45,28 +46,35 @@ import org.koin.androidx.compose.koinViewModel
 private val TAG = "SettingsView"
 
 @Composable
-fun SettingsScreen(context: MainActivity, navController: NavHostController, vm: SettingsViewModel = koinViewModel()) {
+fun SettingsScreen(
+    onChangeColorScheme: () -> Unit,
+    navController: NavHostController,
+    vm: SettingsViewModel = koinViewModel()
+) {
     val uiState by vm.uiState.collectAsState()
-    if (!uiState.errorMessage.isEmpty()) {
-        showToast(uiState.errorMessage, context)
-        vm.clearErrorMessage()
-        Log.w("registrationView", "Получена ошибка: ${uiState.errorMessage}")
-    }
-    KotobaCustomTheme(colorScheme = uiState.colorScheme) {
-        context.window.statusBarColor = MaterialTheme.colors.primary.toArgb()
-        SettingsView(
-            isPassNeeded = uiState.isPasswordNeeded,
-            onIsPassNeededChange = {
-                context.lifecycleScope.launch{ vm.setIsPasswordNeeded(it) }
-            },
-            currentColorScheme = uiState.currentColorScheme,
-            onColorSchemeChange = vm::setCurrentColorScheme,
-            onGoingToMain = {
-                Log.i(TAG, "Перенаправление на главный экран")
-                navController.navigate(MainScreens.Main.route)
-            }
-        )
-    }
+//    if (!uiState.errorMessage.isEmpty()) {
+//        showToast(uiState.errorMessage, context)
+//        vm.clearErrorMessage()
+//        Log.w("registrationView", "Получена ошибка: ${uiState.errorMessage}")
+//    }
+    //KotobaCustomTheme(colorScheme = uiState.colorScheme) {
+    //context.window.statusBarColor = MaterialTheme.colors.primary.toArgb()
+    SettingsView(
+        isPassNeeded = uiState.isPasswordNeeded,
+        onIsPassNeededChange = { },
+        //    context.lifecycleScope.launch{ vm.setIsPasswordNeeded(it) }
+        //},
+        currentColorScheme = uiState.currentColorScheme,
+        onColorSchemeChange = {
+            vm.setCurrentColorScheme(it)
+            onChangeColorScheme()
+        },
+        onGoingToMain = {
+            Log.i(TAG, "Перенаправление на главный экран")
+            navController.navigate(MainScreens.Main.route)
+        }
+    )
+    //}
 }
 
 @Composable

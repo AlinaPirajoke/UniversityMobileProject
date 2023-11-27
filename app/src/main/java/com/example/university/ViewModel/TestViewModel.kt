@@ -1,5 +1,6 @@
 package com.example.university.ViewModel
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.university.Model.AppDB.AppDbManager
@@ -17,7 +18,7 @@ class TestViewModel(val db: AppDbManager, val msp: MySharedPreferences) : ViewMo
     private var listId: Int = -1
     private var wordList = ArrayList<Word>()
     private lateinit var currentWord: Word
-    private var iterator = wordList.iterator()
+    private lateinit var iterator: ListIterator<Word>
 
     private val _uiState = MutableStateFlow(
         TestUiState(
@@ -26,51 +27,53 @@ class TestViewModel(val db: AppDbManager, val msp: MySharedPreferences) : ViewMo
     )
     val uiState: StateFlow<TestUiState> = _uiState.asStateFlow()
 
-    fun setListId(id: Int){
+    fun setListId(id: Int) {
         listId = id
         viewModelScope.launch {
             testStart()
         }
     }
 
-    suspend private fun testStart(){
+    suspend private fun testStart() {
         wordList = db.getWordsFromList(listId)
-        iterator = wordList.iterator()
+        iterator = wordList.listIterator()
         nextWord()
     }
 
-    private fun testFinish(){
-
+    private fun testFinish() {
+        Log.i(TAG, "Тест завершен")
     }
 
-    private fun nextWord(){
-        if(!iterator.hasNext())
+    private fun nextWord() {
+        if (!(iterator.hasNext())) {
             testFinish()
+            return
+        }
 
-        val word = iterator.next()
+        currentWord = iterator.next()
+        Log.d(TAG, "Следующее слово: ${currentWord.word}")
         cleanAllLabels()
         toFirstStage()
     }
 
-    fun toFirstStage(){
+    fun toFirstStage() {
         setCurrentStage(1)
         showWordLabel()
-
     }
 
     // Отсылка к моему прошлому проекту (Не кривой нейминг)
-    fun showKana(){
+    fun showKana() {
         showTranscrLabel()
     }
 
-    fun toSecondStage(){
+    fun toSecondStage() {
         setCurrentStage(2)
         showAllLabels()
     }
 
     // -_- в этих методах различается ровно одна цифра, но логически, это разные случаи
     // Может быть я говнокодер?
-    fun goodResultProcessing(){
+    fun goodResultProcessing() {
         currentWord.result = 1
         viewModelScope.launch {
             saveWordResult()
@@ -78,7 +81,7 @@ class TestViewModel(val db: AppDbManager, val msp: MySharedPreferences) : ViewMo
         nextWord()
     }
 
-    fun badResultProcessing(){
+    fun badResultProcessing() {
         currentWord.result = 0
         viewModelScope.launch {
             saveWordResult()
@@ -86,7 +89,7 @@ class TestViewModel(val db: AppDbManager, val msp: MySharedPreferences) : ViewMo
         nextWord()
     }
 
-    private fun setCurrentStage(stage: Int){
+    private fun setCurrentStage(stage: Int) {
         _uiState.update { state ->
             state.copy(
                 currentStage = stage
@@ -94,7 +97,7 @@ class TestViewModel(val db: AppDbManager, val msp: MySharedPreferences) : ViewMo
         }
     }
 
-    private fun cleanAllLabels(){
+    private fun cleanAllLabels() {
         _uiState.update { state ->
             state.copy(
                 wordLabel = "",
@@ -104,7 +107,7 @@ class TestViewModel(val db: AppDbManager, val msp: MySharedPreferences) : ViewMo
         }
     }
 
-    private fun showWordLabel(){
+    private fun showWordLabel() {
         _uiState.update { state ->
             state.copy(
                 wordLabel = currentWord.word,
@@ -112,7 +115,7 @@ class TestViewModel(val db: AppDbManager, val msp: MySharedPreferences) : ViewMo
         }
     }
 
-    private fun showTranscrLabel(){
+    private fun showTranscrLabel() {
         _uiState.update { state ->
             state.copy(
                 transcrLabel = currentWord.transcription,
@@ -120,7 +123,7 @@ class TestViewModel(val db: AppDbManager, val msp: MySharedPreferences) : ViewMo
         }
     }
 
-    private fun showTranslLabel(){
+    private fun showTranslLabel() {
         _uiState.update { state ->
             state.copy(
                 translLabel = currentWord.translationsToString(),
@@ -128,7 +131,7 @@ class TestViewModel(val db: AppDbManager, val msp: MySharedPreferences) : ViewMo
         }
     }
 
-    private fun showAllLabels(){
+    private fun showAllLabels() {
         _uiState.update { state ->
             state.copy(
                 wordLabel = currentWord.word,
@@ -138,12 +141,7 @@ class TestViewModel(val db: AppDbManager, val msp: MySharedPreferences) : ViewMo
         }
     }
 
-    suspend fun saveWordResult(word: Word = currentWord){
-        when(word.result){
-            0 -> word.lvl = (currentWord.lvl * 0.8).toInt()
-            1 -> word.lvl *= 2
-        }
-
-        // TODO(Сохранение результата в бд)
+    suspend fun saveWordResult(word: Word = currentWord) {
+        db.saveWordResult(word = word, listId = listId)
     }
 }

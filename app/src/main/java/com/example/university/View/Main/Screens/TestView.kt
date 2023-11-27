@@ -44,6 +44,7 @@ import com.example.university.theme.ColorScheme
 import com.example.university.theme.KotobaCustomTheme
 import com.example.university.View.Auth.AuthScreens
 import com.example.university.View.Main.MainActivity
+import com.example.university.View.Main.MainScreens
 import com.example.university.ViewModel.TestViewModel
 import com.example.university.theme.UXConstants
 import kotlinx.coroutines.launch
@@ -74,29 +75,31 @@ fun TestScreen(
 ) {
     val uiState by vm.uiState.collectAsState()
 
-    if (uiState.currentStage == 1)
-        TestFirstStageView(
-            word = uiState.wordLabel,
-            transcr = uiState.transcrLabel,
-            onNext = { vm.toSecondStage() },
-            onShowTranscription = { vm.showKana() },
-            onExit = {
-                Log.i("LoginView", "Перенаправление на главный экран")
-                navController.navigate(AuthScreens.Registration.route)
-            },
-        )
-    else if (uiState.currentStage == 2)
-        TestSecondStageView(
-            word = uiState.wordLabel,
-            transcr = uiState.transcrLabel,
-            transl = uiState.translLabel,
-            onGood = { vm.goodResultProcessing() },
-            onBad = { vm.badResultProcessing() },
-            onExit = {
-                Log.i("LoginView", "Перенаправление на главный экран")
-                navController.navigate(AuthScreens.Registration.route)
-            },
-        )
+    KotobaCustomTheme(colorScheme = uiState.colorScheme) {
+        if (uiState.currentStage == 1)
+            TestFirstStageView(
+                word = uiState.wordLabel,
+                transcr = uiState.transcrLabel,
+                onNext = { vm.toSecondStage() },
+                onShowTranscription = { vm.showKana() },
+                onExit = {
+                    Log.i("LoginView", "Перенаправление на главный экран")
+                    navController.navigate(MainScreens.Main.route)
+                },
+            )
+        else if (uiState.currentStage == 2)
+            TestSecondStageView(
+                word = uiState.wordLabel,
+                transcr = uiState.transcrLabel,
+                transl = uiState.translLabel,
+                onGood = { vm.goodResultProcessing() },
+                onBad = { vm.badResultProcessing() },
+                onExit = {
+                    Log.i("LoginView", "Перенаправление на главный экран")
+                    navController.navigate(MainScreens.Main.route)
+                },
+            )
+    }
 }
 
 // На этом экране есть две фазы, меняющиеся циклично.
@@ -121,16 +124,15 @@ fun TestFirstStageView(
         OptionsButtons(
             onExitButtonAction = onExit,
             secondButtonLabel = "Показать транскрипцию",
-            secondButtonAction = onNext
+            secondButtonAction = onShowTranscription
         )
         BottomGrid {
             item(span = { GridItemSpan(maxCurrentLineSpan) }) {
-                ImgTile(imgId = R.drawable.good, descr = "Открыть", action = onNext)
+                ImgTile(imgId = R.drawable.big_next_right, descr = "Открыть", action = onNext)
             }
         }
     }
 }
-
 
 @Composable()
 fun TestSecondStageView(
@@ -190,20 +192,24 @@ fun WordBanner(word: String = "", transcr: String = "", transl: String = "") {
             // Транскрипция
                 Text(
                     text = transcr,
-                    style = MaterialTheme.typography.subtitle2,
+                    style = MaterialTheme.typography.subtitle1,
                     textAlign = TextAlign.Center,
+                    color = MaterialTheme.colors.secondaryVariant.copy(alpha = 0.8f)
                 )
             if (transl.isNotBlank())
             // Перевод
                 Text(
                     text = transl,
-                    style = MaterialTheme.typography.body1,
+                    style = MaterialTheme.typography.h6,
                     textAlign = TextAlign.Center,
                 )
         }
     }
 }
 
+// В этой функции каждая кнопка задаётся двумя параметрами: текст и действие
+// Параметров ограниченное количество и я понимаю, что это не лучшее решение,
+// но я не собираюсь создавать в ней больше 2-3 кнопок, а потому решил не заморачиваться
 @Composable
 fun OptionsButtons(
     onExitButtonAction: () -> Unit,
@@ -254,7 +260,7 @@ fun BottomGrid(content: LazyGridScope.() -> Unit) {
 fun ImgTile(imgId: Int, descr: String, action: () -> Unit) {
     Card(
         shape = MaterialTheme.shapes.small,
-        elevation = UXConstants.ELEVATION-1.dp,
+        elevation = UXConstants.ELEVATION - 1.dp,
         onClick = { action() }) {
 
         Box(Modifier.padding(20.dp)) {
