@@ -1,7 +1,7 @@
 package com.example.university.ViewModel.States
 
 import androidx.compose.material.Colors
-import com.example.university.Theme.ColorScheme
+import com.example.university.theme.ColorScheme
 
 data class SettingsUiState(
     val isPasswordNeeded: Boolean = true, // Настройка: требуется ли пароль при входе

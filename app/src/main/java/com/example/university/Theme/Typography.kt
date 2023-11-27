@@ -1,6 +1,5 @@
-package com.example.university.Theme
+package com.example.university.theme
 
-import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Typography
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -8,27 +7,22 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.sp
 
 val KotobaTypography = Typography(
-//    h4 = TextStyle(
-//        //fontFamily = Montserrat,
-//        fontWeight = FontWeight.W600,
-//        fontSize = 30.sp
-//    ),
-//
-//    h6 = TextStyle(
-//        //fontFamily = Montserrat,
-//        fontWeight = FontWeight.W600,
-//        fontSize = 20.sp
-//    ),
-//
-    subtitle2 = TextStyle(
+    h4 = TextStyle(
         //fontFamily = Montserrat,
-        fontWeight = FontWeight.W500,
-        fontSize = 14.sp
+        fontWeight = FontWeight.W600,
+        fontSize = 30.sp
     ),
+
     h5 = TextStyle(
         //fontFamily = Montserrat,
         fontWeight = FontWeight.W400,
         fontSize = 25.sp
+    ),
+
+    h6 = TextStyle(
+        //fontFamily = Montserrat,
+        fontWeight = FontWeight.W600,
+        fontSize = 20.sp
     ),
 
     subtitle1 = TextStyle(
@@ -36,6 +30,12 @@ val KotobaTypography = Typography(
         fontWeight = FontWeight.Normal,
         fontSize = 15.sp,
         textAlign = TextAlign.Center
+    ),
+
+    subtitle2 = TextStyle(
+        //fontFamily = Montserrat,
+        fontWeight = FontWeight.W300,
+        fontSize = 14.sp
     ),
 
     body1 = TextStyle(

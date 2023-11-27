@@ -6,7 +6,7 @@ import android.preference.PreferenceManager
 import android.util.Log
 import androidx.compose.material.Colors
 import com.example.university.UsefullStuff.getTodayDate
-import com.example.university.Theme.ColorScheme
+import com.example.university.theme.ColorScheme
 
 class MySharedPreferences(context: Context) {
     val TAG = "MySharedPreferences"

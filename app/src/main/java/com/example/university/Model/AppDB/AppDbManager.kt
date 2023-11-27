@@ -29,8 +29,7 @@ class AppDbManager(val context: Context) {
     fun checkWord() {
         Log.d(TAG, "Проверка дб:")
         val cursor = db!!.rawQuery("SELECT ${AppDbNames.W_DATE} FROM ${AppDbNames.WORD}", null)
-        while (cursor?.moveToNext() == true)
-            Log.i(TAG, "${cursor.getString(0)}")
+        while (cursor?.moveToNext() == true) Log.i(TAG, "${cursor.getString(0)}")
     }
 
     fun insertPassword(pass: String) {
@@ -44,8 +43,7 @@ class AppDbManager(val context: Context) {
         Log.i(TAG, "Пользователи:")
         var values = HashMap<String, Int>()
         val cursor = db!!.rawQuery(
-            "SELECT ${AppDbNames.P_PASS}, ${AppDbNames.P_ID} " +
-                    "FROM ${AppDbNames.PASSWORD}", null
+            "SELECT ${AppDbNames.P_PASS}, ${AppDbNames.P_ID} " + "FROM ${AppDbNames.PASSWORD}", null
         )
         while (cursor?.moveToNext()!!) {
             val pass = cursor.getString(0)
@@ -80,8 +78,7 @@ class AppDbManager(val context: Context) {
     fun dailyDateUpdate() {
         val now = getTodayDate()
         val cursor = db!!.rawQuery(
-            "SELECT COUNT(*) FROM ${AppDbNames.WORD} WHERE ${AppDbNames.W_DATE} < \"$now\"",
-            null
+            "SELECT COUNT(*) FROM ${AppDbNames.WORD} WHERE ${AppDbNames.W_DATE} < \"$now\"", null
         )
         cursor?.moveToFirst()
         val number = cursor?.getInt(0)
@@ -95,22 +92,18 @@ class AppDbManager(val context: Context) {
     }
 
     fun getLearnedCount(): Int {
-        val cursor =
-            db!!.rawQuery(
-                "SELECT COUNT(*) FROM ${AppDbNames.WORD} WHERE ${AppDbNames.W_LVL} < 50",
-                null
-            )
+        val cursor = db!!.rawQuery(
+            "SELECT COUNT(*) FROM ${AppDbNames.WORD} WHERE ${AppDbNames.W_LVL} < 50", null
+        )
         cursor?.moveToFirst()
         val size = cursor?.getInt(0)
         return size!!
     }
 
     fun getLearningCount(): Int {
-        val cursor =
-            db!!.rawQuery(
-                "SELECT COUNT(*) FROM ${AppDbNames.WORD} WHERE ${AppDbNames.W_LVL} >= 50",
-                null
-            )
+        val cursor = db!!.rawQuery(
+            "SELECT COUNT(*) FROM ${AppDbNames.WORD} WHERE ${AppDbNames.W_LVL} >= 50", null
+        )
         cursor?.moveToFirst()
         val size = cursor?.getInt(0)
         return size!!
@@ -134,23 +127,10 @@ class AppDbManager(val context: Context) {
             val word = cursor?.getString(1).toString()
             val transcr = cursor?.getString(2).toString()
             val lvl = cursor?.getInt(3)
-            val cursor2 = db!!.rawQuery(
-                "SELECT ${AppDbNames.TRANSLATION}.${AppDbNames.T_TRANSL} FROM ${AppDbNames.TRANSLATION} JOIN ${AppDbNames.WORD} " +
-                        "ON ${AppDbNames.TRANSLATION}.${AppDbNames.T_WORD} = ${AppDbNames.WORD}.${AppDbNames.W_ID}",
-                null
-            )
-
-            val transl = ArrayList<String>()
-            while (cursor2.moveToNext()) {
-                transl.add(cursor?.getString(0).toString())
-            }
+            val transl = getTranslationsFromWord(id!!)
 
             val resultWord = Word(
-                id = id!!,
-                word = word,
-                transcription = transcr,
-                translations = transl,
-                lvl = lvl!!
+                id = id!!, word = word, transcription = transcr, translations = transl, lvl = lvl!!
             )
             words.add(resultWord)
         }
@@ -159,6 +139,22 @@ class AppDbManager(val context: Context) {
             "Было найдено ${words.size} записей на дату $date: ${words.joinToString { it.word }}"
         )
         return words
+    }
+
+    fun getTranslationsFromWord(wordId: Int): ArrayList<String>{
+        val transl = ArrayList<String>()
+        val cursor = db!!.rawQuery(
+            "SELECT ${AppDbNames.TRANSLATION}.${AppDbNames.T_TRANSL} " +
+                    "FROM ${AppDbNames.TRANSLATION} JOIN ${AppDbNames.WORD} " +
+                    "ON ${AppDbNames.TRANSLATION}.${AppDbNames.T_WORD} = ${AppDbNames.WORD}.${AppDbNames.W_ID}" +
+                    "WHERE ${AppDbNames.WORD}.${AppDbNames.W_ID} = $wordId",
+            null
+        )
+
+        while (cursor.moveToNext()) {
+            transl.add(cursor?.getString(0).toString())
+        }
+        return transl
     }
 
     fun addNewWord(word: String, transc: String, transl: List<String>, days: Int, user: Int) {
@@ -181,8 +177,7 @@ class AppDbManager(val context: Context) {
         val word_id = cursor?.getInt(0)
         if (word_id != null) {
             addNewTranslations(wordId = word_id, transl = transl)
-        } else
-            Log.e(TAG, "Мы проебали id для слова $word")
+        } else Log.e(TAG, "Мы проебали id для слова $word")
     }
 
     fun addNewTranslations(wordId: Int, transl: List<String>) {
@@ -196,24 +191,61 @@ class AppDbManager(val context: Context) {
         Log.i(TAG, "Слово было добавленно под номером $wordId")
     }
 
-    fun createList(words: List<Word>, date: String) {
-        val list_id = 0
+    fun createList(words: List<Word>, date: String, user: Int): Int {
+        var listId = 0
         try {
             val cursor = db!!.rawQuery(
-                "SELECT MAX(${AppDbNames.L_ID}) FROM ${AppDbNames.LIST}",
-                null
+                "SELECT MAX(${AppDbNames.L_ID}) FROM ${AppDbNames.LIST}", null
             )
-            cursor?.moveToFirst()
-            val list_id = cursor?.getInt(0)
+            cursor.moveToFirst()
+            listId = cursor.getInt(0)!! + 1
         } catch (e: Exception) {
             Log.e(TAG, "Ошибка добавления: ${e.javaClass}")
         }
+
         words.forEach { word ->
-            val values = ContentValues().apply {
-                put(AppDbNames.L_ID)
+            val listValues = ContentValues().apply {
+                put(AppDbNames.L_ID, listId)
                 put(AppDbNames.L_WORD, word.id)
-                put(AppDbNames.W_USER, user)
+                put(AppDbNames.L_IS_NEW, if (word.lvl > 0) 1 else 0)
             }
+            db!!.insert(AppDbNames.LIST, null, listValues)
         }
+
+        val dataValues = ContentValues().apply {
+            put(AppDbNames.LD_LIST, listId)
+            put(AppDbNames.LD_USER, user)
+            put(AppDbNames.LD_DATE, date)
+        }
+        db!!.insert(AppDbNames.LIST_DATA, null, dataValues)
+
+        return listId
     }
+
+    fun getWordsFromList(list: Int): ArrayList<Word> {
+        val words = ArrayList<Word>()
+        val cursor = db!!.rawQuery(
+            "SELECT ${AppDbNames.WORD}.${AppDbNames.W_ID}, ${AppDbNames.WORD}.${AppDbNames.W_WORD}," +
+                    "${AppDbNames.WORD}.${AppDbNames.W_SOUND}, ${AppDbNames.WORD}.${AppDbNames.W_LVL} " +
+                    "FROM ${AppDbNames.WORD} JOIN ${AppDbNames.LIST}" +
+                    "ON ${AppDbNames.WORD}.${AppDbNames.W_ID} = ${AppDbNames.LIST}.${AppDbNames.L_WORD}" +
+                    "WHERE ${AppDbNames.L_ID} = $list",
+            null
+        )
+
+        while (cursor.moveToNext()) {
+            val id = cursor?.getInt(0)
+            val word = cursor?.getString(1).toString()
+            val transcr = cursor?.getString(2).toString()
+            val lvl = cursor?.getInt(3)!!
+            val transl = getTranslationsFromWord(id!!)
+
+            val resultWord = Word(
+                id = id, word = word, transcription = transcr, translations = transl, lvl = lvl
+            )
+            words.add(resultWord)
+        }
+        return words
+    }
+
 }

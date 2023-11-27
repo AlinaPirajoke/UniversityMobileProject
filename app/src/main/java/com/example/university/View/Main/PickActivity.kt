@@ -28,8 +28,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.university.Model.AppDB.AppDbManager
-import com.example.university.Theme.ColorScheme
-import com.example.university.Theme.KotobaCustomTheme
+import com.example.university.theme.ColorScheme
+import com.example.university.theme.KotobaCustomTheme
 import com.example.university.UsefullStuff.formatDate
 import com.example.university.UsefullStuff.simpleFormatterWithYear
 import java.time.LocalDate

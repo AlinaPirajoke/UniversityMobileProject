@@ -1,0 +1,349 @@
+package com.example.university.View.Main.Screens
+
+import android.annotation.SuppressLint
+import android.content.ClipData.Item
+import android.util.Log
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.GridCells.*
+import androidx.compose.foundation.lazy.grid.GridItemSpan
+import androidx.compose.foundation.lazy.grid.LazyGridScope
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.Button
+import androidx.compose.material.ButtonDefaults
+import androidx.compose.material.Card
+import androidx.compose.material.ExperimentalMaterialApi
+import androidx.compose.material.Icon
+import androidx.compose.material.MaterialTheme
+import androidx.compose.material.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.vectorResource
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import androidx.lifecycle.lifecycleScope
+import androidx.navigation.NavHostController
+import com.example.university.R
+import com.example.university.theme.ColorScheme
+import com.example.university.theme.KotobaCustomTheme
+import com.example.university.View.Auth.AuthScreens
+import com.example.university.View.Main.MainActivity
+import com.example.university.ViewModel.TestViewModel
+import com.example.university.theme.UXConstants
+import kotlinx.coroutines.launch
+import org.koin.androidx.compose.koinViewModel
+
+private const val TAG = "TestView"
+
+@SuppressLint("CoroutineCreationDuringComposition")
+@Composable
+fun TestInit(
+    context: MainActivity,
+    navController: NavHostController,
+    listId: Int,
+    vm: TestViewModel = koinViewModel(),
+) {
+    context.lifecycleScope.launch {
+        vm.setListId(listId)
+    }
+
+    TestScreen(context = context, navController = navController, vm = vm)
+}
+
+@Composable
+fun TestScreen(
+    context: MainActivity,
+    navController: NavHostController,
+    vm: TestViewModel,
+) {
+    val uiState by vm.uiState.collectAsState()
+
+    if (uiState.currentStage == 1)
+        TestFirstStageView(
+            word = uiState.wordLabel,
+            transcr = uiState.transcrLabel,
+            onNext = { vm.toSecondStage() },
+            onShowTranscription = { vm.showKana() },
+            onExit = {
+                Log.i("LoginView", "Перенаправление на главный экран")
+                navController.navigate(AuthScreens.Registration.route)
+            },
+        )
+    else if (uiState.currentStage == 2)
+        TestSecondStageView(
+            word = uiState.wordLabel,
+            transcr = uiState.transcrLabel,
+            transl = uiState.translLabel,
+            onGood = { vm.goodResultProcessing() },
+            onBad = { vm.badResultProcessing() },
+            onExit = {
+                Log.i("LoginView", "Перенаправление на главный экран")
+                navController.navigate(AuthScreens.Registration.route)
+            },
+        )
+}
+
+// На этом экране есть две фазы, меняющиеся циклично.
+// Логика в них не очень сложная, так что я решил просто менять из в зависимости от currentStage в uiState
+// Колхоз? Тема?
+@Composable()
+fun TestFirstStageView(
+    word: String,
+    transcr: String,
+    onNext: () -> Unit,
+    onShowTranscription: () -> Unit,
+    onExit: () -> Unit,
+) {
+    Column(
+        Modifier
+            .fillMaxSize()
+            .padding(UXConstants.HORIZONTAL_PADDING, UXConstants.VERTICAL_PADDING),
+        verticalArrangement = Arrangement.SpaceBetween,
+    ) {
+
+        WordBanner(word = word, transcr = transcr)
+        OptionsButtons(
+            onExitButtonAction = onExit,
+            secondButtonLabel = "Показать транскрипцию",
+            secondButtonAction = onNext
+        )
+        BottomGrid {
+            item(span = { GridItemSpan(maxCurrentLineSpan) }) {
+                ImgTile(imgId = R.drawable.good, descr = "Открыть", action = onNext)
+            }
+        }
+    }
+}
+
+
+@Composable()
+fun TestSecondStageView(
+    word: String,
+    transcr: String,
+    transl: String,
+    onGood: () -> Unit,
+    onBad: () -> Unit,
+    onExit: () -> Unit,
+) {
+
+    Column(
+        Modifier
+            .fillMaxSize()
+            .padding(UXConstants.HORIZONTAL_PADDING, UXConstants.VERTICAL_PADDING),
+        verticalArrangement = Arrangement.SpaceBetween,
+    ) {
+
+        WordBanner(word = word, transcr = transcr, transl = transl)
+        OptionsButtons(
+            onExitButtonAction = onExit,
+        )
+        BottomGrid {
+            item(span = { GridItemSpan(1) }) {
+                ImgTile(imgId = R.drawable.bad, descr = "Не помню", action = onBad)
+            }
+            item(span = { GridItemSpan(1) }) {
+                ImgTile(imgId = R.drawable.good, descr = "Помню!", action = onGood)
+            }
+        }
+    }
+}
+
+@Composable
+fun WordBanner(word: String = "", transcr: String = "", transl: String = "") {
+    Card(
+        Modifier
+            .fillMaxWidth()
+            .height(150.dp),
+        elevation = UXConstants.ELEVATION,
+        shape = MaterialTheme.shapes.medium
+    ) {
+        Column(
+            Modifier
+                .fillMaxWidth()
+                .padding(12.dp),
+            verticalArrangement = Arrangement.SpaceEvenly,
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            // Слово
+            Text(
+                text = word,
+                style = MaterialTheme.typography.h4,
+                textAlign = TextAlign.Center,
+            )
+            if (transcr.isNotBlank())
+            // Транскрипция
+                Text(
+                    text = transcr,
+                    style = MaterialTheme.typography.subtitle2,
+                    textAlign = TextAlign.Center,
+                )
+            if (transl.isNotBlank())
+            // Перевод
+                Text(
+                    text = transl,
+                    style = MaterialTheme.typography.body1,
+                    textAlign = TextAlign.Center,
+                )
+        }
+    }
+}
+
+@Composable
+fun OptionsButtons(
+    onExitButtonAction: () -> Unit,
+    secondButtonLabel: String = "",
+    secondButtonAction: () -> Unit = { },
+) {
+    Column(Modifier.fillMaxWidth()) {
+        Button(
+            onClick = onExitButtonAction,
+            Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 50.dp, vertical = UXConstants.VERTICAL_PADDING)
+                .height(50.dp),
+            colors = ButtonDefaults.buttonColors(
+                backgroundColor = MaterialTheme.colors.onPrimary,
+                contentColor = MaterialTheme.colors.primary
+            )
+        ) {
+            Text(text = "Выход")
+        }
+        if (secondButtonLabel.isNotBlank())
+            Button(
+                onClick = secondButtonAction,
+                Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 50.dp)
+                    .height(50.dp),
+            ) {
+                Text(text = secondButtonLabel)
+            }
+    }
+}
+
+@Composable
+fun BottomGrid(content: LazyGridScope.() -> Unit) {
+    LazyVerticalGrid(
+        columns = Fixed(2),
+        horizontalArrangement = Arrangement.spacedBy(15.dp),
+        verticalArrangement = Arrangement.spacedBy(15.dp),
+        contentPadding = PaddingValues(0.dp, 15.dp, 0.dp, 15.dp)
+    ) {
+        content()
+    }
+}
+
+@OptIn(ExperimentalMaterialApi::class)
+@Composable
+fun ImgTile(imgId: Int, descr: String, action: () -> Unit) {
+    Card(
+        shape = MaterialTheme.shapes.small,
+        elevation = UXConstants.ELEVATION-1.dp,
+        onClick = { action() }) {
+
+        Box(Modifier.padding(20.dp)) {
+
+            Column(
+                Modifier.fillMaxSize(), verticalArrangement = Arrangement.Center,
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Icon(
+                    modifier = Modifier.size(30.dp),
+                    imageVector = ImageVector.vectorResource(imgId),
+                    contentDescription = descr,
+                    tint = MaterialTheme.colors.primary,
+                )
+
+                Text(
+                    text = descr,
+                    Modifier
+                        .padding(top = 5.dp, bottom = 0.dp),
+                    fontSize = 20.sp,
+                    color = MaterialTheme.colors.secondaryVariant
+                )
+            }
+        }
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun FirstStagePreview() {
+    KotobaCustomTheme(colorScheme = ColorScheme.pink.colors) {
+        TestFirstStageView(
+            word = "sample",
+            transcr = "sample",
+            onNext = { },
+            onExit = { },
+            onShowTranscription = { })
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun SecondStagePreview() {
+    KotobaCustomTheme(colorScheme = ColorScheme.pink.colors) {
+        TestSecondStageView(
+            word = "sample",
+            transcr = "sample",
+            transl = "Пример, пример",
+            onExit = { },
+            onBad = { },
+            onGood = { },
+        )
+    }
+}
+
+// Побудет тут
+/*
+Card(
+Modifier
+.fillMaxHeight()
+.fillMaxWidth(0.5f)
+.padding(end = UXConstants.HORIZONTAL_PADDING / 2),
+elevation = UXConstants.ELEVATION,
+shape = MaterialTheme.shapes.medium
+) {
+    Column(
+        Modifier
+            .fillMaxSize(),
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally,
+    ) {
+        Text(text = "<\nНе помню", textAlign = TextAlign.Center)
+    }
+
+}
+Card(
+Modifier
+.fillMaxHeight()
+.fillMaxWidth(1f)
+.padding(start = UXConstants.HORIZONTAL_PADDING / 2),
+elevation = UXConstants.ELEVATION,
+shape = MaterialTheme.shapes.medium
+) {
+    Column(
+        Modifier
+            .fillMaxSize(),
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally,
+    ) {
+        Text(text = ">\nПомню", textAlign = TextAlign.Center)
+    }
+}*/

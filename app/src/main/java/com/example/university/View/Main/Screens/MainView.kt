@@ -34,7 +34,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.university.R
 import com.example.university.View.Main.MainScreens
-import com.example.university.Theme.KotobaCustomTheme
+import com.example.university.theme.KotobaCustomTheme
 import com.example.university.UsefullStuff.getTodayDate
 import org.koin.androidx.compose.koinViewModel
 
@@ -223,9 +223,9 @@ fun OtherBlock(
             /*Row(
                 Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.spacedBy(15.dp),) {}*/
-            CreateImgCard(imgId = R.drawable.setings, descr = "Настройки", onGoingToSettings)
-            CreateImgCard(imgId = R.drawable.add, descr = "Добавить слово", onGoingToAddNew)
-            CreateImgCard(imgId = R.drawable.logout, descr = "Разлогиниться", onGoingToLogin)
+            ImgCard(imgId = R.drawable.setings, descr = "Настройки", onGoingToSettings)
+            ImgCard(imgId = R.drawable.add, descr = "Добавить слово", onGoingToAddNew)
+            ImgCard(imgId = R.drawable.logout, descr = "Разлогиниться", onGoingToLogin)
         }
     }
 }
@@ -264,7 +264,7 @@ fun TodayAction(text: String, action: () -> Unit) {
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
-fun CreateImgCard(imgId: Int, descr: String, action: () -> Unit) {
+fun ImgCard(imgId: Int, descr: String, action: () -> Unit) {
     Card(shape = RoundedCornerShape(10.dp), elevation = 4.dp, onClick = { action.invoke() }) {
 
         Box(Modifier.padding(20.dp)) {

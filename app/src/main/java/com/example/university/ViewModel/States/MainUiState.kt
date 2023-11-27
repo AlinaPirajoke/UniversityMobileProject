@@ -1,7 +1,7 @@
 package com.example.university.ViewModel.States
 
 import androidx.compose.material.Colors
-import com.example.university.Theme.ColorScheme
+import com.example.university.theme.ColorScheme
 
 data class MainUiState(
     val todayTest: Int = 0, // количество слов для теста на сегодня

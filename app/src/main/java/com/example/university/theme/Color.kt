@@ -1,4 +1,4 @@
-package com.example.university.Theme
+package com.example.university.theme
 
 import androidx.compose.material.Colors
 import androidx.compose.material.lightColors

@@ -30,7 +30,7 @@ class PickQuantityViewModel(val db: AppDbManager, val msp: MySharedPreferences) 
         Log.d(TAG, "Создано")
     }
 
-    fun setWordsQuantity(quantity: Int) {
+    private fun setWordsQuantity(quantity: Int) {
         _uiState.update { state ->
             state.copy(wordsQuantity = quantity)
         }
@@ -57,17 +57,19 @@ class PickQuantityViewModel(val db: AppDbManager, val msp: MySharedPreferences) 
         }
     }
 
-    fun setPickedWords(){
+    private fun setPickedWords() {
         _uiState.update { state ->
-            state.copy(pickedWords = words.joinToString(limit = state.pickedQuantity){it.word})
+            state.copy(pickedWords = words.joinToString(limit = state.pickedQuantity, postfix = "") { it.word })
         }
     }
 
-    fun toTest(){
-
+    suspend fun toTest() {
+        val listId =
+            createList() // createList() (оба) возвращают номер списка слов для прохождения
+        // TODO(запуск экрана теста)
     }
 
-    suspend fun createList(){
-        db.crerateList(list = words, date = date)
+    private suspend fun createList(): Int {
+        return db.createList(words = words, date = date, user = msp.user)
     }
 }

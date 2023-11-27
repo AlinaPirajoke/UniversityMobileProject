@@ -89,18 +89,18 @@ object AppDbNames : BaseColumns {
                     "FOREIGN KEY($L_WORD) REFERENCES $WORD ($W_ID))")
     const val DELETE_TABLE_LIST = "DROP TABLE IF EXISTS $LIST"
 
-    const val LIST_DATE = "list_date"
+    const val LIST_DATA = "list_data"
     const val LD_LIST = "list_id"
     const val LD_DATE = "date"
     const val LD_USER = "user_id"
-    const val CREATE_TABLE_LIST_DATE = (
-            "CREATE TABLE IF NOT EXISTS $LIST_DATE ( " +
+    const val CREATE_TABLE_LIST_DATA = (
+            "CREATE TABLE IF NOT EXISTS $LIST_DATA ( " +
                     "$LD_LIST INTEGER NOT NULL, " +
                     "$LD_DATE DATE NOT NULL, " +
                     "$LD_USER INTEGER NOT NULL," +
                     "FOREIGN KEY($LD_LIST) REFERENCES $LIST ($L_ID)," +
                     "FOREIGN KEY ($LD_USER) REFERENCES $PASSWORD ($P_ID))")
-    const val DELETE_TABLE_LIST_DATE = "DROP TABLE IF EXISTS $LIST_DATE"
+    const val DELETE_TABLE_LIST_DATA = "DROP TABLE IF EXISTS $LIST_DATA"
 
     const val COLUMN_NAME_TITLE = "title"
     const val COLUMN_NAME_SUBTITLE = "subtitle"

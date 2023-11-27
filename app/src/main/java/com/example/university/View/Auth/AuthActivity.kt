@@ -9,7 +9,7 @@ import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.navigation.compose.rememberNavController
 import com.example.university.Model.MySharedPreferences
 import com.example.university.View.Main.MainActivity
-import com.example.university.Theme.KotobaCustomTheme
+import com.example.university.theme.KotobaCustomTheme
 
 class AuthActivity : AppCompatActivity() {
     val TAG = "AuthActivity"
