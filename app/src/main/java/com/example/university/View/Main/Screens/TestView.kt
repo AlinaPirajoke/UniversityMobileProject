@@ -29,6 +29,7 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -55,51 +56,44 @@ private const val TAG = "TestView"
 @SuppressLint("CoroutineCreationDuringComposition")
 @Composable
 fun TestInit(
-    context: MainActivity,
     navController: NavHostController,
     listId: Int,
     vm: TestViewModel = koinViewModel(),
 ) {
-    context.lifecycleScope.launch {
-        vm.setListId(listId)
-    }
+    vm.testStart(listId)
 
-    TestScreen(context = context, navController = navController, vm = vm)
+    TestScreen(navController = navController, vm = vm)
 }
 
 @Composable
 fun TestScreen(
-    context: MainActivity,
     navController: NavHostController,
     vm: TestViewModel,
 ) {
     val uiState by vm.uiState.collectAsState()
-
-    KotobaCustomTheme(colorScheme = uiState.colorScheme) {
-        if (uiState.currentStage == 1)
-            TestFirstStageView(
-                word = uiState.wordLabel,
-                transcr = uiState.transcrLabel,
-                onNext = { vm.toSecondStage() },
-                onShowTranscription = { vm.showKana() },
-                onExit = {
-                    Log.i("LoginView", "Перенаправление на главный экран")
-                    navController.navigate(MainScreens.Main.route)
-                },
-            )
-        else if (uiState.currentStage == 2)
-            TestSecondStageView(
-                word = uiState.wordLabel,
-                transcr = uiState.transcrLabel,
-                transl = uiState.translLabel,
-                onGood = { vm.goodResultProcessing() },
-                onBad = { vm.badResultProcessing() },
-                onExit = {
-                    Log.i("LoginView", "Перенаправление на главный экран")
-                    navController.navigate(MainScreens.Main.route)
-                },
-            )
-    }
+    if (uiState.currentStage == 1)
+        TestFirstStageView(
+            word = uiState.wordLabel,
+            transcr = uiState.transcrLabel,
+            onNext = { vm.toSecondStage() },
+            onShowTranscription = { vm.showKana() },
+            onExit = {
+                Log.i("LoginView", "Перенаправление на главный экран")
+                navController.navigate(MainScreens.Main.route)
+            },
+        )
+    else if (uiState.currentStage == 2)
+        TestSecondStageView(
+            word = uiState.wordLabel,
+            transcr = uiState.transcrLabel,
+            transl = uiState.translLabel,
+            onGood = { vm.goodResultProcessing() },
+            onBad = { vm.badResultProcessing() },
+            onExit = {
+                Log.i("LoginView", "Перенаправление на главный экран")
+                navController.navigate(MainScreens.Main.route)
+            },
+        )
 }
 
 // На этом экране есть две фазы, меняющиеся циклично.

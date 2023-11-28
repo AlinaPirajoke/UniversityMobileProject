@@ -21,6 +21,7 @@ class MainViewModel(val db: AppDbManager, val msp: MySharedPreferences) : ViewMo
 
     init {
         viewModelScope.launch {
+            db.logAllWords()
             getStatistic()
             checkTodayWords()
         }

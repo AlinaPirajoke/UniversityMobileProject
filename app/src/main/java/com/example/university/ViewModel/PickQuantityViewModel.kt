@@ -61,12 +61,16 @@ class PickQuantityViewModel(val db: AppDbManager, val msp: MySharedPreferences) 
 
     private fun setPickedWords() {
         _uiState.update { state ->
-            state.copy(pickedWords = words.joinToString(limit = state.pickedQuantity, postfix = "") { it.word })
+            state.copy(
+                pickedWords = words.joinToString(
+                    limit = state.pickedQuantity,
+                    postfix = ""
+                ) { it.word })
         }
     }
 
     // createList() (оба) возвращают номер списка слов для прохождения
-    suspend fun createList(): Int {
+    fun createList(): Int {
         return db.createList(words = words, date = date, user = msp.user)
     }
 }

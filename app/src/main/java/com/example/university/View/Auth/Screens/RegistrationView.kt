@@ -50,26 +50,27 @@ private const val TAG = "RegistrationView"
 
 @Composable
 fun RegistrationScreen(
-    context: AuthActivity,
     navController: NavHostController,
+    onGoingToMain: () -> Unit,
+    showErrorMessage: (String) -> Unit,
     vm: RegistrationViewModel = koinViewModel()
 ) {
     val uiState by vm.uiState.collectAsState()
 
+    if (uiState.haveErrorMessage) {
+        showErrorMessage(uiState.errorMessage)
+        vm.setHaveErrorMessage(false)
+    }
     if (uiState.isGoingToMain) {
         vm.sendToHomePage(false)
-        context.toMain()
+        onGoingToMain()
     }
     if (uiState.isGoingToLogin) {
         Log.i("registrationView", "Перенаправление на логин: ${uiState.isGoingToLogin}")
         vm.sendToLoginPage(false)
         navController.navigate(AuthScreens.Login.route)
     }
-//    if (!uiState.errorMessage.isEmpty()) {
-//        showToast(uiState.errorMessage, context)
-//        vm.clearErrorMessage()
-//        Log.w("registrationView", "Получена ошибка: ${uiState.errorMessage}")
-//    }
+
 
     RegistrationView(
         pass1 = vm.enteredPass1,
@@ -81,9 +82,7 @@ fun RegistrationScreen(
         isField1Error = uiState.isField1Wrong,
         isField2Error = uiState.isField2Wrong,
         onPassConfirm = {
-            context.lifecycleScope.launch {
-                vm.addUser()
-            }
+            vm.addUser()
         },
     )
 }

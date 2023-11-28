@@ -10,6 +10,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.graphics.toArgb
 import androidx.navigation.compose.rememberNavController
+import com.example.university.UsefullStuff.showToast
 import com.example.university.View.Auth.AuthActivity
 import com.example.university.ViewModel.MainActivityViewModel
 import com.example.university.theme.KotobaCustomTheme
@@ -31,9 +32,9 @@ class MainActivity : AppCompatActivity() {
                 val navController = rememberNavController()
                 MainNavGraph(
                     navController = navController,
-                    this,
                     onGoingToLogin = ::toLogin,
-                    onChangeColorScheme = ::updateColorScheme
+                    onChangeColorScheme = ::updateColorScheme,
+                    showErrorMessage = ::showErrorMassage,
                 )
             }
         }
@@ -46,6 +47,11 @@ class MainActivity : AppCompatActivity() {
     override fun onResume() {
         super.onResume()
         updateColorScheme()
+    }
+
+    fun showErrorMassage(message: String) {
+        showToast(message, this)
+        Log.w(TAG, "Получена ошибка: $message")
     }
 
     fun toLogin() {

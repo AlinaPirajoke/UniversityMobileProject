@@ -42,50 +42,42 @@ private const val TAG = "PickQuantityView"
 
 @Composable
 fun PickQuantityInit(
-    context: MainActivity,
     navController: NavHostController,
     date: String,
     vm: PickQuantityViewModel = koinViewModel()
 ) {
     Log.i(TAG, "Выбранная дата: $date")
     vm.setDate(date)
-    PickQuantityScreen(context = context, navController = navController, vm = vm)
+    PickQuantityScreen(navController = navController, vm = vm)
 }
 
 @Composable
 fun PickQuantityScreen(
-    context: MainActivity,
     navController: NavHostController,
     vm: PickQuantityViewModel,
 ) {
-    val scope = rememberCoroutineScope()
     val uiState by vm.uiState.collectAsState()
 
-    KotobaCustomTheme(colorScheme = uiState.colorScheme) {
-        context.window.statusBarColor = MaterialTheme.colors.primary.toArgb()
-        PickQuantityView(
-            pickedQuantity = uiState.pickedQuantity,
-            wordsQuantity = uiState.wordsQuantity,
-            onValueChange = vm::setPickedQuantity,
-            onGoingToTest = {
-                scope.launch {
-                    Log.i(TAG, "Перенаправление на экран теста")
-                    val listId = vm.createList()
-                    navController.navigate("${MainScreens.Test.route}/${listId}")
-                }
-            },
-            onGoingToMain = {
-                Log.i(TAG, "Перенаправление на главный экран")
-                navController.navigate(MainScreens.Main.route)
-            },
-            isRememberPresent = uiState.isRememberPresent,
-            onGoingToRemember = {
-                Log.i(TAG, "Перенаправление на экран повторения (Пока что главный экран)")
-                navController.navigate(MainScreens.Main.route)
-            },
-            pickedWords = uiState.pickedWords
-        )
-    }
+    PickQuantityView(
+        pickedQuantity = uiState.pickedQuantity,
+        wordsQuantity = uiState.wordsQuantity,
+        onValueChange = vm::setPickedQuantity,
+        onGoingToTest = {
+            Log.i(TAG, "Перенаправление на экран теста")
+            val listId = vm.createList()
+            navController.navigate("${MainScreens.Test.route}/${listId}")
+        },
+        onGoingToMain = {
+            Log.i(TAG, "Перенаправление на главный экран")
+            navController.navigate(MainScreens.Main.route)
+        },
+        isRememberPresent = uiState.isRememberPresent,
+        onGoingToRemember = {
+            Log.i(TAG, "Перенаправление на экран повторения (Пока что главный экран)")
+            navController.navigate(MainScreens.Main.route)
+        },
+        pickedWords = uiState.pickedWords
+    )
 }
 
 @Composable

@@ -263,4 +263,26 @@ class AppDbManager(val context: Context) {
         )
         Log.i(TAG, "Слово ${word.word} отправлено на дату ${getDateNDaysLater(word.lvl)}")
     }
+
+    fun logAllWords() {
+        Log.d(TAG, "Печать всех записей таблицы word:")
+        val cursor = db!!.rawQuery(
+            "SELECT ${AppDbNames.W_ID}, ${AppDbNames.W_WORD}, ${AppDbNames.W_SOUND}, ${AppDbNames.W_LVL}, ${AppDbNames.W_DATE} " + "FROM ${AppDbNames.WORD}",
+            null
+        )
+
+        while (cursor.moveToNext()) {
+            val id = cursor?.getInt(0)
+            val word = cursor?.getString(1).toString()
+            val transcr = cursor?.getString(2).toString()
+            val lvl = cursor?.getInt(3)
+            val date = cursor?.getString(4).toString()
+            val transl = getTranslationsFromWord(id!!)
+
+            Log.i(
+                TAG,
+                "id: $id, date: $date, word: $word, transcr: $transcr, lvl: $lvl, transl: ${transl.joinToString()}"
+            )
+        }
+    }
 }

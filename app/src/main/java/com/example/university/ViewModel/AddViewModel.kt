@@ -3,13 +3,17 @@ package com.example.university.ViewModel
 import android.util.Log
 import androidx.core.text.isDigitsOnly
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.example.university.Model.AppDB.AppDbManager
 import com.example.university.Model.MySharedPreferences
 import com.example.university.ViewModel.States.AddUiState
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class AddViewModel(val db: AppDbManager, val msp: MySharedPreferences) : ViewModel() {
     val TAG = "LoginViewModel"
@@ -103,46 +107,48 @@ class AddViewModel(val db: AppDbManager, val msp: MySharedPreferences) : ViewMod
     }
 
     // Добавление нового слова
-    suspend fun addWord() {
-        val values = uiState.value
+    fun addWord() {
+        viewModelScope.launch {
+            withContext(Dispatchers.IO) {
+                val values = uiState.value
 
-        if (values.wordValue.isBlank()) {
-            setErrorMessage("Слово не должно быть пустым")
-            setWordFieldWrong()
-            return
-        }
-        if (values.translValues.all { it.isBlank() }) {
-            setErrorMessage("Перевод не должен быть пустым")
-            setTranslFieldWrong()
-            return
-        }
-        if (values.lvlValue.isNotBlank() && values.lvlValue.toInt() < 0) {
-            setErrorMessage("Период появления должен быть положительным")
-            setLvlFieldWrong()
-            return
-        }
+                if (values.wordValue.isBlank()) {
+                    setErrorMessage("Слово не должно быть пустым")
+                    setWordFieldWrong()
+                    return@withContext
+                }
+                if (values.translValues.all { it.isBlank() }) {
+                    setErrorMessage("Перевод не должен быть пустым")
+                    setTranslFieldWrong()
+                    return@withContext
+                }
+                if (values.lvlValue.isNotBlank() && values.lvlValue.toInt() < 0) {
+                    setErrorMessage("Период появления должен быть положительным")
+                    setLvlFieldWrong()
+                    return@withContext
+                }
 
-        try {
-            var period = 0
-            if (values.lvlValue.isNotBlank())
-                period = values.lvlValue.toInt()
+                try {
+                    var period = 0
+                    if (values.lvlValue.isNotBlank())
+                        period = values.lvlValue.toInt()
 
-            db.addNewWord(
-                values.wordValue,
-                values.transcrValue,
-                values.translValues,
-                period,
-                msp.user
-            )
-        } catch (ex: NumberFormatException) {
-            setErrorMessage("Период должен быть целочисленным")
-            return
-        } catch (ex: Exception) {
-            setErrorMessage("Ошибка добавления")
-            return
+                    db.addNewWord(
+                        values.wordValue,
+                        values.transcrValue,
+                        values.translValues,
+                        period,
+                        msp.user
+                    )
+                } catch (ex: NumberFormatException) {
+                    setErrorMessage("Период должен быть целочисленным")
+                    return@withContext
+                } catch (ex: Exception) {
+                    setErrorMessage("Ошибка добавления")
+                    return@withContext
+                }
+                sendToMain()
+            }
         }
-        sendToMain()
     }
-
-
 }

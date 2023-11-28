@@ -3,13 +3,17 @@ package com.example.university.ViewModel
 import android.util.Log
 import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.example.university.Model.AppDB.AppDbManager
 import com.example.university.Model.MySharedPreferences
 import com.example.university.ViewModel.States.SettingsUiState
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class SettingsViewModel(val db: AppDbManager, val msp: MySharedPreferences) : ViewModel() {
     val TAG = "SettingsViewModel"
@@ -33,23 +37,29 @@ class SettingsViewModel(val db: AppDbManager, val msp: MySharedPreferences) : Vi
         _uiState.update { state ->
             state.copy(errorMessage = text)
         }
+        setHaveErrorMessage(true)
     }
 
-    fun clearErrorMessage() {
-        setErrorMessage("")
-    }
-
-    suspend fun setIsPasswordNeeded(condition: Boolean) {
-        if (db.getPasswords().size > 1) {
-            setErrorMessage("Для изменения этого параметра, пользователь должен быть только один!")
-            Log.w(TAG, "Отклонено")
-            return
-        }
+    fun setHaveErrorMessage(condition: Boolean) {
         _uiState.update { state ->
-            state.copy(isPasswordNeeded = condition)
+            state.copy(haveErrorMessage = condition)
         }
-        msp.isPasswordNeeded = condition
-        /*sp.edit().putBoolean("isPasswordNeeded", condition).apply()*/
+    }
+
+    fun setIsPasswordNeeded(condition: Boolean) {
+        viewModelScope.launch {
+            withContext(Dispatchers.IO) {
+                if (db.getPasswords().size > 1) {
+                    setErrorMessage("Для изменения этого параметра, пользователь должен быть только один!")
+                    Log.w(TAG, "Отклонено")
+                    return@withContext
+                }
+                _uiState.update { state ->
+                    state.copy(isPasswordNeeded = condition)
+                }
+                msp.isPasswordNeeded = condition
+            }
+        }
     }
 
     fun setCurrentColorScheme(id: Int) {
@@ -60,7 +70,5 @@ class SettingsViewModel(val db: AppDbManager, val msp: MySharedPreferences) : Vi
                 colorScheme = msp.getColorScheme()
             )
         }
-
-        /*sp.edit().putInt("currentColorScheme", number).apply()*/
     }
 }

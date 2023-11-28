@@ -17,9 +17,9 @@ private const val TAG = "MainNavGraph"
 @Composable
 fun MainNavGraph(
     navController: NavHostController,
-    context: MainActivity,
     onGoingToLogin: () -> Unit,
-    onChangeColorScheme: () -> Unit
+    onChangeColorScheme: () -> Unit,
+    showErrorMessage: (String) -> Unit,
 ) {
     NavHost(
         navController = navController,
@@ -29,18 +29,17 @@ fun MainNavGraph(
             MainScreen(navController = navController, onGoingToLogin = onGoingToLogin)
         }
         composable(route = MainScreens.AddNew.route) {
-            AddScreen(context = context, navController = navController)
+            AddScreen(navController = navController)
         }
         composable(route = MainScreens.Settings.route) {
             SettingsScreen(
-                //context = context,
+                showErrorMessage = showErrorMessage,
                 navController = navController,
                 onChangeColorScheme = onChangeColorScheme
             )
         }
         composable(route = MainScreens.PickQuantity.route + "/{date}") { backStackEntry ->
             PickQuantityInit(
-                context = context,
                 navController = navController,
                 date = backStackEntry.arguments?.getString("date")!!
             )
@@ -51,7 +50,6 @@ fun MainNavGraph(
                 "Передаётся аргумент listId = ${backStackEntry.arguments?.getString("listId")}"
             )
             TestInit(
-                context = context,
                 navController = navController,
                 listId = backStackEntry.arguments?.getString("listId")!!.toInt()
             )

@@ -22,6 +22,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -47,34 +48,33 @@ import org.koin.androidx.compose.koinViewModel
 private const val TAG = "LoginView"
 
 @Composable
-fun LoginScreen(context: AuthActivity, navController: NavHostController, vm: LoginViewModel = koinViewModel()) {
-    // Такие аргументы использовать не зашкварно?
-    // Нигде не видел, чтобы так делали, но как иначе не придумал
-
+fun LoginScreen(
+    navController: NavHostController,
+    onGoingToMain: () -> Unit,
+    showErrorMessage: (String) -> Unit,
+    vm: LoginViewModel = koinViewModel()
+) {
+    val scope = rememberCoroutineScope()
     val uiState by vm.uiState.collectAsState()
 
+    if (uiState.haveErrorMessage) {
+        showErrorMessage(uiState.errorMessage)
+        vm.setHaveErrorMessage(false)
+    }
     if (uiState.isGoingToMain) {
         vm.sendToHomePage(false)
-        context.toMain()
+        onGoingToMain()
     }
     if (uiState.isGoingToRegister) {
         Log.i(TAG, "Перенаправление на регистрацию")
         vm.sendToRegisterPage(false)
         navController.navigate(AuthScreens.Registration.route)
     }
-//    if (!uiState.errorMessage.isEmpty()) {
-//        showToast(uiState.errorMessage, context)
-//        vm.clearErrorMessage()
-//        Log.w(TAG, "Получена ошибка: ${uiState.errorMessage}")
-//    }
-
     LoginView(
         pass = vm.enteredPass,
         onUserInputChanged = vm::editUserEnter,
         onPassConfirm = {
-            context.lifecycleScope.launch {
-                vm.checkPassword()
-            }
+            scope.launch { vm.checkPassword() }
             Log.i(TAG, "ПОЕХАЛИ!")
         },
         onGoingToRegister = vm::sendToRegisterPage,
@@ -187,6 +187,5 @@ fun LoginView(
                 }
             }
         }
-
     }
 }

@@ -5,13 +5,17 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.example.university.ViewModel.States.LoginUiState
 import com.example.university.Model.AppDB.AppDbManager
 import com.example.university.Model.MySharedPreferences
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class LoginViewModel(val db: AppDbManager, val msp: MySharedPreferences) : ViewModel() {
     val TAG = "LoginViewModel"
@@ -49,12 +53,14 @@ class LoginViewModel(val db: AppDbManager, val msp: MySharedPreferences) : ViewM
         _uiState.update { state ->
             state.copy(errorMessage = text)
         }
-        if (!text.isEmpty())
-            Log.w(TAG, "Ошибка ввода: ${uiState.value.errorMessage}")
+        setHaveErrorMessage(true)
+
     }
 
-    fun clearErrorMessage() {
-        setErrorMessage("")
+    fun setHaveErrorMessage(condition: Boolean) {
+        _uiState.update { state ->
+            state.copy(haveErrorMessage = condition)
+        }
     }
 
     fun setIsPassWrong(condition: Boolean) {
@@ -68,14 +74,14 @@ class LoginViewModel(val db: AppDbManager, val msp: MySharedPreferences) : ViewM
 
         val enteredPass = enteredPass
         if (msp.isPasswordNeeded)
-            if (enteredPass?.isEmpty() == true) {
+            if (enteredPass.isEmpty()) {
                 setErrorMessage("Введите пароль")
                 setIsPassWrong(true)
                 return
             }
 
         val passwords = db.getPasswords()
-        if (!(enteredPass in passwords.keys)) {
+        if (enteredPass !in passwords.keys) {
             setErrorMessage("Пароль не верен")
             setIsPassWrong(true)
             return
@@ -86,5 +92,6 @@ class LoginViewModel(val db: AppDbManager, val msp: MySharedPreferences) : ViewM
             msp.session = true
             sendToHomePage()
         }
+
     }
 }

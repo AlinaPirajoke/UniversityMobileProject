@@ -7,11 +7,13 @@ import com.example.university.Model.AppDB.AppDbManager
 import com.example.university.Model.MySharedPreferences
 import com.example.university.UsefullStuff.Word
 import com.example.university.ViewModel.States.TestUiState
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class TestViewModel(val db: AppDbManager, val msp: MySharedPreferences) : ViewModel() {
     private val TAG = "TestViewModel"
@@ -27,17 +29,15 @@ class TestViewModel(val db: AppDbManager, val msp: MySharedPreferences) : ViewMo
     )
     val uiState: StateFlow<TestUiState> = _uiState.asStateFlow()
 
-    fun setListId(id: Int) {
-        listId = id
+    fun testStart(pickedListId: Int) {
         viewModelScope.launch {
-            testStart()
+            withContext(Dispatchers.IO) {
+                listId = pickedListId
+                wordList = db.getWordsFromList(listId)
+                iterator = wordList.listIterator()
+                nextWord()
+            }
         }
-    }
-
-    suspend private fun testStart() {
-        wordList = db.getWordsFromList(listId)
-        iterator = wordList.listIterator()
-        nextWord()
     }
 
     private fun testFinish() {

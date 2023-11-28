@@ -23,6 +23,7 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -49,21 +50,19 @@ private val TAG = "SettingsView"
 fun SettingsScreen(
     onChangeColorScheme: () -> Unit,
     navController: NavHostController,
-    vm: SettingsViewModel = koinViewModel()
+    vm: SettingsViewModel = koinViewModel(),
+    showErrorMessage: (String) -> Unit,
 ) {
     val uiState by vm.uiState.collectAsState()
-//    if (!uiState.errorMessage.isEmpty()) {
-//        showToast(uiState.errorMessage, context)
-//        vm.clearErrorMessage()
-//        Log.w("registrationView", "Получена ошибка: ${uiState.errorMessage}")
-//    }
-    //KotobaCustomTheme(colorScheme = uiState.colorScheme) {
-    //context.window.statusBarColor = MaterialTheme.colors.primary.toArgb()
+    if (uiState.haveErrorMessage) {
+        showErrorMessage(uiState.errorMessage)
+        vm.setHaveErrorMessage(false)
+    }
     SettingsView(
         isPassNeeded = uiState.isPasswordNeeded,
-        onIsPassNeededChange = { },
-        //    context.lifecycleScope.launch{ vm.setIsPasswordNeeded(it) }
-        //},
+        onIsPassNeededChange = {
+            vm.setIsPasswordNeeded(it)
+        },
         currentColorScheme = uiState.currentColorScheme,
         onColorSchemeChange = {
             vm.setCurrentColorScheme(it)
@@ -74,7 +73,6 @@ fun SettingsScreen(
             navController.navigate(MainScreens.Main.route)
         }
     )
-    //}
 }
 
 @Composable

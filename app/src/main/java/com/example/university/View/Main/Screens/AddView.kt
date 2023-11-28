@@ -21,6 +21,7 @@ import androidx.compose.material.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusDirection
@@ -47,7 +48,6 @@ private val TAG = "AddView"
 
 @Composable
 fun AddScreen(
-    context: MainActivity,
     navController: NavHostController,
     vm: AddViewModel = koinViewModel()
 ) {
@@ -58,29 +58,27 @@ fun AddScreen(
         navController.navigate(MainScreens.Main.route)
     }
 
-    KotobaCustomTheme(colorScheme = uiState.colorScheme) {
-        context.window.statusBarColor = MaterialTheme.colors.primary.toArgb()
-        AddView(word = uiState.wordValue,
-            onWordChanged = vm::editWordValue,
-            transcription = uiState.transcrValue,
-            onTranscrChanged = vm::editTranscrValue,
-            translations = uiState.translValues,
-            onTranslChanged = vm::editTranslationValue,
-            onAddTranstation = vm::addTranslation,
-            lvl = uiState.lvlValue,
-            onLvlChanged = vm::editLvlValue,
-            onConfirm = {
-                context.lifecycleScope.launch { vm.addWord() }
-            },
-            isWordFieldWrong = uiState.isWordFieldWrong,
-            isTranslFieldWrong = uiState.isTranslFieldWrong,
-            isLvlFieldWrong = uiState.isLvlFieldWrong,
-            errorMessage = uiState.errorMessage,
-            onGoingToMain = {
-                Log.i(TAG, "Перенаправление на главный экран")
-                navController.navigate(MainScreens.Main.route)
-            })
-    }
+    AddView(word = uiState.wordValue,
+        onWordChanged = vm::editWordValue,
+        transcription = uiState.transcrValue,
+        onTranscrChanged = vm::editTranscrValue,
+        translations = uiState.translValues,
+        onTranslChanged = vm::editTranslationValue,
+        onAddTranstation = vm::addTranslation,
+        lvl = uiState.lvlValue,
+        onLvlChanged = vm::editLvlValue,
+        onConfirm = {
+            vm.addWord()
+        },
+        isWordFieldWrong = uiState.isWordFieldWrong,
+        isTranslFieldWrong = uiState.isTranslFieldWrong,
+        isLvlFieldWrong = uiState.isLvlFieldWrong,
+        errorMessage = uiState.errorMessage,
+        onGoingToMain = {
+            Log.i(TAG, "Перенаправление на главный экран")
+            navController.navigate(MainScreens.Main.route)
+        })
+
 }
 
 @OptIn(ExperimentalComposeUiApi::class, ExperimentalMaterialApi::class)

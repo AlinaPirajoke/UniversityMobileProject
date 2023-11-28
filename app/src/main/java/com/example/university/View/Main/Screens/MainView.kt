@@ -71,7 +71,6 @@ fun MainScreen(
         },
         toLogin = onGoingToLogin,
     )
-
 }
 
 val BORDER_PADDING = 12.dp
