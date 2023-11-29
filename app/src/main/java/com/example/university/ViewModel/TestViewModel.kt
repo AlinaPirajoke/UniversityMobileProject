@@ -29,6 +29,30 @@ class TestViewModel(val db: AppDbManager, val msp: MySharedPreferences) : ViewMo
     )
     val uiState: StateFlow<TestUiState> = _uiState.asStateFlow()
 
+    fun showExitAlertDialog() {
+        _uiState.update { state ->
+            state.copy(
+                isExitAlertDialogShowing = true,
+            )
+        }
+    }
+
+    fun hideExitAlertDialog() {
+        _uiState.update { state ->
+            state.copy(
+                isExitAlertDialogShowing = false,
+            )
+        }
+    }
+
+    fun showFinishAlertDialog() {
+        _uiState.update { state ->
+            state.copy(
+                isFinishAlertDialogShowing = true,
+            )
+        }
+    }
+
     fun testStart(pickedListId: Int) {
         viewModelScope.launch {
             withContext(Dispatchers.IO) {
@@ -42,6 +66,7 @@ class TestViewModel(val db: AppDbManager, val msp: MySharedPreferences) : ViewMo
 
     private fun testFinish() {
         Log.i(TAG, "Тест завершен")
+        showFinishAlertDialog()
     }
 
     private fun nextWord() {
@@ -143,5 +168,17 @@ class TestViewModel(val db: AppDbManager, val msp: MySharedPreferences) : ViewMo
 
     suspend fun saveWordResult(word: Word = currentWord) {
         db.saveWordResult(word = word, listId = listId)
+    }
+
+    fun getResult(): Double {
+        var sum = 0
+        wordList.forEach {
+            sum += it.result
+        }
+        return (sum / wordList.size).toDouble() * 100
+    }
+
+    fun onExit() {
+        showExitAlertDialog()
     }
 }

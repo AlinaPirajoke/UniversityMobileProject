@@ -1,7 +1,6 @@
 package com.example.university.View.Main.Screens
 
 import android.annotation.SuppressLint
-import android.content.ClipData.Item
 import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -13,12 +12,11 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.GridCells.*
 import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.lazy.grid.LazyGridScope
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
-import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.AlertDialog
 import androidx.compose.material.Button
 import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.Card
@@ -26,10 +24,10 @@ import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
+import androidx.compose.material.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -38,17 +36,13 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavHostController
 import com.example.university.R
 import com.example.university.theme.ColorScheme
 import com.example.university.theme.KotobaCustomTheme
-import com.example.university.View.Auth.AuthScreens
-import com.example.university.View.Main.MainActivity
 import com.example.university.View.Main.MainScreens
 import com.example.university.ViewModel.TestViewModel
 import com.example.university.theme.UXConstants
-import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
 
 private const val TAG = "TestView"
@@ -71,16 +65,33 @@ fun TestScreen(
     vm: TestViewModel,
 ) {
     val uiState by vm.uiState.collectAsState()
+    if (uiState.isExitAlertDialogShowing)
+        ShowExitConfirm(
+            onConfirm = {
+                vm.hideExitAlertDialog()
+                Log.i("LoginView", "Перенаправление на главный экран")
+                navController.navigate(MainScreens.Main.route)
+            },
+            onReject = vm::hideExitAlertDialog
+        )
+    if (uiState.isFinishAlertDialogShowing)
+        ShowFinishConfirm(
+            toRemember = { /*TODO*/ },
+            onReject = {
+                vm.hideExitAlertDialog()
+                Log.i("LoginView", "Перенаправление на главный экран")
+                navController.navigate(MainScreens.Main.route)
+            },
+            result = vm.getResult(),
+            isRememberPresent = vm.msp.isRememberPresent
+        )
     if (uiState.currentStage == 1)
         TestFirstStageView(
             word = uiState.wordLabel,
             transcr = uiState.transcrLabel,
             onNext = { vm.toSecondStage() },
             onShowTranscription = { vm.showKana() },
-            onExit = {
-                Log.i("LoginView", "Перенаправление на главный экран")
-                navController.navigate(MainScreens.Main.route)
-            },
+            onExit = vm::onExit,
         )
     else if (uiState.currentStage == 2)
         TestSecondStageView(
@@ -89,10 +100,7 @@ fun TestScreen(
             transl = uiState.translLabel,
             onGood = { vm.goodResultProcessing() },
             onBad = { vm.badResultProcessing() },
-            onExit = {
-                Log.i("LoginView", "Перенаправление на главный экран")
-                navController.navigate(MainScreens.Main.route)
-            },
+            onExit = vm::onExit,
         )
 }
 
@@ -238,6 +246,59 @@ fun OptionsButtons(
 }
 
 @Composable
+fun ShowExitConfirm(onConfirm: () -> Unit, onReject: () -> Unit) {
+    AlertDialog(
+        onDismissRequest = onReject,
+        text = { Text("Вы действительно хотите закончить тестирование (его можно будеть продолжить позже)") },
+        confirmButton = {
+            TextButton(
+                onClick = onConfirm
+            ) {
+                Text("Выйти")
+            }
+        },
+        dismissButton = {
+            TextButton(
+                onClick = onReject
+            ) {
+                Text("Остаться")
+            }
+        }
+    )
+}
+
+@Composable
+fun ShowFinishConfirm(
+    toRemember: () -> Unit,
+    onReject: () -> Unit,
+    result: Double,
+    isRememberPresent: Boolean
+) {
+    var text = "Вы прошли тест с результатом $result%."
+    if (isRememberPresent)
+        text += "\nХотите ли вы ещё раз пройтись по этим словам?"
+    AlertDialog(
+        onDismissRequest = onReject,
+        text = { Text(text = text) },
+        confirmButton = {
+            TextButton(
+                onClick = onReject
+            ) {
+                Text("Выйти")
+            }
+        },
+        dismissButton = {
+            if (isRememberPresent)
+                TextButton(
+                    onClick = toRemember
+                ) {
+                    Text("Остаться")
+                }
+        }
+    )
+}
+
+@Composable
 fun BottomGrid(content: LazyGridScope.() -> Unit) {
     LazyVerticalGrid(
         columns = Fixed(2),
@@ -309,41 +370,3 @@ fun SecondStagePreview() {
         )
     }
 }
-
-// Побудет тут
-/*
-Card(
-Modifier
-.fillMaxHeight()
-.fillMaxWidth(0.5f)
-.padding(end = UXConstants.HORIZONTAL_PADDING / 2),
-elevation = UXConstants.ELEVATION,
-shape = MaterialTheme.shapes.medium
-) {
-    Column(
-        Modifier
-            .fillMaxSize(),
-        verticalArrangement = Arrangement.Center,
-        horizontalAlignment = Alignment.CenterHorizontally,
-    ) {
-        Text(text = "<\nНе помню", textAlign = TextAlign.Center)
-    }
-
-}
-Card(
-Modifier
-.fillMaxHeight()
-.fillMaxWidth(1f)
-.padding(start = UXConstants.HORIZONTAL_PADDING / 2),
-elevation = UXConstants.ELEVATION,
-shape = MaterialTheme.shapes.medium
-) {
-    Column(
-        Modifier
-            .fillMaxSize(),
-        verticalArrangement = Arrangement.Center,
-        horizontalAlignment = Alignment.CenterHorizontally,
-    ) {
-        Text(text = ">\nПомню", textAlign = TextAlign.Center)
-    }
-}*/

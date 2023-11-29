@@ -8,5 +8,7 @@ data class TestUiState(
     val transcrLabel: String = "",
     val translLabel: String = "",
     val currentStage: Int = 1,
-    val colorScheme: Colors = PHColors
+    val colorScheme: Colors = PHColors,
+    val isExitAlertDialogShowing: Boolean = false,
+    val isFinishAlertDialogShowing: Boolean = false,
 )
