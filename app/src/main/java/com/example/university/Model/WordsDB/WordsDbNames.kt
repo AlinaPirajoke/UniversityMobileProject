@@ -1,7 +1,6 @@
 package com.example.university.Model.WordsDB
 
 import android.provider.BaseColumns
-import com.example.university.Model.AppDB.AppDbNames
 
 object WordsDbNames : BaseColumns {
     // Бд, содержащее все слова
@@ -29,5 +28,4 @@ object WordsDbNames : BaseColumns {
                     "$T_TRANSL TEXT NOT NULL, " +
                     "FOREIGN KEY ($T_WORD) REFERENCES ${WORD} ($W_ID))")
     const val DELETE_TABLE_TRANSLATION = "DROP TABLE IF EXISTS $TRANSLATION"
-
 }
