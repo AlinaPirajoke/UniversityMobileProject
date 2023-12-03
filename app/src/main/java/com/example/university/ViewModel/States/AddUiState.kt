@@ -15,6 +15,7 @@ data class AddUiState(
     val transcrValue: String = "", // Транскрипция
     val lvlValue: String = "", // начальный уровень слова (период повторения в днях)
     val translValues: SnapshotStateList<String> = mutableStateListOf(("")), // Список переводов
-    val colorScheme: Colors = ColorScheme.PH.colors // Цветовая тема
-    //val translCount: Int = 1
+    val colorScheme: Colors = ColorScheme.PH.colors, // Цветовая тема
+    val isTranslating: Boolean = false, // Находится ли слово в процессе перевода
+    val isTranslationError: Boolean = false, // Произошла ли ошибка в процессе перевода
 )

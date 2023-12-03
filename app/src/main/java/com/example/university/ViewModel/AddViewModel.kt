@@ -4,6 +4,7 @@ import android.util.Log
 import androidx.core.text.isDigitsOnly
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.university.Model.API.ApiManager
 import com.example.university.Model.AppDB.AppDbManager
 import com.example.university.Model.MySharedPreferences
 import com.example.university.ViewModel.States.AddUiState
@@ -56,9 +57,15 @@ class AddViewModel(val db: AppDbManager, val msp: MySharedPreferences) : ViewMod
         }
     }
 
-    fun updateColorScheme() {
+    fun setTranslating(condition: Boolean){
         _uiState.update { state ->
-            state.copy(colorScheme = msp.getColorScheme())
+            state.copy(isTranslating = condition)
+        }
+    }
+
+    fun setTranslationError(condition: Boolean){
+        _uiState.update { state ->
+            state.copy(isTranslationError = condition)
         }
     }
 
@@ -103,6 +110,27 @@ class AddViewModel(val db: AppDbManager, val msp: MySharedPreferences) : ViewMod
             val newTranslValues = state.translValues
             newTranslValues.add("")
             state.copy(translValues = newTranslValues)
+        }
+    }
+
+    fun autoTranslate(){
+        if (uiState.value.wordValue.isBlank()) {
+            setErrorMessage("Укажите слово для перевода")
+            setWordFieldWrong()
+            return
+        }
+        viewModelScope.launch {
+            setTranslationError(false)
+            try {
+                setTranslating(true)
+                val api = ApiManager()
+                val translation = api.translateText(uiState.value.wordValue)
+                editTranslationValue(translation.text, 0)
+            }
+            catch (e: Exception){
+                setTranslationError(true)
+            }
+            setTranslating(false)
         }
     }
 

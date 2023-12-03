@@ -21,11 +21,9 @@ import androidx.compose.material.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusDirection
-import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.text.input.ImeAction
@@ -34,14 +32,11 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavHostController
-import com.example.university.View.Main.MainActivity
 import com.example.university.View.Main.MainScreens
 import com.example.university.ViewModel.AddViewModel
 import com.example.university.theme.ColorScheme
 import com.example.university.theme.KotobaCustomTheme
-import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
 
 private val TAG = "AddView"
@@ -58,7 +53,8 @@ fun AddScreen(
         navController.navigate(MainScreens.Main.route)
     }
 
-    AddView(word = uiState.wordValue,
+    AddView(
+        word = uiState.wordValue,
         onWordChanged = vm::editWordValue,
         transcription = uiState.transcrValue,
         onTranscrChanged = vm::editTranscrValue,
@@ -77,8 +73,11 @@ fun AddScreen(
         onGoingToMain = {
             Log.i(TAG, "Перенаправление на главный экран")
             navController.navigate(MainScreens.Main.route)
-        })
-
+        },
+        isTranslating = uiState.isTranslating,
+        isTranslationError = uiState.isTranslationError,
+        onAutoTranslate = vm::autoTranslate,
+    )
 }
 
 @OptIn(ExperimentalComposeUiApi::class, ExperimentalMaterialApi::class)
@@ -99,6 +98,9 @@ fun AddView(
     isLvlFieldWrong: Boolean,
     errorMessage: String,
     onGoingToMain: () -> Unit,
+    isTranslating: Boolean,
+    isTranslationError: Boolean,
+    onAutoTranslate: () -> Unit,
 ) {
     val keyboardController = LocalSoftwareKeyboardController.current
     val focusManager = LocalFocusManager.current
@@ -109,18 +111,15 @@ fun AddView(
             .fillMaxHeight()
             .padding(50.dp, 0.dp)
             .verticalScroll(scrollState),
-        verticalArrangement = Arrangement.Center
-
-
+        verticalArrangement = Arrangement.Center,
     ) {
         Text(
             text = "Добавьте новое слово",
             modifier = Modifier
-                .fillMaxWidth()
-                .padding(),
+                .padding()
+                .fillMaxWidth(),
             textAlign = TextAlign.Center,
-            //style = TextStyle(fontWeight = FontWeight.Bold),
-            fontSize = 20.sp,
+            style = MaterialTheme.typography.h5
         )
 
         OutlinedTextField(
@@ -128,13 +127,13 @@ fun AddView(
             onValueChange = { onWordChanged(it) },
             label = {
                 if (isWordFieldWrong) Text(text = errorMessage)
-                else Text("Слово")
+                else Text("Оригинальное слово")
             },
             isError = isWordFieldWrong,
             singleLine = true,
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(top = 20.dp),
+                .padding(top = 10.dp),
             keyboardOptions = KeyboardOptions(
                 imeAction = ImeAction.Next
             ),
@@ -148,6 +147,24 @@ fun AddView(
                 focusedLabelColor = MaterialTheme.colors.secondary,
             )
         )
+
+
+        Text(
+            text =
+            if (isTranslating) "Переводим..."
+            else "Перевести автоматически",
+            Modifier
+                .fillMaxWidth()
+                .padding(top = 7.dp)
+                .clickable { onAutoTranslate() },
+            fontSize = 15.sp,
+            color =
+            if (isTranslationError) MaterialTheme.colors.error
+            else MaterialTheme.colors.secondary.copy(alpha = 0.9f),
+            textAlign = TextAlign.Left,
+            style = MaterialTheme.typography.body1
+        )
+
 
         OutlinedTextField(
             value = transcription,
@@ -175,7 +192,7 @@ fun AddView(
             Log.d(TAG, "Значение перевода $index - $translation")
             OutlinedTextField(
                 value = translation,
-                onValueChange = { onTranslChanged(it, index.toInt()) },
+                onValueChange = { onTranslChanged(it, index) },
                 label = {
                     if (isTranslFieldWrong && index == 0) Text(text = errorMessage)
                     else Text("Перевод")
@@ -207,7 +224,7 @@ fun AddView(
                 .clickable { onAddTranstation() },
             text = "Добавить перевод",
             fontSize = 15.sp,
-            color = MaterialTheme.colors.secondary,
+            color = MaterialTheme.colors.secondary.copy(alpha = 0.9f),
             textAlign = TextAlign.Right,
         )
 
@@ -290,8 +307,10 @@ fun AddViewPreview() {
             isTranslFieldWrong = false,
             isLvlFieldWrong = false,
             errorMessage = "",
-        ) {
-
-        }
+            onGoingToMain = { },
+            isTranslating = false,
+            isTranslationError = false,
+            onAutoTranslate = { }
+        )
     }
 }
