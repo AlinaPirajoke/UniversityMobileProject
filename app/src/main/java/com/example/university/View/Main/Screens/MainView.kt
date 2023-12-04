@@ -1,6 +1,7 @@
 package com.example.university.View.Main.Screens
 
 import android.util.Log
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -27,56 +28,61 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.university.R
 import com.example.university.View.Main.MainScreens
-import com.example.university.theme.ColorScheme
 import com.example.university.theme.KotobaCustomTheme
+import com.example.university.UsefullStuff.getTodayDate
+import org.koin.androidx.compose.koinViewModel
 
-private val TAG = "MainView"
+private const val TAG = "MainView"
 
 @Composable
-fun mainScreen(context: MainActivity, navController: NavHostController, vm: MainViewModel) {
+fun MainScreen(
+    onGoingToLogin: () -> Unit,
+    navController: NavHostController,
+    vm: MainViewModel = koinViewModel()
+) {
     val uiState by vm.uiState.collectAsState()
-//  if (uiState.isGoingToTest) context.toTest()
-    KotobaCustomTheme(colorScheme = uiState.colorScheme) {
-        context.window.statusBarColor = MaterialTheme.colors.primary.toArgb()
-        mainView(
-            statLearned = uiState.statLearned,
-            statLearning = uiState.statLearning,
-            statAverage = uiState.statAverage,
-            todayTest = uiState.todayTest,
-            todayLearn = uiState.todayLearn,
-            onGoingToPickCount = { },
-            onGoingToPickWords = { },
-            toAddNew = {
-                Log.i(TAG, "Перенаправление на экран добавления слов")
-                navController.navigate(MainScreens.AddNew.route)
-            },
-            toSettings = {
-                Log.i(TAG, "Перенаправление на экран настроек")
-                navController.navigate(MainScreens.Settings.route)
-            },
-            toLogin = context::toLogin,
-        )
-    }
-
+    MainView(
+        statLearned = uiState.statLearned,
+        statLearning = uiState.statLearning,
+        statAverage = uiState.statAverage,
+        todayTest = uiState.todayTest,
+        todayLearn = uiState.todayLearn,
+        onGoingToPickQuantity = {
+            if (uiState.todayTest > 0) {
+                Log.i(TAG, "Перенаправление на экран выбора количества слов для тестирования")
+                navController.navigate("${MainScreens.PickQuantity.route}/${getTodayDate()}")
+            }
+        },
+        onGoingToPickWords = { },
+        toAddNew = {
+            Log.i(TAG, "Перенаправление на экран добавления слов")
+            navController.navigate(MainScreens.AddNew.route)
+        },
+        toSettings = {
+            Log.i(TAG, "Перенаправление на экран настроек")
+            navController.navigate(MainScreens.Settings.route)
+        },
+        toLogin = onGoingToLogin,
+    )
 }
 
 val BORDER_PADDING = 12.dp
 
 @Composable
-fun mainView(
+fun MainView(
     statLearned: Int,
     statLearning: Int,
     statAverage: Int,
     todayTest: Int,
     todayLearn: Int,
-    onGoingToPickCount: () -> Unit,
+    onGoingToPickQuantity: () -> Unit,
     onGoingToPickWords: () -> Unit,
     toAddNew: () -> Unit,
     toLogin: () -> Unit,
@@ -89,18 +95,18 @@ fun mainView(
             .padding(0.dp, 0.dp, 0.dp, 0.dp)
             .verticalScroll(scrollState),
     ) {
-        statisticBlock(
+        StatisticBlock(
             learned = statLearned,
             learning = statLearning,
             average = statAverage,
         )
-        todayBlock(
+        TodayBlock(
             todayTest = todayTest,
             todayLearn = todayLearn,
-            onGoingToPickCount = onGoingToPickCount,
+            onGoingToPickCount = onGoingToPickQuantity,
             onGoingToPickWords = onGoingToPickWords,
         )
-        otherBlock(
+        OtherBlock(
             onGoingToSettings = { toSettings() },
             onGoingToAddNew = { toAddNew() },
             onGoingToLogin = { toLogin() },
@@ -109,7 +115,7 @@ fun mainView(
 }
 
 @Composable
-fun statisticBlock(
+fun StatisticBlock(
     learned: Int = 0,
     learning: Int = 0,
     average: Int = 0,
@@ -137,16 +143,16 @@ fun statisticBlock(
                     .padding(10.dp),
                 Arrangement.SpaceBetween,
             ) {
-                statisticLine(text = "Всего слов изучено", value = learned)
-                statisticLine(text = "Слов изучается", value = learning)
-                statisticLine(text = "Среднее изучаемое в день", value = average)
+                StatisticLine(text = "Всего слов изучено", value = learned)
+                StatisticLine(text = "Слов изучается", value = learning)
+                StatisticLine(text = "Среднее изучаемое в день", value = average)
             }
         }
     }
 }
 
 @Composable
-fun todayBlock(
+fun TodayBlock(
     todayTest: Int = 0,
     todayLearn: Int = 0,
     onGoingToPickCount: () -> Unit,
@@ -167,8 +173,8 @@ fun todayBlock(
             color = MaterialTheme.colors.secondaryVariant,
             textAlign = TextAlign.Center
         )
-        todayAction(text = "$todayTest осталось повторить", onGoingToPickWords)
-        todayAction(text = "$todayLearn слов осталось изучить", onGoingToPickCount)
+        TodayAction(text = "$todayTest осталось повторить", onGoingToPickCount)
+        TodayAction(text = "$todayLearn слов осталось изучить", onGoingToPickWords)
         Text(
             modifier = Modifier
                 .fillMaxWidth()
@@ -182,7 +188,7 @@ fun todayBlock(
 }
 
 @Composable
-fun otherBlock(
+fun OtherBlock(
     onGoingToSettings: () -> (Unit),
     onGoingToAddNew: () -> (Unit),
     onGoingToLogin: () -> (Unit),
@@ -213,15 +219,15 @@ fun otherBlock(
             /*Row(
                 Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.spacedBy(15.dp),) {}*/
-            createImgCard(imgId = R.drawable.setings, descr = "Настройки", onGoingToSettings)
-            createImgCard(imgId = R.drawable.add, descr = "Добавить слово", onGoingToAddNew)
-            createImgCard(imgId = R.drawable.logout, descr = "Разлогиниться", onGoingToLogin)
+            ImgCard(imgId = R.drawable.setings, descr = "Настройки", onGoingToSettings)
+            ImgCard(imgId = R.drawable.add, descr = "Добавить слово", onGoingToAddNew)
+            ImgCard(imgId = R.drawable.logout, descr = "Разлогиниться", onGoingToLogin)
         }
     }
 }
 
 @Composable
-fun statisticLine(text: String, value: Int) {
+fun StatisticLine(text: String, value: Int) {
     Row(
         Modifier
             .fillMaxWidth()
@@ -234,11 +240,12 @@ fun statisticLine(text: String, value: Int) {
 }
 
 @Composable
-fun todayAction(text: String, action: () -> Unit) {
+fun TodayAction(text: String, action: () -> Unit) {
     Card(
         Modifier
             .fillMaxWidth()
-            .padding(top = 15.dp),
+            .padding(top = 15.dp)
+            .clickable { action() },
         shape = RoundedCornerShape(7.dp),
         elevation = 4.dp,
     ) {
@@ -253,7 +260,7 @@ fun todayAction(text: String, action: () -> Unit) {
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
-fun createImgCard(imgId: Int, descr: String, action: () -> Unit) {
+fun ImgCard(imgId: Int, descr: String, action: () -> Unit) {
     Card(shape = RoundedCornerShape(10.dp), elevation = 4.dp, onClick = { action.invoke() }) {
 
         Box(Modifier.padding(20.dp)) {

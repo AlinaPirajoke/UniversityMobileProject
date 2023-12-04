@@ -1,21 +1,21 @@
 package com.example.university.ViewModel
 
-import android.content.Context
-import android.content.SharedPreferences
 import android.util.Log
 import androidx.core.text.isDigitsOnly
 import androidx.lifecycle.ViewModel
-import com.example.university.Model.DBManager
+import androidx.lifecycle.viewModelScope
+import com.example.university.Model.AppDB.AppDbManager
 import com.example.university.Model.MySharedPreferences
 import com.example.university.ViewModel.States.AddUiState
-import com.example.university.ViewModel.States.LoginUiState
-import com.example.university.usefull_stuff.showToast
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
-class AddViewModel(val db: DBManager, val msp: MySharedPreferences) : ViewModel() {
+class AddViewModel(val db: AppDbManager, val msp: MySharedPreferences) : ViewModel() {
     val TAG = "LoginViewModel"
 
     private val _uiState = MutableStateFlow(AddUiState(colorScheme = msp.getColorScheme()))
@@ -23,6 +23,12 @@ class AddViewModel(val db: DBManager, val msp: MySharedPreferences) : ViewModel(
 
     init {
         Log.d(TAG, "Создано")
+    }
+
+    fun sendToMain(condition: Boolean = true) {
+        _uiState.update { state ->
+            state.copy(isGoingToMain = condition)
+        }
     }
 
     // Флаги ошибок
@@ -102,44 +108,47 @@ class AddViewModel(val db: DBManager, val msp: MySharedPreferences) : ViewModel(
 
     // Добавление нового слова
     fun addWord() {
+        viewModelScope.launch {
+            withContext(Dispatchers.IO) {
+                val values = uiState.value
 
-        if (uiState.value.wordValue.isBlank()) {
-            setErrorMessage("Слово не должно быть пустым")
-            setWordFieldWrong()
-            return
-        }
+                if (values.wordValue.isBlank()) {
+                    setErrorMessage("Слово не должно быть пустым")
+                    setWordFieldWrong()
+                    return@withContext
+                }
+                if (values.translValues.all { it.isBlank() }) {
+                    setErrorMessage("Перевод не должен быть пустым")
+                    setTranslFieldWrong()
+                    return@withContext
+                }
+                if (values.lvlValue.isNotBlank() && values.lvlValue.toInt() < 0) {
+                    setErrorMessage("Период появления должен быть положительным")
+                    setLvlFieldWrong()
+                    return@withContext
+                }
 
-        if (uiState.value.translValues.all { it.isBlank() }) {
-            setErrorMessage("Перевод не должен быть пустым")
-            setTranslFieldWrong()
-            return
-        }
+                try {
+                    var period = 0
+                    if (values.lvlValue.isNotBlank())
+                        period = values.lvlValue.toInt()
 
-        if (uiState.value.lvlValue.toInt() < 0) {
-            setErrorMessage("Период появления должен быть положительным")
-            setLvlFieldWrong()
-            return
+                    db.addNewWord(
+                        values.wordValue,
+                        values.transcrValue,
+                        values.translValues,
+                        period,
+                        msp.user
+                    )
+                } catch (ex: NumberFormatException) {
+                    setErrorMessage("Период должен быть целочисленным")
+                    return@withContext
+                } catch (ex: Exception) {
+                    setErrorMessage("Ошибка добавления")
+                    return@withContext
+                }
+                sendToMain()
+            }
         }
-        /*
-        try{
-            val period: Int
-            if(days.isBlank())
-                period = 0
-            else
-                period = days.toInt()
-            db.addNewWord(enWord, transc, ruWord, period, user)
-        }
-        catch (ex: NumberFormatException) {
-            showToast("Период должен быть целочисленным", context)
-            return
-        }
-        catch (ex: Exception) {
-            showToast("Ошибка добавления", context)
-            return
-        }
-
-        toExit()*/
     }
-
-
 }

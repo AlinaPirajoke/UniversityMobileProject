@@ -53,6 +53,8 @@ android {
 }
 
 dependencies {
+    implementation("androidx.compose.ui:ui-text-android:1.5.4")
+    implementation("androidx.compose.ui:ui-graphics-android:1.5.4")
     val composeBom = platform("androidx.compose:compose-bom:2023.08.00")
     implementation(composeBom)
     androidTestImplementation(composeBom)
@@ -70,7 +72,7 @@ dependencies {
     debugImplementation("androidx.compose.ui:ui-test-manifest")
 
     // Optional - Integration with activities
-    implementation("androidx.activity:activity-compose:1.7.2")
+    implementation("androidx.activity:activity-compose:1.8.0")
     // Optional - Integration with ViewModels
     implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.6.2")
     // Optional - Integration with LiveData
@@ -84,7 +86,7 @@ dependencies {
     implementation("io.insert-koin:koin-android:$koin_version")
     implementation("io.insert-koin:koin-androidx-compose:$koin_version")
 
-    implementation("androidx.navigation:navigation-compose:2.7.4")
+    implementation("androidx.navigation:navigation-compose:2.7.5")
 
 //    implementation("androidx.datastore:datastore-preferences:1.1.0-alpha05")
 

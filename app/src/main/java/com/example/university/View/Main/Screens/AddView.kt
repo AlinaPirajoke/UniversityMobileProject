@@ -21,12 +21,10 @@ import androidx.compose.material.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusDirection
-import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
@@ -36,47 +34,56 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavHostController
 import com.example.university.View.Main.MainActivity
 import com.example.university.View.Main.MainScreens
 import com.example.university.ViewModel.AddViewModel
-import com.example.university.ViewModel.MainViewModel
 import com.example.university.theme.ColorScheme
 import com.example.university.theme.KotobaCustomTheme
+import kotlinx.coroutines.launch
+import org.koin.androidx.compose.koinViewModel
 
 private val TAG = "AddView"
 
 @Composable
-fun addScreen(context: MainActivity, navController: NavHostController, vm: AddViewModel) {
+fun AddScreen(
+    navController: NavHostController,
+    vm: AddViewModel = koinViewModel()
+) {
     val uiState by vm.uiState.collectAsState()
-    KotobaCustomTheme(colorScheme = uiState.colorScheme) {
-        context.window.statusBarColor = MaterialTheme.colors.primary.toArgb()
-        addView(
-            word = uiState.wordValue,
-            onWordChanged = { vm.editWordValue(it) },
-            transcription = uiState.transcrValue,
-            onTranscrChanged = { vm.editTranscrValue(it) },
-            translations = uiState.translValues,
-            onTranslChanged = { value, id -> vm.editTranslationValue(value, id) },
-            onAddTranstation = { vm.addTranslation() },
-            lvl = uiState.lvlValue,
-            onLvlChanged = { vm.editLvlValue(it) },
-            onConfirm = { vm.addWord() },
-            isWordFieldWrong = uiState.isWordFieldWrong,
-            isTranslFieldWrong = uiState.isTranslFieldWrong,
-            isLvlFieldWrong = uiState.isLvlFieldWrong,
-            errorMessage = uiState.errorMessage,
-            onGoingToMain = {
-                Log.i(TAG, "Перенаправление на главный экран")
-                navController.navigate(MainScreens.AddNew.route)
-            }
-        )
+    if (uiState.isGoingToMain) {
+        vm.sendToMain(false)
+        Log.i(TAG, "Перенаправление на главный экран")
+        navController.navigate(MainScreens.Main.route)
     }
+
+    AddView(word = uiState.wordValue,
+        onWordChanged = vm::editWordValue,
+        transcription = uiState.transcrValue,
+        onTranscrChanged = vm::editTranscrValue,
+        translations = uiState.translValues,
+        onTranslChanged = vm::editTranslationValue,
+        onAddTranstation = vm::addTranslation,
+        lvl = uiState.lvlValue,
+        onLvlChanged = vm::editLvlValue,
+        onConfirm = {
+            vm.addWord()
+        },
+        isWordFieldWrong = uiState.isWordFieldWrong,
+        isTranslFieldWrong = uiState.isTranslFieldWrong,
+        isLvlFieldWrong = uiState.isLvlFieldWrong,
+        errorMessage = uiState.errorMessage,
+        onGoingToMain = {
+            Log.i(TAG, "Перенаправление на главный экран")
+            navController.navigate(MainScreens.Main.route)
+        })
+
 }
 
 @OptIn(ExperimentalComposeUiApi::class, ExperimentalMaterialApi::class)
 @Composable
-fun addView(
+fun AddView(
     word: String,
     onWordChanged: (String) -> Unit,
     transcription: String,
@@ -120,10 +127,8 @@ fun addView(
             value = word,
             onValueChange = { onWordChanged(it) },
             label = {
-                if (isWordFieldWrong)
-                    Text(text = errorMessage)
-                else
-                    Text("Слово")
+                if (isWordFieldWrong) Text(text = errorMessage)
+                else Text("Слово")
             },
             isError = isWordFieldWrong,
             singleLine = true,
@@ -172,10 +177,8 @@ fun addView(
                 value = translation,
                 onValueChange = { onTranslChanged(it, index.toInt()) },
                 label = {
-                    if (isTranslFieldWrong && index == 0)
-                        Text(text = errorMessage)
-                    else
-                        Text("Перевод")
+                    if (isTranslFieldWrong && index == 0) Text(text = errorMessage)
+                    else Text("Перевод")
                 },
                 isError = isTranslFieldWrong,
                 singleLine = true,
@@ -200,7 +203,7 @@ fun addView(
         Text(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(top = 7.dp,)
+                .padding(top = 7.dp)
                 .clickable { onAddTranstation() },
             text = "Добавить перевод",
             fontSize = 15.sp,
@@ -213,10 +216,8 @@ fun addView(
             value = lvl,
             onValueChange = { onLvlChanged(it) },
             label = {
-                if (isLvlFieldWrong)
-                    Text(text = errorMessage)
-                else
-                    Text("Период показа")
+                if (isLvlFieldWrong) Text(text = errorMessage)
+                else Text("Период показа")
             },
             isError = isLvlFieldWrong,
             singleLine = true,
@@ -227,8 +228,7 @@ fun addView(
                 .fillMaxWidth()
                 .padding(top = 10.dp),
             keyboardOptions = KeyboardOptions(
-                imeAction = ImeAction.Done,
-                keyboardType = KeyboardType.Number
+                imeAction = ImeAction.Done, keyboardType = KeyboardType.Number
             ),
             keyboardActions = KeyboardActions(onDone = {
                 keyboardController?.hide()
@@ -261,9 +261,7 @@ fun addView(
         Button(
             onClick = {
                 onGoingToMain()
-            },
-            modifier = Modifier.fillMaxWidth(),
-            colors = ButtonDefaults.buttonColors(
+            }, modifier = Modifier.fillMaxWidth(), colors = ButtonDefaults.buttonColors(
                 backgroundColor = MaterialTheme.colors.onPrimary,
                 contentColor = MaterialTheme.colors.primary
             )
@@ -277,7 +275,7 @@ fun addView(
 @Composable
 fun AddViewPreview() {
     KotobaCustomTheme(colorScheme = ColorScheme.pink.colors) {
-        addView(
+        AddView(
             word = "Example",
             onWordChanged = { },
             transcription = "Example",

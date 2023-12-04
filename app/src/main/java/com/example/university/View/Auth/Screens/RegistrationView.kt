@@ -26,7 +26,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusDirection
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.vectorResource
@@ -37,63 +36,64 @@ import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavHostController
 import com.example.university.R
 import com.example.university.View.Auth.AuthActivity
 import com.example.university.View.Auth.AuthScreens
 import com.example.university.ViewModel.RegistrationViewModel
-import com.example.university.ViewModel.RegistrationViewModelFactory
-import com.example.university.usefull_stuff.showToast
+import com.example.university.UsefullStuff.showToast
+import kotlinx.coroutines.launch
+import org.koin.androidx.compose.koinViewModel
+
+private const val TAG = "RegistrationView"
 
 @Composable
-fun registrationInit(context: AuthActivity, navController: NavHostController) {
-    val vm = ViewModelProvider(
-        context,
-        RegistrationViewModelFactory(context)
-    ).get(RegistrationViewModel::class.java)
-    registrationScreen(context = context, navController = navController, vm = vm)
-}
-
-@Composable
-fun registrationScreen(
-    context: AuthActivity, navController: NavHostController, vm: RegistrationViewModel
+fun RegistrationScreen(
+    navController: NavHostController,
+    onGoingToMain: () -> Unit,
+    showErrorMessage: (String) -> Unit,
+    vm: RegistrationViewModel = koinViewModel()
 ) {
-    // Мня за такие аргументы не опустят?
-
-
     val uiState by vm.uiState.collectAsState()
 
-    if (uiState.isGoingToMain) context.toMain()
+    if (uiState.haveErrorMessage) {
+        showErrorMessage(uiState.errorMessage)
+        vm.setHaveErrorMessage(false)
+    }
+    if (uiState.isGoingToMain) {
+        vm.sendToHomePage(false)
+        onGoingToMain()
+    }
     if (uiState.isGoingToLogin) {
         Log.i("registrationView", "Перенаправление на логин: ${uiState.isGoingToLogin}")
         vm.sendToLoginPage(false)
         navController.navigate(AuthScreens.Login.route)
     }
-    if (!uiState.errorMessage.isEmpty()) {
-        showToast(uiState.errorMessage, context)
-        vm.clearErrorMessage()
-        Log.w("registrationView", "Получена ошибка: ${uiState.errorMessage}")
-    }
 
-    registrationView(
+
+    RegistrationView(
         pass1 = vm.enteredPass1,
         pass2 = vm.enteredPass2,
-        onUserInput1Changed = { vm.setPass1Value(it) },
-        onUserInput2Changed = { vm.setPass2Value(it) },
-        onPassConfirm = { vm.addUser() },
-        onGoingToLogin = { vm.sendToLoginPage() },
+        onUserInput1Changed = vm::setPass1Value,
+        onUserInput2Changed = vm::setPass2Value,
+        onGoingToLogin = vm::sendToLoginPage,
+        errorMessage = uiState.errorMessage,
         isField1Error = uiState.isField1Wrong,
         isField2Error = uiState.isField2Wrong,
+        onPassConfirm = {
+            vm.addUser()
+        },
     )
 }
 
 @Composable
-fun registrationView(
+fun RegistrationView(
     pass1: String,
     pass2: String,
     onUserInput1Changed: (String) -> Unit,
     onUserInput2Changed: (String) -> Unit,
+    errorMessage: String,
     onPassConfirm: () -> Unit,
     onGoingToLogin: () -> Unit,
     isField1Error: Boolean,
@@ -121,10 +121,11 @@ fun registrationView(
         )
         var isHidden1 by remember { mutableStateOf(true) }
 
-        OutlinedTextField(value = pass1,
+        OutlinedTextField(
+            value = pass1,
             onValueChange = { onUserInput1Changed(it) },
             label = {
-                if (isField1Error) Text("Такой пароль не подойдёт")
+                if (isField1Error) Text(text = errorMessage)
                 else Text("Придумайте пароль")
             },
             singleLine = true,
@@ -155,10 +156,11 @@ fun registrationView(
         )
 
         var isHidden2 by remember { mutableStateOf(true) }
-        OutlinedTextField(value = pass2,
+        OutlinedTextField(
+            value = pass2,
             onValueChange = { onUserInput2Changed(it) },
             label = {
-                if (isField2Error) Text("Такой пароль не подойдёт")
+                if (isField2Error) Text(text = errorMessage)
                 else Text("Повторите пароль")
             },
             singleLine = true,

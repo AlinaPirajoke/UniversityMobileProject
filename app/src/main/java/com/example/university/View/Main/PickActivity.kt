@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.Button
 import androidx.compose.material.Card
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Slider
@@ -22,14 +23,15 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.university.Model.DBManager
+import com.example.university.Model.AppDB.AppDbManager
 import com.example.university.theme.ColorScheme
 import com.example.university.theme.KotobaCustomTheme
-import com.example.university.usefull_stuff.formatDate
-import com.example.university.usefull_stuff.simpleFormatterWithYear
+import com.example.university.UsefullStuff.formatDate
+import com.example.university.UsefullStuff.simpleFormatterWithYear
 import java.time.LocalDate
 
 class PickActivity : AppCompatActivity() {
@@ -50,8 +52,8 @@ class PickActivity : AppCompatActivity() {
         Log.i(TAG, "Выбранная дата: ${dateString}")
 
         // not MVVM
-        val db = DBManager(this)
-        val count = db.getSizeFromDate(dateString, user)
+        val db = AppDbManager(this)
+        val count = db.getQuantityFromDate(dateString, user)
         /////
 
         setContent() {
@@ -120,7 +122,18 @@ class PickActivity : AppCompatActivity() {
                         }
 
                     }
-
+                    Column (
+                        Modifier.fillMaxWidth(),
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.Center
+                    ){
+                        Button(onClick = { /*TODO*/ }) {
+                            Text(text = "Сюды")
+                        }
+                        Button(onClick = { /*TODO*/ }) {
+                            Text(text = "Туды")
+                        }
+                    }
                 }
             }
         }

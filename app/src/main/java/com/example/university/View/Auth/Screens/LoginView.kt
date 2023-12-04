@@ -22,6 +22,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -34,59 +35,62 @@ import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavHostController
 import com.example.university.R
 import com.example.university.View.Auth.AuthActivity
 import com.example.university.View.Auth.AuthScreens
 import com.example.university.ViewModel.LoginViewModel
-import com.example.university.ViewModel.LoginViewModelFactory
-import com.example.university.usefull_stuff.showToast
+import com.example.university.UsefullStuff.showToast
+import kotlinx.coroutines.launch
+import org.koin.androidx.compose.koinViewModel
 
-
-@Composable
-fun loginInit(context: AuthActivity, navController: NavHostController) {
-    val vm = ViewModelProvider(context, LoginViewModelFactory(context))
-        .get(LoginViewModel::class.java)
-    loginScreen(context = context, navController = navController, vm = vm)
-}
+private const val TAG = "LoginView"
 
 @Composable
-fun loginScreen(context: AuthActivity, navController: NavHostController, vm: LoginViewModel) {
-    // Такие аргументы использовать не зашкварно?
-    // Нигде не видел, чтобы так делали, но как иначе не придумал
-
+fun LoginScreen(
+    navController: NavHostController,
+    onGoingToMain: () -> Unit,
+    showErrorMessage: (String) -> Unit,
+    vm: LoginViewModel = koinViewModel()
+) {
+    val scope = rememberCoroutineScope()
     val uiState by vm.uiState.collectAsState()
 
-    if (uiState.isGoingToMain)
-        context.toMain()
+    if (uiState.haveErrorMessage) {
+        showErrorMessage(uiState.errorMessage)
+        vm.setHaveErrorMessage(false)
+    }
+    if (uiState.isGoingToMain) {
+        vm.sendToHomePage(false)
+        onGoingToMain()
+    }
     if (uiState.isGoingToRegister) {
-        Log.i("LoginView", "Перенаправление на регистрацию: ${uiState.isGoingToRegister}")
+        Log.i(TAG, "Перенаправление на регистрацию")
         vm.sendToRegisterPage(false)
         navController.navigate(AuthScreens.Registration.route)
     }
-    if (!uiState.errorMessage.isEmpty()) {
-        showToast(uiState.errorMessage, context)
-        vm.clearErrorMessage()
-        Log.w("LoginView", "Получена ошибка: ${uiState.errorMessage}")
-    }
-
-    loginView(
+    LoginView(
         pass = vm.enteredPass,
-        onUserInputChanged = { vm.editUserEnter(it) },
-        onPassConfirm = { vm.checkPassword() },
-        onGoingToRegister = { vm.sendToRegisterPage() },
+        onUserInputChanged = vm::editUserEnter,
+        onPassConfirm = {
+            scope.launch { vm.checkPassword() }
+            Log.i(TAG, "ПОЕХАЛИ!")
+        },
+        onGoingToRegister = vm::sendToRegisterPage,
         isError = uiState.isFieldWrong,
+        errorMessage = uiState.errorMessage,
     )
 }
 
 @Composable
-fun loginView(
+fun LoginView(
     pass: String,
     onUserInputChanged: (String) -> Unit,
     onPassConfirm: () -> Unit,
     onGoingToRegister: () -> Unit,
     isError: Boolean,
+    errorMessage: String,
 ) {
     Column(
         Modifier
@@ -119,7 +123,7 @@ fun loginView(
                     onValueChange = { onUserInputChanged(it) },
                     label = {
                         if (isError)
-                            Text("Пароль не верен")
+                            Text(text = errorMessage)
                         else
                             Text("Введите пароль")
                     },
@@ -183,6 +187,5 @@ fun loginView(
                 }
             }
         }
-
     }
 }

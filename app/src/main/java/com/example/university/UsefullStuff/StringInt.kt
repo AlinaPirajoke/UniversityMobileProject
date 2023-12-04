@@ -1,4 +1,4 @@
-package com.example.university.usefull_stuff
+package com.example.university.UsefullStuff
 
 class StringInt(str: String, i: Int) {
     var string: String = str

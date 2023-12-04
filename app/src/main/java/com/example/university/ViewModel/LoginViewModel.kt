@@ -1,6 +1,5 @@
 package com.example.university.ViewModel
 
-import android.content.SharedPreferences
 import android.util.Log
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -8,14 +7,17 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.university.ViewModel.States.LoginUiState
-import com.example.university.Model.DBManager
+import com.example.university.Model.AppDB.AppDbManager
+import com.example.university.Model.MySharedPreferences
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
-class LoginViewModel(val db: DBManager, val sharedPreferences: SharedPreferences) : ViewModel() {
+class LoginViewModel(val db: AppDbManager, val msp: MySharedPreferences) : ViewModel() {
     val TAG = "LoginViewModel"
 
     private val _uiState = MutableStateFlow(LoginUiState())
@@ -26,7 +28,7 @@ class LoginViewModel(val db: DBManager, val sharedPreferences: SharedPreferences
 
     init {
         Log.d(TAG, "Создано")
-        sharedPreferences.edit().putBoolean("session", false).apply()
+        msp.session = false
     }
 
     fun editUserEnter(enteredPass: String) {
@@ -51,12 +53,14 @@ class LoginViewModel(val db: DBManager, val sharedPreferences: SharedPreferences
         _uiState.update { state ->
             state.copy(errorMessage = text)
         }
-        if (!text.isEmpty())
-            Log.w(TAG, "Ошибка ввода: ${uiState.value.errorMessage}")
+        setHaveErrorMessage(true)
+
     }
 
-    fun clearErrorMessage() {
-        setErrorMessage("")
+    fun setHaveErrorMessage(condition: Boolean) {
+        _uiState.update { state ->
+            state.copy(haveErrorMessage = condition)
+        }
     }
 
     fun setIsPassWrong(condition: Boolean) {
@@ -65,28 +69,29 @@ class LoginViewModel(val db: DBManager, val sharedPreferences: SharedPreferences
         }
     }
 
-    fun checkPassword() {
-        Log.d(TAG, "Проверка пароля $enteredPass")
-        viewModelScope.launch {
-            val enteredPass = enteredPass
-            if (!sharedPreferences.getBoolean("isPasswordNeeded", true))
-                if (enteredPass?.isEmpty() == true) {
-                    setErrorMessage("Введите пароль")
-                    setIsPassWrong(true)
-                    return@launch
-                }
-            val passwords = db.getPasswords()
-            if (!(enteredPass in passwords.keys)) {
-                setErrorMessage("Пароль не верен")
+    suspend fun checkPassword() {
+        Log.i(TAG, "Проверка пароля $enteredPass")
+
+        val enteredPass = enteredPass
+        if (msp.isPasswordNeeded)
+            if (enteredPass.isEmpty()) {
+                setErrorMessage("Введите пароль")
                 setIsPassWrong(true)
-                return@launch
+                return
             }
 
-            passwords.get(enteredPass)?.let {
-                sharedPreferences.edit().putInt("user", it).apply()
-                sharedPreferences.edit().putBoolean("session", true).apply()
-                sendToHomePage()
-            }
+        val passwords = db.getPasswords()
+        if (enteredPass !in passwords.keys) {
+            setErrorMessage("Пароль не верен")
+            setIsPassWrong(true)
+            return
         }
+
+        passwords.get(enteredPass)?.let {
+            msp.user = it
+            msp.session = true
+            sendToHomePage()
+        }
+
     }
 }

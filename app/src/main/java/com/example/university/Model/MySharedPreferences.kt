@@ -5,6 +5,7 @@ import android.content.SharedPreferences
 import android.preference.PreferenceManager
 import android.util.Log
 import androidx.compose.material.Colors
+import com.example.university.UsefullStuff.getTodayDate
 import com.example.university.theme.ColorScheme
 
 class MySharedPreferences(context: Context) {
@@ -65,6 +66,29 @@ class MySharedPreferences(context: Context) {
             field = count
             sp.edit().putInt("studyQuantityPerDay", count).apply()
         }
+
+    var isRememberPresent: Boolean = false
+        get() {
+            val v = sp.getBoolean("isRememberPresent", false)
+            Log.i(TAG, "isRememberPresent: $v")
+            return v
+        }
+        set(condition: Boolean){
+            field = condition
+            sp.edit().putBoolean("isRememberPresent", condition).apply()
+        }
+
+    var lastOpenedAppDate: String = "1970-01-01"
+        get() {
+            val v = sp.getString("lastOpenedAppDate", getTodayDate())
+            Log.i(TAG, "lastOpenedAppDate: $v")
+            return v.toString()
+        }
+        set(date: String){
+            field = date
+            sp.edit().putString("lastOpenedAppDate", date).apply()
+        }
+
 
     fun getColorScheme(): Colors {
         val v = sp.getInt("currentColorSchemeId", 0)

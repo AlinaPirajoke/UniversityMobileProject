@@ -1,11 +1,15 @@
 package com.example.university.ViewModel.DI
 
-import com.example.university.Model.DBManager
+import com.example.university.Model.AppDB.AppDbManager
 import com.example.university.Model.MySharedPreferences
 import com.example.university.ViewModel.MainActivityViewModel
 import com.example.university.ViewModel.AddViewModel
+import com.example.university.ViewModel.LoginViewModel
 import com.example.university.ViewModel.MainViewModel
+import com.example.university.ViewModel.PickQuantityViewModel
+import com.example.university.ViewModel.RegistrationViewModel
 import com.example.university.ViewModel.SettingsViewModel
+import com.example.university.ViewModel.TestViewModel
 import org.koin.androidx.viewmodel.dsl.viewModel
 import org.koin.core.module.Module
 import org.koin.dsl.module
@@ -16,8 +20,8 @@ val dataModule = module {
 }
 
 private fun Module.data(){
-    single<DBManager>{
-        DBManager(context = get())
+    single<AppDbManager>{
+        AppDbManager(context = get())
     }
     single<MySharedPreferences>{
         MySharedPreferences(context = get())
@@ -45,6 +49,30 @@ private fun Module.presentation(){
     }
     viewModel<AddViewModel>{
         AddViewModel(
+            db = get(),
+            msp = get()
+        )
+    }
+    viewModel<LoginViewModel>{
+        LoginViewModel(
+            db = get(),
+            msp = get()
+        )
+    }
+    viewModel<RegistrationViewModel>{
+        RegistrationViewModel(
+            db = get(),
+            msp = get()
+        )
+    }
+    viewModel<PickQuantityViewModel>{
+        PickQuantityViewModel(
+            db = get(),
+            msp = get()
+        )
+    }
+    viewModel<TestViewModel>{
+        TestViewModel(
             db = get(),
             msp = get()
         )

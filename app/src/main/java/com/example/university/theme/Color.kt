@@ -14,6 +14,7 @@ val pinkDark = Color(0xFFC93B94)
 
 val error = Color(0xFFFF715E)
 val gray = Color(0xFF494949)
+val mediumGray = Color(0xFF2B2B2B)
 val darkGray = Color(0xFF303030)
 
 val PHColors = lightColors(
@@ -23,7 +24,7 @@ val PHColors = lightColors(
     secondary = darkGray,
     secondaryVariant = gray,
     onSecondary = Color.White,
-    error = error
+    error = error,
 )
 val pinkColors = lightColors(
     primary = pink,

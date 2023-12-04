@@ -1,24 +1,23 @@
 package com.example.university.ViewModel
 
-import android.content.SharedPreferences
 import android.util.Log
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.graphics.Color
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.university.Model.DBManager
-import com.example.university.ViewModel.States.LoginUiState
+import com.example.university.Model.AppDB.AppDbManager
+import com.example.university.Model.MySharedPreferences
 import com.example.university.ViewModel.States.RegistrationUiState
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
-class RegistrationViewModel(val db: DBManager, val sharedPreferences: SharedPreferences) :
+class RegistrationViewModel(val db: AppDbManager, val msp: MySharedPreferences) :
     ViewModel() {
     val TAG = "RegistrationViewModel"
 
@@ -82,40 +81,53 @@ class RegistrationViewModel(val db: DBManager, val sharedPreferences: SharedPref
         }
         if (!text.isEmpty())
             Log.w(TAG, "Ошибка ввода: ${uiState.value.errorMessage}")
+        setHaveErrorMessage(true)
     }
 
-    fun clearErrorMessage() {
-        setErrorMessage("")
+    fun setHaveErrorMessage(condition: Boolean) {
+        _uiState.update { state ->
+            state.copy(haveErrorMessage = condition)
+        }
     }
 
     fun addUser() {
-        val pass1 = enteredPass1
-        val pass2 = enteredPass2
-        if (pass1 != pass2) {
-            setErrorMessage("Пароли не совпадают")
-            setIsField2Wrong(true)
-            return
-        }
-        if (!(isValidSymbols(pass1) == true && isValidLength(pass1))) {
-            setErrorMessage("Использованы недопустимые символы")
-            setIsField1Wrong(true)
-            setIsField2Wrong(true)
-            return
-        }
-        if ((pass1 in db.getPasswords().keys) != false) {
-            setErrorMessage("Пароль не подходит, придумайте другой")
-            setIsField1Wrong(true)
-            setIsField2Wrong(true)
-            return
-        }
         viewModelScope.launch {
-            db.insertPassword(pass1.toString())
-            val newId = db.getPasswords().get(pass1)
-            sharedPreferences.edit().putBoolean("session", true).apply()
-            newId?.let {
-                sharedPreferences.edit().putInt("user", it).apply()
+            withContext(Dispatchers.IO) {
+                val pass1 = enteredPass1
+                val pass2 = enteredPass2
+                if (pass1 != pass2) {
+                    setErrorMessage("Пароли не совпадают")
+                    setIsField2Wrong(true)
+                    return@withContext
+                }
+                if (!isValidSymbols(pass1)) {
+                    setErrorMessage("Использованы недопустимые символы")
+                    setIsField1Wrong(true)
+                    setIsField2Wrong(true)
+                    return@withContext
+                }
+                if (!isValidLength(pass1)) {
+                    setErrorMessage("Пароль слишком короткий")
+                    setIsField1Wrong(true)
+                    setIsField2Wrong(true)
+                    return@withContext
+                }
+                if ((pass1 in db.getPasswords().keys) != false) {
+                    setErrorMessage("Пароль не подходит, придумайте другой")
+                    setIsField1Wrong(true)
+                    setIsField2Wrong(true)
+                    return@withContext
+                }
+                viewModelScope.launch {
+                    db.insertPassword(pass1.toString())
+                    val newId = db.getPasswords().get(pass1)
+                    msp.session = true
+                    newId?.let {
+                        msp.user = it
+                    }
+                    sendToHomePage()
+                }
             }
-            sendToHomePage()
         }
     }
 

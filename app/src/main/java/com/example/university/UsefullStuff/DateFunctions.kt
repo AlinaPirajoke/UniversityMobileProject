@@ -1,4 +1,4 @@
-package com.example.university.usefull_stuff
+package com.example.university.UsefullStuff
 
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
@@ -9,7 +9,7 @@ val simpleFormatter = DateTimeFormatter.ofPattern("d MMMM", Locale("ru"))
 val simpleFormatterWithYear = DateTimeFormatter.ofPattern("d MMMM yyyy", Locale("ru"))
 
 fun getDaysFromToday(n: Int): List<LocalDate> {
-    var dates = ArrayList<LocalDate>()
+    val dates = ArrayList<LocalDate>()
     var date = LocalDate.now()
 
     repeat(n) {

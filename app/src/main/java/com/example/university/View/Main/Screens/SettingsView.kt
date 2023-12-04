@@ -23,50 +23,60 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavHostController
 import com.example.university.View.Main.MainActivity
 import com.example.university.View.Main.MainScreens
-import com.example.university.ViewModel.MainViewModel
 import com.example.university.ViewModel.SettingsViewModel
 import com.example.university.theme.KotobaCustomTheme
 import com.example.university.theme.PH
 import com.example.university.theme.pink
-import com.example.university.usefull_stuff.showToast
+import com.example.university.UsefullStuff.showToast
+import kotlinx.coroutines.launch
+import org.koin.androidx.compose.koinViewModel
 
 private val TAG = "SettingsView"
 
 @Composable
-fun settingsScreen(context: MainActivity, navController: NavHostController, vm: SettingsViewModel) {
+fun SettingsScreen(
+    onChangeColorScheme: () -> Unit,
+    navController: NavHostController,
+    vm: SettingsViewModel = koinViewModel(),
+    showErrorMessage: (String) -> Unit,
+) {
     val uiState by vm.uiState.collectAsState()
-    if (!uiState.errorMessage.isEmpty()) {
-        showToast(uiState.errorMessage, context)
-        vm.clearErrorMessage()
-        Log.w("registrationView", "Получена ошибка: ${uiState.errorMessage}")
+    if (uiState.haveErrorMessage) {
+        showErrorMessage(uiState.errorMessage)
+        vm.setHaveErrorMessage(false)
     }
-    KotobaCustomTheme(colorScheme = uiState.colorScheme) {
-        context.window.statusBarColor = MaterialTheme.colors.primary.toArgb()
-        settingsView(
-            isPassNeeded = uiState.isPasswordNeeded,
-            onIsPassNeededChange = { vm.setIsPasswordNeeded(it) },
-            currentColorScheme = uiState.currentColorScheme,
-            onColorSchemeChange = { vm.setCurrentColorScheme(it) },
-            onGoingToMain = {
-                Log.i(TAG, "Перенаправление на главный экран")
-                navController.navigate(MainScreens.Main.route)
-            }
-        )
-    }
+    SettingsView(
+        isPassNeeded = uiState.isPasswordNeeded,
+        onIsPassNeededChange = {
+            vm.setIsPasswordNeeded(it)
+        },
+        currentColorScheme = uiState.currentColorScheme,
+        onColorSchemeChange = {
+            vm.setCurrentColorScheme(it)
+            onChangeColorScheme()
+        },
+        onGoingToMain = {
+            Log.i(TAG, "Перенаправление на главный экран")
+            navController.navigate(MainScreens.Main.route)
+        }
+    )
 }
 
 @Composable
-fun settingsView(
+fun SettingsView(
     isPassNeeded: Boolean,
     onIsPassNeededChange: (Boolean) -> Unit,
     currentColorScheme: Int,
