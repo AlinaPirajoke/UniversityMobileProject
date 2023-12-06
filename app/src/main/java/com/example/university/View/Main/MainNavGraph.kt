@@ -8,7 +8,7 @@ import androidx.navigation.compose.composable
 import com.example.university.View.Main.Screens.AddScreen
 import com.example.university.View.Main.Screens.MainScreen
 import com.example.university.View.Main.Screens.PickQuantityInit
-import com.example.university.View.Main.Screens.PickQuantityScreen
+import com.example.university.View.Main.Screens.PickWordScreen
 import com.example.university.View.Main.Screens.SettingsScreen
 import com.example.university.View.Main.Screens.TestInit
 
@@ -52,6 +52,11 @@ fun MainNavGraph(
             TestInit(
                 navController = navController,
                 listId = backStackEntry.arguments?.getString("listId")!!.toInt()
+            )
+        }
+        composable(route = MainScreens.PickWord.route) {
+            PickWordScreen(
+                navController = navController
             )
         }
     }

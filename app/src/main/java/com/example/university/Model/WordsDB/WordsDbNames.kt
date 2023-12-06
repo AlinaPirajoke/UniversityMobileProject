@@ -4,8 +4,10 @@ import android.provider.BaseColumns
 
 object WordsDbNames : BaseColumns {
     // Бд, содержащее все слова
+    const val DATABASE_NAME = "unlearned_words_database.sqlite3"
+    const val DATABASE_VERSION = 2
     // Таблица со словами
-    const val WORD = "word"
+    const val WORD = "word_table"
     const val W_ID = BaseColumns._ID
     const val W_WORD = "word"
     const val W_TRANSCR = "transcription"

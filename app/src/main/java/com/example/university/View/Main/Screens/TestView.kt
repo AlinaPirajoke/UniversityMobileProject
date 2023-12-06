@@ -6,7 +6,6 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -26,6 +25,7 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.material.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -38,15 +38,17 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import com.example.university.R
-import com.example.university.theme.ColorScheme
-import com.example.university.theme.KotobaCustomTheme
 import com.example.university.View.Main.MainScreens
 import com.example.university.ViewModel.TestViewModel
+import com.example.university.theme.ColorScheme
+import com.example.university.theme.KotobaCustomTheme
 import com.example.university.theme.UXConstants
 import org.koin.androidx.compose.koinViewModel
 
 private const val TAG = "TestView"
 
+// TestInit нужен только для того, чтоб запускать vm.testStart,
+// чтоб когда uiState обновлялся тест не перезапускался
 @SuppressLint("CoroutineCreationDuringComposition")
 @Composable
 fun TestInit(
@@ -54,8 +56,9 @@ fun TestInit(
     listId: Int,
     vm: TestViewModel = koinViewModel(),
 ) {
-    vm.testStart(listId)
-
+    LaunchedEffect(key1 = listId){
+        vm.testStart(listId)
+    }
     TestScreen(navController = navController, vm = vm)
 }
 
@@ -104,9 +107,6 @@ fun TestScreen(
         )
 }
 
-// На этом экране есть две фазы, меняющиеся циклично.
-// Логика в них не очень сложная, так что я решил просто менять из в зависимости от currentStage в uiState
-// Колхоз? Тема?
 @Composable()
 fun TestFirstStageView(
     word: String,
@@ -249,7 +249,7 @@ fun OptionsButtons(
 fun ShowExitConfirm(onConfirm: () -> Unit, onReject: () -> Unit) {
     AlertDialog(
         onDismissRequest = onReject,
-        text = { Text("Вы действительно хотите закончить тестирование (его можно будеть продолжить позже)") },
+        text = { Text("Вы действительно хотите закончить тестирование? (его можно будеть продолжить позже)") },
         confirmButton = {
             TextButton(
                 onClick = onConfirm

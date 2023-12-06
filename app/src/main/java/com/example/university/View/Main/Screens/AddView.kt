@@ -259,7 +259,6 @@ fun AddView(
             )
         )
 
-
         Button(
             onClick = {
                 onConfirm()

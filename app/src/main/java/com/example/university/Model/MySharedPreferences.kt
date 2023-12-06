@@ -21,6 +21,7 @@ class MySharedPreferences(context: Context) {
         set(condition: Boolean){
             field = condition
             sp.edit().putBoolean("session", condition).apply()
+            Log.i(TAG, "session: $condition")
         }
 
     var user: Int = 0
@@ -32,6 +33,7 @@ class MySharedPreferences(context: Context) {
         set(id: Int){
             field = id
             sp.edit().putInt("user", id).apply()
+            Log.i(TAG, "user: $id")
         }
 
     var isPasswordNeeded: Boolean = true
@@ -43,6 +45,7 @@ class MySharedPreferences(context: Context) {
         set(condition: Boolean){
             field = condition
             sp.edit().putBoolean("isPasswordNeeded", condition).apply()
+            Log.i(TAG, "isPasswordNeeded: $condition")
         }
 
     var currentColorSchemeId: Int = 0
@@ -54,6 +57,7 @@ class MySharedPreferences(context: Context) {
         set(id: Int) {
             field = id
             sp.edit().putInt("currentColorSchemeId", id).apply()
+            Log.i(TAG, "currentColorSchemeId: $id")
         }
 
     var studyQuantityPerDay: Int = 999
@@ -62,9 +66,10 @@ class MySharedPreferences(context: Context) {
             Log.i(TAG, "studyQuantityPerDay: $v")
             return v
         }
-        set(count: Int) {
-            field = count
-            sp.edit().putInt("studyQuantityPerDay", count).apply()
+        set(quantity: Int) {
+            field = quantity
+            sp.edit().putInt("studyQuantityPerDay", quantity).apply()
+            Log.i(TAG, "studyQuantityPerDay: $quantity")
         }
 
     var isRememberPresent: Boolean = false
@@ -76,6 +81,7 @@ class MySharedPreferences(context: Context) {
         set(condition: Boolean){
             field = condition
             sp.edit().putBoolean("isRememberPresent", condition).apply()
+            Log.i(TAG, "isRememberPresent: $condition")
         }
 
     var lastOpenedAppDate: String = "1970-01-01"
@@ -87,8 +93,20 @@ class MySharedPreferences(context: Context) {
         set(date: String){
             field = date
             sp.edit().putString("lastOpenedAppDate", date).apply()
+            Log.i(TAG, "lastOpenedAppDate: $date")
         }
 
+    var todayStudiedQuantity: Int = 999
+        get() {
+            val v = sp.getInt("todayStudiedQuantity", 0)
+            Log.i(TAG, "todayStudiedQuantity: $v")
+            return v
+        }
+        set(quantity: Int) {
+            field = quantity
+            sp.edit().putInt("todayStudiedQuantity", quantity).apply()
+            Log.i(TAG, "todayStudiedQuantity: $quantity")
+        }
 
     fun getColorScheme(): Colors {
         val v = sp.getInt("currentColorSchemeId", 0)

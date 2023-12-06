@@ -6,4 +6,5 @@ sealed class MainScreens(val route: String) {
     object Settings : MainScreens("settings_screen")
     object PickQuantity : MainScreens("quantity_screen")
     object Test: MainScreens("test_screen")
+    object PickWord : MainScreens("new_words_screen")
 }

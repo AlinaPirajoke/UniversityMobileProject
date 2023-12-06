@@ -4,6 +4,7 @@ import android.content.ContentValues
 import android.content.Context
 import android.database.sqlite.SQLiteDatabase
 import android.util.Log
+import com.example.university.Model.MySharedPreferences
 import com.example.university.UsefullStuff.StringInt
 import com.example.university.UsefullStuff.Word
 import com.example.university.UsefullStuff.getDateNDaysLater
@@ -15,6 +16,7 @@ class AppDbManager(val context: Context) {
     val TAG = "DBManager"
     val dbHelper = AppDbHelper(context)
     var db: SQLiteDatabase? = null
+    val msp = MySharedPreferences(context)
 
     init {
         db = dbHelper.writableDatabase
@@ -29,6 +31,7 @@ class AppDbManager(val context: Context) {
         Log.d(TAG, "Проверка дб:")
         val cursor = db!!.rawQuery("SELECT ${AppDbNames.W_DATE} FROM ${AppDbNames.WORD}", null)
         while (cursor?.moveToNext() == true) Log.i(TAG, "${cursor.getString(0)}")
+        cursor.close()
     }
 
     fun insertPassword(pass: String) {
@@ -50,6 +53,7 @@ class AppDbManager(val context: Context) {
             values.put(pass, id)
             Log.i(TAG, "$pass, $id")
         }
+        cursor.close()
         return values
     }
 
@@ -71,6 +75,7 @@ class AppDbManager(val context: Context) {
         )
         cursor?.moveToFirst()
         val size = cursor?.getInt(0)
+        cursor.close()
         return size
     }
 
@@ -83,6 +88,7 @@ class AppDbManager(val context: Context) {
         val number = cursor?.getInt(0)
         db!!.execSQL("UPDATE ${AppDbNames.WORD} SET ${AppDbNames.W_DATE} = \"$now\" WHERE ${AppDbNames.W_DATE} < \"$now\"")
         Log.i(TAG, "Обновлена дата $number записей")
+        cursor.close()
     }
 
     // Доделать
@@ -96,6 +102,7 @@ class AppDbManager(val context: Context) {
         )
         cursor?.moveToFirst()
         val size = cursor?.getInt(0)
+        cursor.close()
         return size!!
     }
 
@@ -105,6 +112,7 @@ class AppDbManager(val context: Context) {
         )
         cursor?.moveToFirst()
         val size = cursor?.getInt(0)
+        cursor.close()
         return size!!
     }
 
@@ -136,6 +144,7 @@ class AppDbManager(val context: Context) {
             TAG,
             "Было найдено ${words.size} записей на дату $date: ${words.joinToString { it.word }}"
         )
+        cursor.close()
         return words
     }
 
@@ -149,6 +158,7 @@ class AppDbManager(val context: Context) {
         while (cursor.moveToNext()) {
             transl.add(cursor?.getString(0).toString())
         }
+        cursor.close()
         return transl
     }
 
@@ -173,6 +183,12 @@ class AppDbManager(val context: Context) {
         if (word_id != null) {
             addNewTranslations(wordId = word_id, transl = transl)
         } else Log.e(TAG, "Мы проебали id для слова $word")
+        cursor.close()
+        msp.todayStudiedQuantity++
+    }
+
+    fun addNewWord (word: Word , user: Int){
+        addNewWord(word.word, word.transcription, word.translations, word.lvl, user)
     }
 
     fun addNewTranslations(wordId: Int, transl: List<String>) {
@@ -195,6 +211,7 @@ class AppDbManager(val context: Context) {
             )
             cursor.moveToFirst()
             listId = cursor.getInt(0)!! + 1
+            cursor.close()
         } catch (e: Exception) {
             Log.e(TAG, "Ошибка добавления: ${e.javaClass}")
         }
@@ -239,6 +256,7 @@ class AppDbManager(val context: Context) {
             )
             words.add(resultWord)
         }
+        cursor.close()
         return words
     }
 
@@ -283,6 +301,13 @@ class AppDbManager(val context: Context) {
                 TAG,
                 "id: $id, date: $date, word: $word, transcr: $transcr, lvl: $lvl, transl: ${transl.joinToString()}"
             )
+        }
+        cursor.close()
+    }
+
+    fun addNewWords(words: List<Word>, user: Int){
+        words.forEach{
+            addNewWord(it, user)
         }
     }
 }

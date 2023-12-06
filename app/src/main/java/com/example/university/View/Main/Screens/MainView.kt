@@ -21,22 +21,19 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.navigation.NavHostController
-import com.example.university.View.Main.MainActivity
-import com.example.university.ViewModel.MainViewModel
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
-import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavHostController
 import com.example.university.R
-import com.example.university.View.Main.MainScreens
-import com.example.university.theme.KotobaCustomTheme
 import com.example.university.UsefullStuff.getTodayDate
+import com.example.university.View.Main.MainScreens
+import com.example.university.ViewModel.MainViewModel
+import com.example.university.theme.UXConstants
 import org.koin.androidx.compose.koinViewModel
 
 private const val TAG = "MainView"
@@ -60,7 +57,10 @@ fun MainScreen(
                 navController.navigate("${MainScreens.PickQuantity.route}/${getTodayDate()}")
             }
         },
-        onGoingToPickWords = { },
+        onGoingToPickWords = {
+            Log.i(TAG, "Перенаправление на экран выбора слов")
+            navController.navigate(MainScreens.PickWord.route)
+        },
         toAddNew = {
             Log.i(TAG, "Перенаправление на экран добавления слов")
             navController.navigate(MainScreens.AddNew.route)
@@ -133,7 +133,12 @@ fun StatisticBlock(
         Card(
             Modifier
                 .fillMaxWidth()
-                .padding(BORDER_PADDING, 20.dp),
+                .padding(
+                    UXConstants.HORIZONTAL_PADDING,
+                    20.dp,
+                    UXConstants.HORIZONTAL_PADDING,
+                    UXConstants.HORIZONTAL_PADDING
+                ),
             shape = RoundedCornerShape(10.dp),
             elevation = 4.dp,
         ) {
@@ -162,7 +167,8 @@ fun TodayBlock(
     Column(
         Modifier
             .fillMaxWidth()
-            .padding(BORDER_PADDING, 50.dp), verticalArrangement = Arrangement.SpaceBetween
+            .padding(UXConstants.HORIZONTAL_PADDING, 50.dp),
+        verticalArrangement = Arrangement.SpaceBetween
     ) {
         Text(
             modifier = Modifier
@@ -206,14 +212,14 @@ fun OtherBlock(
         modifier = Modifier
             .fillMaxWidth()
             .padding(top = 20.dp),
-        shape = RoundedCornerShape(30.dp, 30.dp, 0.dp, 0.dp),
+        shape = RoundedCornerShape(20.dp, 20.dp, 0.dp, 0.dp),
         elevation = 4.dp,
         backgroundColor = MaterialTheme.colors.primaryVariant,
     ) {
         Column(
             Modifier
                 .fillMaxWidth()
-                .padding(BORDER_PADDING, 28.dp),
+                .padding(BORDER_PADDING, 20.dp),
             verticalArrangement = Arrangement.spacedBy(15.dp),
         ) {
             /*Row(

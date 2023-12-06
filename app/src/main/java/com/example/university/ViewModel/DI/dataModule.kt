@@ -2,11 +2,13 @@ package com.example.university.ViewModel.DI
 
 import com.example.university.Model.AppDB.AppDbManager
 import com.example.university.Model.MySharedPreferences
-import com.example.university.ViewModel.MainActivityViewModel
+import com.example.university.Model.WordsDB.WordsDbManager
 import com.example.university.ViewModel.AddViewModel
 import com.example.university.ViewModel.LoginViewModel
+import com.example.university.ViewModel.MainActivityViewModel
 import com.example.university.ViewModel.MainViewModel
 import com.example.university.ViewModel.PickQuantityViewModel
+import com.example.university.ViewModel.PickWordViewModel
 import com.example.university.ViewModel.RegistrationViewModel
 import com.example.university.ViewModel.SettingsViewModel
 import com.example.university.ViewModel.TestViewModel
@@ -25,6 +27,9 @@ private fun Module.data(){
     }
     single<MySharedPreferences>{
         MySharedPreferences(context = get())
+    }
+    single<WordsDbManager>{
+        WordsDbManager(context = get())
     }
 }
 
@@ -75,6 +80,13 @@ private fun Module.presentation(){
         TestViewModel(
             db = get(),
             msp = get()
+        )
+    }
+    viewModel<PickWordViewModel>{
+        PickWordViewModel(
+            adb = get(),
+            wdb = get(),
+            msp = get(),
         )
     }
 }

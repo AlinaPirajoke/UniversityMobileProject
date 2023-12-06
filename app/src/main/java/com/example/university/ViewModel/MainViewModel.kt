@@ -59,15 +59,13 @@ class MainViewModel(val db: AppDbManager, val msp: MySharedPreferences) : ViewMo
 
     suspend fun checkTodayWords() {
         viewModelScope.launch {
-            if (msp.lastOpenedAppDate <= getTodayDate())
-                db.dailyDateUpdate()
 
             setTest(db.getQuantityFromDate(getTodayDate(), user)!!)
-            var learnCount = db.getTodayLearnedCount(getTodayDate(), user)!!
-            learnCount = msp.studyQuantityPerDay - learnCount
-            if (learnCount < 0)
-                learnCount = 0
-            setLearn(learnCount)
+            var learnQuantity = db.getTodayLearnedCount(getTodayDate(), user)!!
+            learnQuantity = msp.studyQuantityPerDay - msp.todayStudiedQuantity
+            if (learnQuantity < 0)
+                learnQuantity = 0
+            setLearn(learnQuantity)
         }
     }
 

@@ -3,6 +3,7 @@ package com.example.university.ViewModel
 import androidx.lifecycle.ViewModel
 import com.example.university.Model.AppDB.AppDbManager
 import com.example.university.Model.MySharedPreferences
+import com.example.university.UsefullStuff.getTodayDate
 import com.example.university.ViewModel.States.MainActivityUiState
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -24,6 +25,15 @@ class MainActivityViewModel(val db: AppDbManager, val msp: MySharedPreferences) 
             session = true
         if (!session)
             sendToLogin()
+
+        if(msp.lastOpenedAppDate > getTodayDate())
+            dailyUpdates()
+    }
+
+    fun dailyUpdates(){
+        msp.todayStudiedQuantity = 0
+        db.dailyDateUpdate()
+        msp.lastOpenedAppDate = getTodayDate()
     }
 
     fun sendToLogin(condition: Boolean = true) {
