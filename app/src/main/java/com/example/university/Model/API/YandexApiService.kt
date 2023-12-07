@@ -13,6 +13,12 @@ interface YandexApiService {
     @POST("translate/v2/translate")
     suspend fun translateThis(
         @Body translateRequest: TranslationRequest,
-        @Header("Authorization") apiKey: String
+        @Header("Authorization") apiKey: String,
     ): TranslationList
+
+    companion object {
+        operator fun invoke(retrofitAdapter: RetrofitAdapter): YandexApiService {
+            return retrofitAdapter.getInstance().create(YandexApiService::class.java)
+        }
+    }
 }
