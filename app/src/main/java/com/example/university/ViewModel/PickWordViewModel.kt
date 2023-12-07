@@ -5,7 +5,6 @@ import androidx.lifecycle.viewModelScope
 import com.example.university.Model.AppDB.AppDbManager
 import com.example.university.Model.MySharedPreferences
 import com.example.university.Model.WordsDB.WordsDbManager
-import com.example.university.UsefullStuff.getTodayDate
 import com.example.university.ViewModel.States.PickWordUiState
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -20,7 +19,7 @@ class PickWordViewModel(
 ) : ViewModel() {
     private val TAG = "PickQuantityViewModel"
     private var trueRemain: Int =
-        msp.studyQuantityPerDay - adb.getTodayLearnedCount(getTodayDate(), msp.user)!!
+        msp.studyQuantityPerDay - msp.todayStudiedQuantity
     private val _uiState = MutableStateFlow(PickWordUiState())
     val uiState: StateFlow<PickWordUiState> = _uiState.asStateFlow()
 

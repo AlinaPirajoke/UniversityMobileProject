@@ -69,11 +69,13 @@ fun MainScreen(
             Log.i(TAG, "Перенаправление на экран настроек")
             navController.navigate(MainScreens.Settings.route)
         },
+        toAnotherDates = {
+            Log.i(TAG, "Перенаправление на экран будующих тестов")
+            navController.navigate(MainScreens.FutureTests.route)
+        },
         toLogin = onGoingToLogin,
     )
 }
-
-val BORDER_PADDING = 12.dp
 
 @Composable
 fun MainView(
@@ -87,6 +89,7 @@ fun MainView(
     toAddNew: () -> Unit,
     toLogin: () -> Unit,
     toSettings: () -> Unit,
+    toAnotherDates: () -> Unit,
 ) {
     val scrollState = rememberScrollState()
     Column(
@@ -105,6 +108,7 @@ fun MainView(
             todayLearn = todayLearn,
             onGoingToPickCount = onGoingToPickQuantity,
             onGoingToPickWords = onGoingToPickWords,
+            toAnotherDates = toAnotherDates,
         )
         OtherBlock(
             onGoingToSettings = { toSettings() },
@@ -162,6 +166,7 @@ fun TodayBlock(
     todayLearn: Int = 0,
     onGoingToPickCount: () -> Unit,
     onGoingToPickWords: () -> Unit,
+    toAnotherDates: () -> Unit,
 ) {
 
     Column(
@@ -184,7 +189,8 @@ fun TodayBlock(
         Text(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(top = 20.dp),
+                .padding(top = 20.dp)
+                .clickable { toAnotherDates() },
             text = "Посмотреть другие даты",
             fontSize = 15.sp,
             color = MaterialTheme.colors.primary,
@@ -219,7 +225,7 @@ fun OtherBlock(
         Column(
             Modifier
                 .fillMaxWidth()
-                .padding(BORDER_PADDING, 20.dp),
+                .padding(UXConstants.HORIZONTAL_PADDING, 20.dp),
             verticalArrangement = Arrangement.spacedBy(15.dp),
         ) {
             /*Row(

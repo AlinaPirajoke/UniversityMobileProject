@@ -5,7 +5,6 @@ import android.content.Context
 import android.database.sqlite.SQLiteDatabase
 import android.util.Log
 import com.example.university.Model.MySharedPreferences
-import com.example.university.UsefullStuff.StringInt
 import com.example.university.UsefullStuff.Word
 import com.example.university.UsefullStuff.getDateNDaysLater
 import com.example.university.UsefullStuff.getDaysFromToday
@@ -57,13 +56,13 @@ class AppDbManager(val context: Context) {
         return values
     }
 
-    fun getListsSizeAndDays(n: Int, user: Int): ArrayList<StringInt> {
-        val datesCount = ArrayList<StringInt>()
-        val dates = getDaysFromToday(n)
+    fun getListsSizeAndDays(length: Int, user: Int): List<Pair<String, Int>> {
+        val datesCount = ArrayList<Pair<String, Int>>()
+        val dates = getDaysFromToday(length)
         for (date in dates) {
-            val dt = date.format(simpleFormatter)
-            val count = getQuantityFromDate(dt, user)
-            count?.let { StringInt(dt, it) }?.let { datesCount.add(it) }
+            val sDate = date.format(simpleFormatter)
+            val quantity = getQuantityFromDate(sDate, user)!!
+            datesCount.add(sDate to quantity)
         }
         return datesCount
     }
@@ -89,11 +88,6 @@ class AppDbManager(val context: Context) {
         db!!.execSQL("UPDATE ${AppDbNames.WORD} SET ${AppDbNames.W_DATE} = \"$now\" WHERE ${AppDbNames.W_DATE} < \"$now\"")
         Log.i(TAG, "Обновлена дата $number записей")
         cursor.close()
-    }
-
-    // Доделать
-    fun getTodayLearnedCount(date: String, user: Int): Int? {
-        return 0
     }
 
     fun getLearnedCount(): Int {

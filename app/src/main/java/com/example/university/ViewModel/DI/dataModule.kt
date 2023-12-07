@@ -4,6 +4,7 @@ import com.example.university.Model.AppDB.AppDbManager
 import com.example.university.Model.MySharedPreferences
 import com.example.university.Model.WordsDB.WordsDbManager
 import com.example.university.ViewModel.AddViewModel
+import com.example.university.ViewModel.FutureTestsViewModel
 import com.example.university.ViewModel.LoginViewModel
 import com.example.university.ViewModel.MainActivityViewModel
 import com.example.university.ViewModel.MainViewModel
@@ -87,6 +88,12 @@ private fun Module.presentation(){
             adb = get(),
             wdb = get(),
             msp = get(),
+        )
+    }
+    viewModel<FutureTestsViewModel>{
+        FutureTestsViewModel(
+            db = get(),
+            msp = get()
         )
     }
 }

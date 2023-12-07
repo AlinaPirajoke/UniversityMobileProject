@@ -6,6 +6,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import com.example.university.View.Main.Screens.AddScreen
+import com.example.university.View.Main.Screens.FutureTestsScreen
 import com.example.university.View.Main.Screens.MainScreen
 import com.example.university.View.Main.Screens.PickQuantityInit
 import com.example.university.View.Main.Screens.PickWordScreen
@@ -56,6 +57,11 @@ fun MainNavGraph(
         }
         composable(route = MainScreens.PickWord.route) {
             PickWordScreen(
+                navController = navController
+            )
+        }
+        composable(route = MainScreens.FutureTests.route) {
+            FutureTestsScreen(
                 navController = navController
             )
         }

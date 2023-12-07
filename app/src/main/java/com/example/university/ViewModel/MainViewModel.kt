@@ -61,8 +61,7 @@ class MainViewModel(val db: AppDbManager, val msp: MySharedPreferences) : ViewMo
         viewModelScope.launch {
 
             setTest(db.getQuantityFromDate(getTodayDate(), user)!!)
-            var learnQuantity = db.getTodayLearnedCount(getTodayDate(), user)!!
-            learnQuantity = msp.studyQuantityPerDay - msp.todayStudiedQuantity
+            var learnQuantity = msp.studyQuantityPerDay - msp.todayStudiedQuantity
             if (learnQuantity < 0)
                 learnQuantity = 0
             setLearn(learnQuantity)
