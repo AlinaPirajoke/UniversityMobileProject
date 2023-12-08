@@ -81,7 +81,7 @@ fun MainScreen(
 fun MainView(
     statLearned: Int,
     statLearning: Int,
-    statAverage: Int,
+    statAverage: Double,
     todayTest: Int,
     todayLearn: Int,
     onGoingToPickQuantity: () -> Unit,
@@ -122,7 +122,7 @@ fun MainView(
 fun StatisticBlock(
     learned: Int = 0,
     learning: Int = 0,
-    average: Int = 0,
+    average: Double = 0.0,
 ) {
     Column {
         Text(
@@ -240,6 +240,19 @@ fun OtherBlock(
 
 @Composable
 fun StatisticLine(text: String, value: Int) {
+    Row(
+        Modifier
+            .fillMaxWidth()
+            .padding(top = 5.dp, bottom = 5.dp),
+        Arrangement.SpaceBetween,
+    ) {
+        Text(modifier = Modifier.alpha(0.8f), text = text, fontSize = 20.sp)
+        Text(modifier = Modifier.alpha(0.9f), text = value.toString(), fontSize = 20.sp)
+    }
+}
+
+@Composable
+fun StatisticLine(text: String, value: Double) {
     Row(
         Modifier
             .fillMaxWidth()

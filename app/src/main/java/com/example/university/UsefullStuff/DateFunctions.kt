@@ -2,6 +2,7 @@ package com.example.university.UsefullStuff
 
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
+import java.time.temporal.ChronoUnit
 import java.util.Locale
 
 val stdFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")
@@ -34,5 +35,11 @@ fun getTodayDate(): String{
 
 fun formatDate(date: LocalDate): String{
     return date.format(stdFormatter)
+}
+
+fun getDaysBeforeToday(startDate: String): Int {
+    val firstDate = LocalDate.parse(startDate, DateTimeFormatter.ofPattern("yyyy-MM-dd"))
+    val period = ChronoUnit.DAYS.between(firstDate, LocalDate.now())
+    return period.toInt()
 }
 

@@ -108,6 +108,18 @@ class MySharedPreferences(context: Context) {
             Log.i(TAG, "todayStudiedQuantity: $quantity")
         }
 
+    var firstAppAccessDate: String = ""
+        get() {
+            val v = sp.getString("firstAppAccessDate", "")
+            Log.i(TAG, "firstAppAccessDate: $v")
+            return v.toString()
+        }
+        set(date: String){
+            field = date
+            sp.edit().putString("firstAppAccessDate", date).apply()
+            Log.i(TAG, "firstAppAccessDate: $date")
+        }
+
     fun getColorScheme(): Colors {
         val v = sp.getInt("currentColorSchemeId", 0)
         Log.i(TAG, "currentColorSchemeId: $v")

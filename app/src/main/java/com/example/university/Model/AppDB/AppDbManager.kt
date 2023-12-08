@@ -6,12 +6,13 @@ import android.database.sqlite.SQLiteDatabase
 import android.util.Log
 import com.example.university.Model.MySharedPreferences
 import com.example.university.UsefullStuff.Word
+import com.example.university.UsefullStuff.formatDate
 import com.example.university.UsefullStuff.getDateNDaysLater
 import com.example.university.UsefullStuff.getDaysFromToday
 import com.example.university.UsefullStuff.getTodayDate
 import com.example.university.UsefullStuff.simpleFormatter
 
-class AppDbManager(val context: Context) {
+class AppDbManager(val context: Context) { // оставь надежду всяк сюда входящий
     val TAG = "DBManager"
     val dbHelper = AppDbHelper(context)
     var db: SQLiteDatabase? = null
@@ -61,7 +62,7 @@ class AppDbManager(val context: Context) {
         val dates = getDaysFromToday(length)
         for (date in dates) {
             val sDate = date.format(simpleFormatter)
-            val quantity = getQuantityFromDate(sDate, user)!!
+            val quantity = getQuantityFromDate(formatDate(date), user)!!
             datesCount.add(sDate to quantity)
         }
         return datesCount
@@ -110,9 +111,15 @@ class AppDbManager(val context: Context) {
         return size!!
     }
 
-    // Доделать
-    fun getAverage(): Int {
-        return 7
+    fun getAllWordsQuantity(): Int {
+        val cursor = db!!.rawQuery(
+            "SELECT COUNT(${AppDbNames.W_DATE}) FROM ${AppDbNames.WORD}",
+            null
+        )
+        cursor.moveToFirst()
+        val quantity = cursor?.getInt(0)!!
+        cursor.close()
+        return quantity
     }
 
     fun getWordsFromDate(date: String, user: Int): ArrayList<Word> {
@@ -181,7 +188,7 @@ class AppDbManager(val context: Context) {
         msp.todayStudiedQuantity++
     }
 
-    fun addNewWord (word: Word , user: Int){
+    fun addNewWord(word: Word, user: Int) {
         addNewWord(word.word, word.transcription, word.translations, word.lvl, user)
     }
 
@@ -299,8 +306,8 @@ class AppDbManager(val context: Context) {
         cursor.close()
     }
 
-    fun addNewWords(words: List<Word>, user: Int){
-        words.forEach{
+    fun addNewWords(words: List<Word>, user: Int) {
+        words.forEach {
             addNewWord(it, user)
         }
     }

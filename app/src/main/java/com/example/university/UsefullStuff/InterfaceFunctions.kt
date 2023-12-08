@@ -14,8 +14,3 @@ fun showToast(text: String, context: Context) {
         Toast.LENGTH_SHORT
     ).show()
 }
-
-// Этого парня можно вот так, вне класса оставлять?
-fun getColorScheme(){
-
-}

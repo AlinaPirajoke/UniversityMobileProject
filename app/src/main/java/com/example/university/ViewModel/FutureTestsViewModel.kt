@@ -1,5 +1,6 @@
 package com.example.university.ViewModel
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.university.Model.AppDB.AppDbManager
@@ -28,6 +29,8 @@ class FutureTestsViewModel(val db: AppDbManager, val msp: MySharedPreferences) :
     }
 
     suspend fun getDateQuantityList(): List<Pair<String, Int>> {
-        return db.getListsSizeAndDays(length = BLOCK_QUANTITY, user = msp.user)
+        val quality = db.getListsSizeAndDays(length = BLOCK_QUANTITY, user = msp.user)
+        Log.i(TAG, "Даты и кол-во слов для повторения: $quality")
+        return quality
     }
 }

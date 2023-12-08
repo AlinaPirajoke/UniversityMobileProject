@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.university.Model.AppDB.AppDbManager
 import com.example.university.Model.MySharedPreferences
+import com.example.university.UsefullStuff.getDaysBeforeToday
 import com.example.university.UsefullStuff.getTodayDate
 import com.example.university.ViewModel.States.MainUiState
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -39,9 +40,11 @@ class MainViewModel(val db: AppDbManager, val msp: MySharedPreferences) : ViewMo
         }
     }
 
-    fun setStatAverage(count: Int) {
+    suspend fun setStatAverage(number: Int) {
+        val period = getDaysBeforeToday(msp.firstAppAccessDate) + 1
+        val quantity = number.toDouble().div(period)
         _uiState.update { state ->
-            state.copy(statAverage = count)
+            state.copy(statAverage = quantity)
         }
     }
 
@@ -72,7 +75,7 @@ class MainViewModel(val db: AppDbManager, val msp: MySharedPreferences) : ViewMo
         viewModelScope.launch {
             setStatLearned(db.getLearnedCount())
             setStatLearning(db.getLearningCount())
-            setStatAverage(db.getAverage())
+            setStatAverage(db.getAllWordsQuantity())
         }
     }
 

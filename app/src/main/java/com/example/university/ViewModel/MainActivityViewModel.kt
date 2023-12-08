@@ -1,5 +1,6 @@
 package com.example.university.ViewModel
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import com.example.university.Model.AppDB.AppDbManager
 import com.example.university.Model.MySharedPreferences
@@ -31,6 +32,10 @@ class MainActivityViewModel(val db: AppDbManager, val msp: MySharedPreferences) 
     }
 
     private fun dailyUpdates(){
+        Log.i(TAG, "Проводится ежедневное обновление")
+        if (msp.firstAppAccessDate.isBlank())
+            msp.firstAppAccessDate = getTodayDate()
+
         msp.todayStudiedQuantity = 0
         db.dailyDateUpdate()
         msp.lastOpenedAppDate = getTodayDate()
