@@ -77,7 +77,7 @@ fun TestScreen(
             },
             onReject = vm::hideExitAlertDialog
         )
-    if (uiState.isFinishAlertDialogShowing)
+    else if (uiState.isFinishAlertDialogShowing)
         ShowFinishConfirm(
             toRemember = { /*TODO*/ },
             onReject = {

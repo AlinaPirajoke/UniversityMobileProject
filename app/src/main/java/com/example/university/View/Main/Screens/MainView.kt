@@ -74,6 +74,10 @@ fun MainScreen(
             navController.navigate(MainScreens.FutureTests.route)
         },
         toLogin = onGoingToLogin,
+        toUserWords = {
+            Log.i(TAG, "Перенаправление на экран пользовательского словаря")
+            navController.navigate(MainScreens.UserWords.route)
+        }
     )
 }
 
@@ -90,6 +94,7 @@ fun MainView(
     toLogin: () -> Unit,
     toSettings: () -> Unit,
     toAnotherDates: () -> Unit,
+    toUserWords: () -> Unit
 ) {
     val scrollState = rememberScrollState()
     Column(
@@ -111,9 +116,10 @@ fun MainView(
             toAnotherDates = toAnotherDates,
         )
         OtherBlock(
-            onGoingToSettings = { toSettings() },
-            onGoingToAddNew = { toAddNew() },
-            onGoingToLogin = { toLogin() },
+            onGoingToSettings = toSettings,
+            onGoingToAddNew = toAddNew,
+            onGoingToLogin = toLogin,
+            onGoingToDictionary = toUserWords
         )
     }
 }
@@ -204,6 +210,7 @@ fun OtherBlock(
     onGoingToSettings: () -> (Unit),
     onGoingToAddNew: () -> (Unit),
     onGoingToLogin: () -> (Unit),
+    onGoingToDictionary: () -> Unit
 ) {
     Text(
         modifier = Modifier
@@ -234,6 +241,7 @@ fun OtherBlock(
             ImgCard(imgId = R.drawable.setings, descr = "Настройки", onGoingToSettings)
             ImgCard(imgId = R.drawable.add, descr = "Добавить слово", onGoingToAddNew)
             ImgCard(imgId = R.drawable.logout, descr = "Разлогиниться", onGoingToLogin)
+            ImgCard(imgId = R.drawable.dictionary, descr = "Мой словарь", onGoingToDictionary)
         }
     }
 }

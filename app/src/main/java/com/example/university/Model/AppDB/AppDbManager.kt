@@ -311,4 +311,39 @@ class AppDbManager(val context: Context) { // оставь надежду вся
             addNewWord(it, user)
         }
     }
+
+    fun getAllWords(user: Int): ArrayList<Word> {
+        val words = ArrayList<Word>()
+        val cursor = db!!.rawQuery(
+            "SELECT ${AppDbNames.W_ID}, ${AppDbNames.W_WORD}, ${AppDbNames.W_SOUND}, ${AppDbNames.W_LVL}, ${AppDbNames.W_DATE} " + "FROM ${AppDbNames.WORD} WHERE ${AppDbNames.W_USER} = $user",
+            null
+        )
+
+        while (cursor.moveToNext()) {
+            val id = cursor?.getInt(0)!!
+            val word = cursor.getString(1).toString()
+            val transcr = cursor.getString(2).toString()
+            val lvl = cursor.getInt(3)
+            val date = cursor.getString(4).toString()
+            val transl = getTranslationsFromWord(id)
+
+            words.add(
+                Word(
+                    id = id,
+                    word = word,
+                    transcription = transcr,
+                    translations = transl,
+                    lvl = lvl
+                )
+            )
+        }
+        cursor.close()
+        return words
+    }
+
+    fun deleteWord(word: Word) = deleteWord(word.id)
+
+    fun deleteWord(id: Int){
+        db?.execSQL("DELETE FROM ${AppDbNames.WORD} WHERE ${AppDbNames.W_ID} = $id")
+    }
 }

@@ -27,11 +27,11 @@ class MainActivityViewModel(val db: AppDbManager, val msp: MySharedPreferences) 
         if (!session)
             sendToLogin()
 
-        if(msp.lastOpenedAppDate < getTodayDate())
+        if (msp.lastOpenedAppDate < getTodayDate())
             dailyUpdates()
     }
 
-    private fun dailyUpdates(){
+    private fun dailyUpdates() {
         Log.i(TAG, "Проводится ежедневное обновление")
         if (msp.firstAppAccessDate.isBlank())
             msp.firstAppAccessDate = getTodayDate()

@@ -13,6 +13,7 @@ import com.example.university.ViewModel.PickWordViewModel
 import com.example.university.ViewModel.RegistrationViewModel
 import com.example.university.ViewModel.SettingsViewModel
 import com.example.university.ViewModel.TestViewModel
+import com.example.university.ViewModel.UserWordsViewModel
 import org.koin.androidx.viewmodel.dsl.viewModel
 import org.koin.core.module.Module
 import org.koin.dsl.module
@@ -22,19 +23,19 @@ val dataModule = module {
     presentation()
 }
 
-private fun Module.data(){
-    single<AppDbManager>{
+private fun Module.data() {
+    single<AppDbManager> {
         AppDbManager(context = get())
     }
-    single<MySharedPreferences>{
+    single<MySharedPreferences> {
         MySharedPreferences(context = get())
     }
-    single<WordsDbManager>{
+    single<WordsDbManager> {
         WordsDbManager(context = get())
     }
 }
 
-private fun Module.presentation(){
+private fun Module.presentation() {
     viewModel<MainActivityViewModel> {
         MainActivityViewModel(
             db = get(),
@@ -53,45 +54,51 @@ private fun Module.presentation(){
             msp = get()
         )
     }
-    viewModel<AddViewModel>{
+    viewModel<AddViewModel> {
         AddViewModel(
             db = get(),
             msp = get()
         )
     }
-    viewModel<LoginViewModel>{
+    viewModel<LoginViewModel> {
         LoginViewModel(
             db = get(),
             msp = get()
         )
     }
-    viewModel<RegistrationViewModel>{
+    viewModel<RegistrationViewModel> {
         RegistrationViewModel(
             db = get(),
             msp = get()
         )
     }
-    viewModel<PickQuantityViewModel>{
+    viewModel<PickQuantityViewModel> {
         PickQuantityViewModel(
             db = get(),
             msp = get()
         )
     }
-    viewModel<TestViewModel>{
+    viewModel<TestViewModel> {
         TestViewModel(
             db = get(),
             msp = get()
         )
     }
-    viewModel<PickWordViewModel>{
+    viewModel<PickWordViewModel> {
         PickWordViewModel(
             adb = get(),
             wdb = get(),
             msp = get(),
         )
     }
-    viewModel<FutureTestsViewModel>{
+    viewModel<FutureTestsViewModel> {
         FutureTestsViewModel(
+            db = get(),
+            msp = get()
+        )
+    }
+    viewModel<UserWordsViewModel> {
+        UserWordsViewModel(
             db = get(),
             msp = get()
         )

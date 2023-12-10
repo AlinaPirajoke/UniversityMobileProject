@@ -12,6 +12,7 @@ import com.example.university.View.Main.Screens.PickQuantityInit
 import com.example.university.View.Main.Screens.PickWordScreen
 import com.example.university.View.Main.Screens.SettingsScreen
 import com.example.university.View.Main.Screens.TestInit
+import com.example.university.View.Main.Screens.UserWordsScreen
 
 private const val TAG = "MainNavGraph"
 
@@ -62,6 +63,11 @@ fun MainNavGraph(
         }
         composable(route = MainScreens.FutureTests.route) {
             FutureTestsScreen(
+                navController = navController
+            )
+        }
+        composable(route = MainScreens.UserWords.route) {
+            UserWordsScreen(
                 navController = navController
             )
         }

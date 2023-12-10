@@ -67,7 +67,9 @@ fun PickWordView(
         Modifier
             .fillMaxSize()
             .padding(
-                vertical = UXConstants.VERTICAL_PADDING, horizontal = UXConstants.HORIZONTAL_PADDING
+                top = UXConstants.VERTICAL_PADDING,
+                start = UXConstants.HORIZONTAL_PADDING,
+                end = UXConstants.HORIZONTAL_PADDING
             )
     ) {
         Text(
@@ -77,7 +79,8 @@ fun PickWordView(
             style = MaterialTheme.typography.h5
         )
         LazyColumn(
-            Modifier.fillMaxWidth()
+            Modifier
+                .fillMaxWidth()
                 .padding(top = UXConstants.VERTICAL_PADDING),
         ) {
             item() {
@@ -105,7 +108,7 @@ fun ConfirmTile(onConfirm: () -> Unit, text: String) {
         Modifier
             .fillMaxWidth()
             .height(80.dp)
-            .padding(top = UXConstants.VERTICAL_PADDING),
+            .padding(vertical = UXConstants.VERTICAL_PADDING),
         elevation = UXConstants.ELEVATION,
         shape = MaterialTheme.shapes.small
     ) {
@@ -131,14 +134,14 @@ fun ListTile(
 ) {
     var modifier = Modifier
         .fillMaxWidth()
-        .padding(top = UXConstants.VERTICAL_PADDING / 2)
+        .padding(bottom = UXConstants.VERTICAL_PADDING / 2)
         .height(80.dp)
         .clickable { onClick() }
 
     if (isPicked)
-        modifier=  Modifier
+        modifier = Modifier
             .fillMaxWidth()
-            .padding(top = UXConstants.VERTICAL_PADDING / 2)
+            .padding(bottom = UXConstants.VERTICAL_PADDING / 2)
             .height(80.dp)
             .clickable { onClick() }
             .border(
@@ -149,7 +152,7 @@ fun ListTile(
 
     Card(
         modifier = modifier,
-        elevation = if (isPicked) UXConstants.ELEVATION else 0.dp,
+        elevation = if (isPicked) UXConstants.ELEVATION else 2.dp,
         shape = MaterialTheme.shapes.small,
     ) {
         Column(
