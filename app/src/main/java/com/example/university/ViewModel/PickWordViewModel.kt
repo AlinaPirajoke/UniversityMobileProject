@@ -4,7 +4,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.university.Model.AppDB.AppDbManager
 import com.example.university.Model.MySharedPreferences
-import com.example.university.Model.WordsDB.WordsDbManager
 import com.example.university.ViewModel.States.PickWordUiState
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -13,8 +12,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 class PickWordViewModel(
-    val adb: AppDbManager,
-    val wdb: WordsDbManager,
+    val db: AppDbManager,
     val msp: MySharedPreferences
 ) : ViewModel() {
     private val TAG = "PickQuantityViewModel"
@@ -26,7 +24,7 @@ class PickWordViewModel(
     init {
         viewModelScope.launch {
             _uiState.update { state ->
-                state.copy(words = wdb.getUnlearnedWords())
+                state.copy(words = db.getUnlernedLibraryWords(user = msp.user))
             }
             setRemain()
         }
@@ -104,8 +102,8 @@ class PickWordViewModel(
                 val picked = uiState.value.words.filterIndexed { id, word ->
                     id in uiState.value.pickedWords
                 }
-                // wdb.removeWords(picked) TODO(разкоментить при релизе)
-                adb.addNewWords(picked, msp.user)
+                db.markWordsAsLearned(picked = picked, user = msp.user)
+                db.addNewWords(picked, msp.user)
                 sendToMain()
             }
         }

@@ -4,6 +4,7 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import com.example.university.Model.AppDB.AppDbManager
 import com.example.university.Model.MySharedPreferences
+import com.example.university.Model.WordsDB.WordsDbManager
 import com.example.university.UsefullStuff.getTodayDate
 import com.example.university.ViewModel.States.MainActivityUiState
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -11,7 +12,11 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 
-class MainActivityViewModel(val db: AppDbManager, val msp: MySharedPreferences) : ViewModel() {
+class MainActivityViewModel(
+    val adb: AppDbManager,
+    val wdb: WordsDbManager,
+    val msp: MySharedPreferences
+) : ViewModel() {
     val TAG = "MainActivityViewModel"
     val user = msp.user
 
@@ -26,7 +31,7 @@ class MainActivityViewModel(val db: AppDbManager, val msp: MySharedPreferences) 
             session = true
         if (!session)
             sendToLogin()
-
+        //onFirstAccess()
         if (msp.lastOpenedAppDate < getTodayDate())
             dailyUpdates()
     }
@@ -34,11 +39,16 @@ class MainActivityViewModel(val db: AppDbManager, val msp: MySharedPreferences) 
     private fun dailyUpdates() {
         Log.i(TAG, "Проводится ежедневное обновление")
         if (msp.firstAppAccessDate.isBlank())
-            msp.firstAppAccessDate = getTodayDate()
+            onFirstAccess()
 
         msp.todayStudiedQuantity = 0
-        db.dailyDateUpdate()
+        adb.dailyDateUpdate()
         msp.lastOpenedAppDate = getTodayDate()
+    }
+
+    private fun onFirstAccess() {
+        msp.firstAppAccessDate = getTodayDate()
+        adb.fillWordsLibrary(wdb.getAllWords())
     }
 
     fun sendToLogin(condition: Boolean = true) {

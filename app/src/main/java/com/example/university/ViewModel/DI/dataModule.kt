@@ -38,7 +38,8 @@ private fun Module.data() {
 private fun Module.presentation() {
     viewModel<MainActivityViewModel> {
         MainActivityViewModel(
-            db = get(),
+            adb = get(),
+            wdb = get(),
             msp = get()
         )
     }
@@ -86,8 +87,7 @@ private fun Module.presentation() {
     }
     viewModel<PickWordViewModel> {
         PickWordViewModel(
-            adb = get(),
-            wdb = get(),
+            db = get(),
             msp = get(),
         )
     }

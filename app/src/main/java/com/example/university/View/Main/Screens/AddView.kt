@@ -17,6 +17,7 @@ import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.OutlinedTextField
 import androidx.compose.material.Text
+import androidx.compose.material.TextButton
 import androidx.compose.material.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -77,6 +78,10 @@ fun AddScreen(
         isTranslating = uiState.isTranslating,
         isTranslationError = uiState.isTranslationError,
         onAutoTranslate = vm::autoTranslate,
+        onGoingToPickWord = {
+            Log.i(TAG, "Перенаправление на экран библиотеки")
+            navController.navigate(MainScreens.PickWord.route)
+        }
     )
 }
 
@@ -101,6 +106,7 @@ fun AddView(
     isTranslating: Boolean,
     isTranslationError: Boolean,
     onAutoTranslate: () -> Unit,
+    onGoingToPickWord: () -> Unit
 ) {
     val keyboardController = LocalSoftwareKeyboardController.current
     val focusManager = LocalFocusManager.current
@@ -284,6 +290,13 @@ fun AddView(
         ) {
             Text(text = "Выйти")
         }
+
+        TextButton(
+            onClick = onGoingToPickWord,
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Text(text = "Или выберите слово из библиотеки")
+        }
     }
 }
 
@@ -298,10 +311,10 @@ fun AddViewPreview() {
             onTranscrChanged = { },
             translations = listOf("Example"),
             onTranslChanged = { str, int -> },
-            onAddTranstation = { /*TODO*/ },
+            onAddTranstation = { },
             lvl = "13",
             onLvlChanged = {},
-            onConfirm = { /*TODO*/ },
+            onConfirm = { },
             isWordFieldWrong = false,
             isTranslFieldWrong = false,
             isLvlFieldWrong = false,
@@ -309,7 +322,8 @@ fun AddViewPreview() {
             onGoingToMain = { },
             isTranslating = false,
             isTranslationError = false,
-            onAutoTranslate = { }
+            onAutoTranslate = { },
+            onGoingToPickWord = {}
         )
     }
 }

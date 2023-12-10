@@ -5,7 +5,7 @@ import android.provider.BaseColumns
 object AppDbNames : BaseColumns {
     // Бд со словами пользователя
     const val DATABASE_NAME = "words_database.db"
-    const val DATABASE_VERSION = 8
+    const val DATABASE_VERSION = 12
 
     // Таблица с пользователями
     const val PASSWORD = "password"
@@ -102,6 +102,43 @@ object AppDbNames : BaseColumns {
                     "FOREIGN KEY($LD_LIST) REFERENCES $LIST ($L_ID)," +
                     "FOREIGN KEY($LD_USER) REFERENCES $PASSWORD ($P_ID))")
     const val DELETE_TABLE_LIST_DATA = "DROP TABLE IF EXISTS $LIST_DATA"
+
+    // Таблица со стандартной библиотекой слов
+    const val LIBRARY = "library"
+    const val LI_WORD_ID = BaseColumns._ID
+    const val LI_WORD = "word"
+    const val LI_SOUND = "sound"
+    const val CREATE_TABLE_LIBRARY = (
+            "CREATE TABLE IF NOT EXISTS $LIBRARY (" +
+                    "$LI_WORD_ID INTEGER PRIMARY KEY AUTOINCREMENT, " +
+                    "$LI_WORD TEXT NOT NULL, " +
+                    "$LI_SOUND TEXT DEFAULT \'\')")
+    const val DELETE_TABLE_LIBRARY = "DROP TABLE IF EXISTS $LIBRARY"
+
+    // Таблица с переводами слов библиотеки
+    const val LI_TRANSLATION = "library_translation"
+    const val LIT_ID = BaseColumns._ID
+    const val LIT_WORD = "library_word_id"
+    const val LIT_TRANSL = "translation"
+    const val CREATE_TABLE_LI_TRANSLATION = (
+            "CREATE TABLE IF NOT EXISTS $LI_TRANSLATION (" +
+                    "$LIT_ID INTEGER PRIMARY KEY AUTOINCREMENT, " +
+                    "$LIT_WORD TEXT NOT NULL, " +
+                    "$LIT_TRANSL TEXT NOT NULL, " +
+                    "FOREIGN KEY ($LIT_WORD) REFERENCES $LIBRARY ($LI_WORD_ID))")
+    const val DELETE_TABLE_LI_TRANSLATION = "DROP TABLE IF EXISTS $LI_TRANSLATION"
+
+    // Таблица, хранящая слова библиотеки, изученные пользователями
+    const val LIBRARY_USER = "library_user"
+    const val LIU_WORD_ID = "list_id"
+    const val LIU_USER = "user_id"
+    const val CREATE_TABLE_LIBRARY_USER = (
+            "CREATE TABLE IF NOT EXISTS $LIBRARY_USER ( " +
+                    "$LIU_WORD_ID INTEGER NOT NULL, " +
+                    "$LIU_USER INTEGER NOT NULL," +
+                    "FOREIGN KEY($LIU_WORD_ID) REFERENCES $LIBRARY ($LI_WORD_ID)," +
+                    "FOREIGN KEY($LIU_USER) REFERENCES $PASSWORD ($P_ID))")
+    const val DELETE_TABLE_LIBRARY_USER = "DROP TABLE IF EXISTS $LIST_DATA"
 
     const val COLUMN_NAME_TITLE = "title"
     const val COLUMN_NAME_SUBTITLE = "subtitle"

@@ -34,6 +34,86 @@ class AppDbManager(val context: Context) { // оставь надежду вся
         cursor.close()
     }
 
+    fun fillWordsLibrary(words: ArrayList<Word>) {
+        words.forEach { word ->
+            val values = ContentValues().apply {
+                put(AppDbNames.LI_WORD, word.word)
+                put(AppDbNames.LI_SOUND, word.transcription)
+            }
+            db!!.insert(AppDbNames.LIBRARY, null, values)
+            val cursor = db!!.rawQuery(
+                "SELECT MAX(${AppDbNames.LI_WORD_ID}) FROM ${AppDbNames.LIBRARY}",
+                null
+            )
+            cursor?.moveToFirst()
+            val word_id = cursor?.getInt(0)!!
+            cursor.close()
+
+            addNewTranslToLibrary(word_id, word.translations)
+        }
+        Log.i(TAG, "${words.size} слов было добавленно в библиотеку")
+    }
+
+    fun addNewTranslToLibrary(wordId: Int, transl: List<String>) {
+        transl.forEach {
+            val values = ContentValues().apply {
+                put(AppDbNames.LIT_WORD, wordId)
+                put(AppDbNames.LIT_TRANSL, it)
+            }
+            db!!.insert(AppDbNames.LI_TRANSLATION, null, values)
+
+        }
+    }
+
+    fun getUnlernedLibraryWords(user: Int): ArrayList<Word> {
+        val words = ArrayList<Word>()
+        val cursor = db!!.rawQuery(
+            // "SELECT ${AppDbNames.LIBRARY}.${AppDbNames.LI_WORD_ID}, ${AppDbNames.LIBRARY}.${AppDbNames.LI_WORD}, ${AppDbNames.LIBRARY}.${AppDbNames.LI_SOUND} FROM ${AppDbNames.LIBRARY} JOIN ${AppDbNames.LIBRARY_USER} ON ${AppDbNames.LIBRARY}.${AppDbNames.LI_WORD_ID} = ${AppDbNames.LIBRARY_USER}.${AppDbNames.LIU_WORD_ID} WHERE ${AppDbNames.LIBRARY}.${AppDbNames.LI_WORD_ID} NOT IN (SELECT ${AppDbNames.LIU_WORD_ID} FROM ${AppDbNames.LIBRARY_USER} WHERE ${AppDbNames.LIU_USER} <> $user)",
+            "SELECT ${AppDbNames.LI_WORD_ID}, ${AppDbNames.LI_WORD}, ${AppDbNames.LI_SOUND} FROM ${AppDbNames.LIBRARY} WHERE ${AppDbNames.LI_WORD_ID} NOT IN (SELECT ${AppDbNames.LIU_WORD_ID} FROM ${AppDbNames.LIBRARY_USER} WHERE ${AppDbNames.LIU_USER} = $user)",
+            null
+        )
+
+        while (cursor.moveToNext()) {
+            val id = cursor?.getInt(0)!!
+            val word = cursor.getString(1).toString()
+            val transcr = cursor.getString(2).toString()
+            val lvl = 0
+            val transl = getTranslationsFromLibrary(id)
+
+            val resultWord = Word(
+                id = id, word = word, transcription = transcr, translations = transl, lvl = lvl
+            )
+            words.add(resultWord)
+        }
+        cursor.close()
+        return words
+    }
+
+    fun getTranslationsFromLibrary(wordId: Int): ArrayList<String> {
+        val transl = ArrayList<String>()
+        val cursor = db!!.rawQuery(
+            "SELECT ${AppDbNames.LIT_TRANSL} FROM ${AppDbNames.LI_TRANSLATION} WHERE ${AppDbNames.LIT_WORD} = $wordId",
+            null
+        )
+
+        while (cursor.moveToNext()) {
+            transl.add(cursor?.getString(0).toString())
+        }
+        cursor.close()
+        return transl
+    }
+
+    fun markWordsAsLearned(picked: List<Word>, user: Int) {
+        picked.forEach { word ->
+            val values = ContentValues().apply {
+                put(AppDbNames.LIU_WORD_ID, word.id)
+                put(AppDbNames.LIU_USER, user)
+            }
+            db!!.insert(AppDbNames.LIBRARY_USER, null, values)
+            Log.i(TAG, "Слово ${word.word} было отмечено как изучаемое")
+        }
+    }
+
     fun insertPassword(pass: String) {
         val values = ContentValues().apply {
             put(AppDbNames.P_PASS, pass)
@@ -43,7 +123,7 @@ class AppDbManager(val context: Context) { // оставь надежду вся
 
     fun getPasswords(): HashMap<String, Int> {
         Log.i(TAG, "Пользователи:")
-        var values = HashMap<String, Int>()
+        val values = HashMap<String, Int>()
         val cursor = db!!.rawQuery(
             "SELECT ${AppDbNames.P_PASS}, ${AppDbNames.P_ID} " + "FROM ${AppDbNames.PASSWORD}", null
         )
@@ -176,7 +256,7 @@ class AppDbManager(val context: Context) { // оставь надежду вся
         db!!.insert(AppDbNames.WORD, null, values)
         Log.d(TAG, "Слово добавлено")
         val cursor = db!!.rawQuery(
-            "SELECT ${AppDbNames.W_ID} FROM ${AppDbNames.WORD} WHERE ${AppDbNames.W_WORD} = \"$word\" AND ${AppDbNames.W_LVL} = $days AND ${AppDbNames.W_USER} = ${user}",
+            "SELECT MAX(${AppDbNames.W_ID}) FROM ${AppDbNames.WORD} WHERE ${AppDbNames.W_WORD} = \"$word\" AND ${AppDbNames.W_LVL} = $days AND ${AppDbNames.W_USER} = ${user}",
             null
         )
         cursor?.moveToFirst()
@@ -193,14 +273,14 @@ class AppDbManager(val context: Context) { // оставь надежду вся
     }
 
     fun addNewTranslations(wordId: Int, transl: List<String>) {
-        val values = ContentValues().apply {
-            put(AppDbNames.T_WORD, wordId)
-            transl.forEach {
+        transl.forEach {
+            val values = ContentValues().apply {
+                put(AppDbNames.T_WORD, wordId)
                 put(AppDbNames.T_TRANSL, it)
             }
+            db!!.insert(AppDbNames.TRANSLATION, null, values)
+            Log.i(TAG, "Слово было добавленно под номером $wordId")
         }
-        db!!.insert(AppDbNames.TRANSLATION, null, values)
-        Log.i(TAG, "Слово было добавленно под номером $wordId")
     }
 
     fun createList(words: List<Word>, date: String, user: Int): Int {
@@ -343,7 +423,7 @@ class AppDbManager(val context: Context) { // оставь надежду вся
 
     fun deleteWord(word: Word) = deleteWord(word.id)
 
-    fun deleteWord(id: Int){
+    fun deleteWord(id: Int) {
         db?.execSQL("DELETE FROM ${AppDbNames.WORD} WHERE ${AppDbNames.W_ID} = $id")
     }
 }

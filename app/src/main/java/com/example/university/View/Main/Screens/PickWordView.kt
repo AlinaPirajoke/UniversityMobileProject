@@ -39,6 +39,7 @@ fun PickWordScreen(
     val uiState by vm.uiState.collectAsState()
 
     if (uiState.isGoingToMain) {
+        vm.sendToMain(false)
         Log.i(TAG, "Перенаправление на главный экран")
         navController.navigate(MainScreens.Main.route)
     }
@@ -106,9 +107,9 @@ fun PickWordView(
 fun ConfirmTile(onConfirm: () -> Unit, text: String) {
     Card(
         Modifier
-            .fillMaxWidth()
+            .padding(vertical = UXConstants.VERTICAL_PADDING / 2)
             .height(80.dp)
-            .padding(vertical = UXConstants.VERTICAL_PADDING),
+            .fillMaxWidth(),
         elevation = UXConstants.ELEVATION,
         shape = MaterialTheme.shapes.small
     ) {

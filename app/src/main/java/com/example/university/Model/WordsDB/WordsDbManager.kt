@@ -10,7 +10,8 @@ class WordsDbManager(val context: Context) {
     val dbHelper = WordsDbHelper(context)
     var db: SQLiteDatabase = dbHelper.readableDatabase
 
-    fun getUnlearnedWords(): ArrayList<Word> {
+    fun getAllWords(): ArrayList<Word> {
+        Log.i(TAG, "Начинается перемещение библиотеки в базу данных")
         val words = ArrayList<Word>()
         val cursor = db.rawQuery(
             "SELECT ${WordsDbNames.W_ID}, ${WordsDbNames.W_WORD}, ${WordsDbNames.W_TRANSCR} FROM ${WordsDbNames.WORD}",
@@ -29,8 +30,7 @@ class WordsDbManager(val context: Context) {
             words.add(resultWord)
         }
         Log.i(
-            TAG,
-            "Осталось ${words.size} неизученных слов}"
+            TAG, "Всего слов в библиотеке: ${words.size}"
         )
         cursor.close()
         return words
@@ -48,12 +48,4 @@ class WordsDbManager(val context: Context) {
         cursor.close()
         return transl
     }
-
-    fun removeWords(words: List<Word>){
-        words.forEach{
-            db.execSQL("DELETE FROM ${WordsDbNames.WORD} WHERE ${WordsDbNames.W_ID} = ${it.id}")
-            db.execSQL("DELETE FROM ${WordsDbNames.TRANSLATION} WHERE ${WordsDbNames.T_WORD} = ${it.id}")
-        }
-    }
-
 }
