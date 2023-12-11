@@ -8,5 +8,6 @@ sealed class MainScreens(val route: String) {
     object Test : MainScreens("test_screen")
     object PickWord : MainScreens("new_words_screen")
     object FutureTests : MainScreens("future_tests_screen")
-    object UserWords : MainScreens("user_words")
+    object UserWords : MainScreens("user_words_screen")
+    object Remember : MainScreens("remember_screen")
 }

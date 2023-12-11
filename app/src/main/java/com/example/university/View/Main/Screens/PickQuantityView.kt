@@ -68,8 +68,9 @@ fun PickQuantityScreen(
         },
         isRememberPresent = uiState.isRememberPresent,
         onGoingToRemember = {
-            Log.i(TAG, "Перенаправление на экран повторения (Пока что главный экран)")
-            navController.navigate(MainScreens.Main.route)
+            Log.i(TAG, "Перенаправление на экран повторения")
+            val listId = vm.createList()
+            navController.navigate("${MainScreens.Remember.route}/${listId}")
         },
         pickedWords = uiState.pickedWords
     )

@@ -23,25 +23,17 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.toArgb
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavHostController
-import com.example.university.View.Main.MainActivity
 import com.example.university.View.Main.MainScreens
 import com.example.university.ViewModel.SettingsViewModel
-import com.example.university.theme.KotobaCustomTheme
 import com.example.university.theme.PH
 import com.example.university.theme.pink
-import com.example.university.UsefullStuff.showToast
-import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
 
 private val TAG = "SettingsView"
@@ -63,6 +55,8 @@ fun SettingsScreen(
         onIsPassNeededChange = {
             vm.setIsPasswordNeeded(it)
         },
+        isRememberPresent = uiState.isRememberPresent,
+        onIsRememberPresentChange = vm::setIsRememberPresent,
         currentColorScheme = uiState.currentColorScheme,
         onColorSchemeChange = {
             vm.setCurrentColorScheme(it)
@@ -79,6 +73,8 @@ fun SettingsScreen(
 fun SettingsView(
     isPassNeeded: Boolean,
     onIsPassNeededChange: (Boolean) -> Unit,
+    isRememberPresent: Boolean,
+    onIsRememberPresentChange: (Boolean) -> Unit,
     currentColorScheme: Int,
     onColorSchemeChange: (Int) -> Unit,
     onGoingToMain: () -> Unit
@@ -112,13 +108,18 @@ fun SettingsView(
             contentPadding = PaddingValues(15.dp)
         ) {
             item {
-                Column(Modifier.fillMaxWidth()) {
-                    switchOption(
-                        currentState = isPassNeeded,
-                        description = "Вход через пароль",
-                        action = onIsPassNeededChange,
-                    )
-                }
+                SwitchOption(
+                    currentState = isPassNeeded,
+                    description = "Вход через пароль",
+                    action = onIsPassNeededChange,
+                )
+            }
+            item {
+                SwitchOption(
+                    currentState = isRememberPresent,
+                    description = "Предлогать повторить пройденные слова",
+                    action = onIsRememberPresentChange
+                )
             }
             item {
                 Text(
@@ -154,7 +155,7 @@ fun SettingsView(
 }
 
 @Composable
-private fun switchOption(
+private fun SwitchOption(
     currentState: Boolean,
     description: String,
     action: (Boolean) -> (Unit),

@@ -56,7 +56,7 @@ fun TestInit(
     listId: Int,
     vm: TestViewModel = koinViewModel(),
 ) {
-    LaunchedEffect(key1 = listId){
+    LaunchedEffect(key1 = listId) {
         vm.testStart(listId)
     }
     TestScreen(navController = navController, vm = vm)
@@ -69,7 +69,7 @@ fun TestScreen(
 ) {
     val uiState by vm.uiState.collectAsState()
     if (uiState.isExitAlertDialogShowing)
-        ShowExitConfirm(
+        ShowExitConfirmAlert(
             onConfirm = {
                 vm.hideExitAlertDialog()
                 Log.i("LoginView", "Перенаправление на главный экран")
@@ -78,10 +78,13 @@ fun TestScreen(
             onReject = vm::hideExitAlertDialog
         )
     else if (uiState.isFinishAlertDialogShowing)
-        ShowFinishConfirm(
-            toRemember = { /*TODO*/ },
+        ShowTestFinishAlert(
+            toRemember = {
+                Log.i(TAG, "Перенаправление на экран повторения")
+                navController.navigate("${MainScreens.Remember.route}/${vm.getListId()}")
+            },
             onReject = {
-                vm.hideExitAlertDialog()
+                vm.hideFinishAlertDialog()
                 Log.i("LoginView", "Перенаправление на главный экран")
                 navController.navigate(MainScreens.Main.route)
             },
@@ -246,7 +249,7 @@ fun OptionsButtons(
 }
 
 @Composable
-fun ShowExitConfirm(onConfirm: () -> Unit, onReject: () -> Unit) {
+fun ShowExitConfirmAlert(onConfirm: () -> Unit, onReject: () -> Unit) {
     AlertDialog(
         onDismissRequest = onReject,
         text = { Text("Вы действительно хотите закончить тестирование? (его можно будеть продолжить позже)") },
@@ -268,7 +271,7 @@ fun ShowExitConfirm(onConfirm: () -> Unit, onReject: () -> Unit) {
 }
 
 @Composable
-fun ShowFinishConfirm(
+fun ShowTestFinishAlert(
     toRemember: () -> Unit,
     onReject: () -> Unit,
     result: Double,
@@ -276,7 +279,7 @@ fun ShowFinishConfirm(
 ) {
     var text = "Вы прошли тест с результатом $result%."
     if (isRememberPresent)
-        text += "\nХотите ли вы ещё раз пройтись по этим словам?"
+        text += "\nХотите ли вы ещё раз повторить слова?"
     AlertDialog(
         onDismissRequest = onReject,
         text = { Text(text = text) },

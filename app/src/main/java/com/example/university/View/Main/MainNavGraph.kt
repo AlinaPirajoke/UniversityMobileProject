@@ -10,6 +10,7 @@ import com.example.university.View.Main.Screens.FutureTestsScreen
 import com.example.university.View.Main.Screens.MainScreen
 import com.example.university.View.Main.Screens.PickQuantityInit
 import com.example.university.View.Main.Screens.PickWordScreen
+import com.example.university.View.Main.Screens.RememberInit
 import com.example.university.View.Main.Screens.SettingsScreen
 import com.example.university.View.Main.Screens.TestInit
 import com.example.university.View.Main.Screens.UserWordsScreen
@@ -69,6 +70,16 @@ fun MainNavGraph(
         composable(route = MainScreens.UserWords.route) {
             UserWordsScreen(
                 navController = navController
+            )
+        }
+        composable(route = MainScreens.Remember.route + "/{listId}") { backStackEntry ->
+            Log.i(
+                TAG,
+                "Передаётся аргумент listId = ${backStackEntry.arguments?.getString("listId")}"
+            )
+            RememberInit(
+                navController = navController,
+                listId = backStackEntry.arguments?.getString("listId")!!.toInt()
             )
         }
     }

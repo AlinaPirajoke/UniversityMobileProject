@@ -6,7 +6,7 @@ import androidx.lifecycle.viewModelScope
 import com.example.university.Model.AppDB.AppDbManager
 import com.example.university.Model.MySharedPreferences
 import com.example.university.UsefullStuff.Word
-import com.example.university.ViewModel.States.TestUiState
+import com.example.university.ViewModel.States.RememberUiState
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -15,17 +15,17 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
-class TestViewModel(val db: AppDbManager, val msp: MySharedPreferences) : ViewModel() {
-    private val TAG = "TestViewModel"
+class RememberViewModel(val db: AppDbManager, val msp: MySharedPreferences) : ViewModel() {
+    private val TAG = " RememberViewModel"
     private var listId: Int = -1
     private var wordList = ArrayList<Word>()
     private lateinit var currentWord: Word
     private lateinit var iterator: ListIterator<Word>
 
     private val _uiState = MutableStateFlow(
-        TestUiState()
+        RememberUiState()
     )
-    val uiState: StateFlow<TestUiState> = _uiState.asStateFlow()
+    val uiState: StateFlow<RememberUiState> = _uiState.asStateFlow()
 
     fun showExitAlertDialog() {
         _uiState.update { state ->
@@ -59,66 +59,45 @@ class TestViewModel(val db: AppDbManager, val msp: MySharedPreferences) : ViewMo
         }
     }
 
-    fun testStart(pickedListId: Int) {
+    fun rememberStart(pickedListId: Int) {
         viewModelScope.launch {
             withContext(Dispatchers.IO) {
                 listId = pickedListId
                 wordList = db.getWordsFromList(listId)
                 iterator = wordList.listIterator()
-                nextWord()
+                toFirstStage()
             }
         }
     }
 
-    private fun testFinish() {
+    fun testFinish() {
         Log.i(TAG, "Тест завершен")
         showFinishAlertDialog()
     }
 
-    private fun nextWord() {
+    private fun toNextWord(){
         if (!(iterator.hasNext())) {
             testFinish()
             return
         }
 
+        showTranscrLabel(false)
         currentWord = iterator.next()
+        setCurrentWord()
         Log.d(TAG, "Следующее слово: ${currentWord.word}")
-        cleanAllLabels()
-        toFirstStage()
+        if (!(iterator.hasNext())) {
+            setItLastWord()
+        }
     }
 
     fun toFirstStage() {
+        toNextWord()
         setCurrentStage(1)
-        showWordLabel()
     }
 
-    // Отсылка к моему прошлому проекту (Не кривой нейминг)
-    fun showKana() {
-        showTranscrLabel()
-    }
+    fun toSecondStage() = setCurrentStage(2)
 
-    fun toSecondStage() {
-        setCurrentStage(2)
-        showAllLabels()
-    }
-
-    // -_- в этих методах различается ровно одна цифра, но логически, это разные случаи
-    // Может быть я говнокодер?
-    fun goodResultProcessing() {
-        currentWord.result = 1
-        viewModelScope.launch {
-            saveWordResult()
-        }
-        nextWord()
-    }
-
-    fun badResultProcessing() {
-        currentWord.result = 0
-        viewModelScope.launch {
-            saveWordResult()
-        }
-        nextWord()
-    }
+    fun showKana() = showTranscrLabel()
 
     private fun setCurrentStage(stage: Int) {
         _uiState.update { state ->
@@ -128,63 +107,29 @@ class TestViewModel(val db: AppDbManager, val msp: MySharedPreferences) : ViewMo
         }
     }
 
-    private fun cleanAllLabels() {
+    private fun setCurrentWord() {
         _uiState.update { state ->
             state.copy(
-                wordLabel = "",
-                transcrLabel = "",
-                translLabel = ""
+                currentWord = currentWord,
             )
         }
     }
 
-    private fun showWordLabel() {
+    private fun showTranscrLabel(condition: Boolean = true) {
         _uiState.update { state ->
             state.copy(
-                wordLabel = currentWord.word,
+                isTranscrShowing = condition,
             )
         }
     }
 
-    private fun showTranscrLabel() {
+    fun setItLastWord(condition: Boolean = true){
         _uiState.update { state ->
             state.copy(
-                transcrLabel = currentWord.transcription,
+                isItLastWord = condition,
             )
         }
     }
-
-    private fun showTranslLabel() {
-        _uiState.update { state ->
-            state.copy(
-                translLabel = currentWord.translationsToString(),
-            )
-        }
-    }
-
-    private fun showAllLabels() {
-        _uiState.update { state ->
-            state.copy(
-                wordLabel = currentWord.word,
-                transcrLabel = currentWord.transcription,
-                translLabel = currentWord.translationsToString(),
-            )
-        }
-    }
-
-    suspend fun saveWordResult(word: Word = currentWord) {
-        db.saveWordResult(word = word, listId = listId)
-    }
-
-    fun getResult(): Double {
-        var sum = 0
-        wordList.forEach {
-            sum += it.result
-        }
-        return (sum / wordList.size).toDouble() * 100
-    }
-
-    fun getListId(): Int = listId
 
     fun onExit() {
         showExitAlertDialog()

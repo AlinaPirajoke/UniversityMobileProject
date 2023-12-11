@@ -1,7 +1,6 @@
 package com.example.university.ViewModel
 
 import android.util.Log
-import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.university.Model.AppDB.AppDbManager
@@ -26,9 +25,8 @@ class SettingsViewModel(val db: AppDbManager, val msp: MySharedPreferences) : Vi
         _uiState.update { state ->
             state.copy(
                 isPasswordNeeded = msp.isPasswordNeeded,
-                currentColorScheme = msp.currentColorSchemeId
-                /*isPasswordNeeded = sp.getBoolean("isPasswordNeeded", false),
-                currentColorScheme = sp.getInt("currentColorScheme", 0),*/
+                currentColorScheme = msp.currentColorSchemeId,
+                isRememberPresent = msp.isRememberPresent
             )
         }
     }
@@ -70,5 +68,12 @@ class SettingsViewModel(val db: AppDbManager, val msp: MySharedPreferences) : Vi
                 colorScheme = msp.getColorScheme()
             )
         }
+    }
+
+    fun setIsRememberPresent(condition: Boolean){
+        _uiState.update { state ->
+            state.copy(isRememberPresent = condition)
+        }
+        msp.isRememberPresent = condition
     }
 }

@@ -11,6 +11,7 @@ import com.example.university.ViewModel.MainViewModel
 import com.example.university.ViewModel.PickQuantityViewModel
 import com.example.university.ViewModel.PickWordViewModel
 import com.example.university.ViewModel.RegistrationViewModel
+import com.example.university.ViewModel.RememberViewModel
 import com.example.university.ViewModel.SettingsViewModel
 import com.example.university.ViewModel.TestViewModel
 import com.example.university.ViewModel.UserWordsViewModel
@@ -99,6 +100,12 @@ private fun Module.presentation() {
     }
     viewModel<UserWordsViewModel> {
         UserWordsViewModel(
+            db = get(),
+            msp = get()
+        )
+    }
+    viewModel<RememberViewModel> {
+        RememberViewModel(
             db = get(),
             msp = get()
         )
