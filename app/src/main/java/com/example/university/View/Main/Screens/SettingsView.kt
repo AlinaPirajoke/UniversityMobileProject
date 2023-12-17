@@ -8,31 +8,41 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.Button
 import androidx.compose.material.ButtonDefaults
+import androidx.compose.material.LocalTextStyle
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.material.Switch
 import androidx.compose.material.SwitchDefaults
 import androidx.compose.material.Text
+import androidx.compose.material.TextField
+import androidx.compose.material.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import com.example.university.View.Main.MainScreens
 import com.example.university.ViewModel.SettingsViewModel
+import com.example.university.theme.ColorScheme
+import com.example.university.theme.KotobaCustomTheme
 import com.example.university.theme.PH
+import com.example.university.theme.UXConstants
+import com.example.university.theme.mint
 import com.example.university.theme.pink
 import org.koin.androidx.compose.koinViewModel
 
@@ -65,7 +75,9 @@ fun SettingsScreen(
         onGoingToMain = {
             Log.i(TAG, "Перенаправление на главный экран")
             navController.navigate(MainScreens.Main.route)
-        }
+        },
+        studyQuantityPerDay = uiState.studyQuantityPerDay,
+        onStudyQuantityChange = vm::setStudyQuantityPerDay
     )
 }
 
@@ -77,36 +89,31 @@ fun SettingsView(
     onIsRememberPresentChange: (Boolean) -> Unit,
     currentColorScheme: Int,
     onColorSchemeChange: (Int) -> Unit,
-    onGoingToMain: () -> Unit
+    onGoingToMain: () -> Unit,
+    studyQuantityPerDay: Int,
+    onStudyQuantityChange: (Int) -> Unit,
 ) {
     Column(
         Modifier
             .fillMaxSize()
-            .padding(20.dp, 10.dp),
+            .padding(
+                bottom = UXConstants.VERTICAL_PADDING,
+                start = UXConstants.HORIZONTAL_PADDING,
+                end = UXConstants.HORIZONTAL_PADDING
+            ),
+        verticalArrangement = Arrangement.SpaceBetween
     ) {
-        Row(
-            Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Text(text = "Настройки", fontSize = 20.sp)
-
-            Button(
-                onClick = onGoingToMain,
-                modifier = Modifier.width(125.dp),
-                colors = ButtonDefaults.buttonColors(
-                    backgroundColor = MaterialTheme.colors.primary,
-                    contentColor = MaterialTheme.colors.onPrimary
-                )
-            ) {
-                Text(text = "Выйти")
-            }
-        }
-
         LazyColumn(
             modifier = Modifier.fillMaxWidth(),
-            contentPadding = PaddingValues(15.dp)
+            contentPadding = PaddingValues(UXConstants.VERTICAL_PADDING)
         ) {
+            item {
+                Text(
+                    text = "Настройки",
+                    Modifier.padding(bottom = UXConstants.VERTICAL_PADDING),
+                    style = MaterialTheme.typography.h5
+                )
+            }
             item {
                 SwitchOption(
                     currentState = isPassNeeded,
@@ -119,6 +126,19 @@ fun SettingsView(
                     currentState = isRememberPresent,
                     description = "Предлогать повторить пройденные слова",
                     action = onIsRememberPresentChange
+                )
+            }
+            item {
+                InputOption(
+                    currentValue = studyQuantityPerDay,
+                    description = "Дневная норма слов",
+                    action = {
+                        try {
+                            onStudyQuantityChange(it.toInt())
+                        } catch (e: Exception){
+                            onStudyQuantityChange(0)
+                        }
+                    }
                 )
             }
             item {
@@ -148,8 +168,26 @@ fun SettingsView(
                         onClick = { onColorSchemeChange(1) },
                         isPicked = currentColorScheme == 1
                     )
+                    // мятная тема
+                    colorTile(
+                        bcColor = mint,
+                        onClick = { onColorSchemeChange(2) },
+                        isPicked = currentColorScheme == 2
+                    )
                 }
             }
+        }
+        Button(
+            onClick = onGoingToMain,
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(75.dp),
+            colors = ButtonDefaults.buttonColors(
+                backgroundColor = MaterialTheme.colors.primary,
+                contentColor = MaterialTheme.colors.onPrimary
+            )
+        ) {
+            Text(text = "Выйти")
         }
     }
 }
@@ -164,12 +202,12 @@ private fun SwitchOption(
 
     Row(
         Modifier.fillMaxWidth(),
-        verticalAlignment = Alignment.CenterVertically
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.SpaceBetween
     ) {
 
         Text(
             text = description,
-            Modifier.fillMaxWidth(),
             style = MaterialTheme.typography.subtitle1,
             textAlign = TextAlign.Left
         )
@@ -183,13 +221,44 @@ private fun SwitchOption(
             colors = SwitchDefaults.colors(
                 checkedThumbColor = MaterialTheme.colors.primary,
                 checkedTrackColor = MaterialTheme.colors.primaryVariant,
-                uncheckedThumbColor = MaterialTheme.colors.secondary,
-                uncheckedTrackColor = MaterialTheme.colors.secondaryVariant
+                uncheckedThumbColor = MaterialTheme.colors.secondary.copy(alpha = 0.6f),
+                uncheckedTrackColor = MaterialTheme.colors.secondaryVariant.copy(alpha = 0.6f),
             ),
-            modifier = Modifier.padding(top = 10.dp)
+            //modifier = Modifier.padding(top = 10.dp)
         )
+    }
+}
 
+@Composable
+fun InputOption(
+    currentValue: Int,
+    description: String,
+    action: (String) -> (Unit),
+){
+    Row(
+        Modifier.fillMaxWidth(),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.SpaceBetween
+    ) {
 
+        Text(
+            text = description,
+            style = MaterialTheme.typography.subtitle1,
+            textAlign = TextAlign.Left
+        )
+        TextField(
+            value = currentValue.toString(),
+            onValueChange = action,
+            modifier = Modifier.width(75.dp),
+            singleLine = true,
+            colors = TextFieldDefaults.textFieldColors(
+                backgroundColor = MaterialTheme.colors.background,
+                unfocusedIndicatorColor = MaterialTheme.colors.primary,
+                focusedIndicatorColor = MaterialTheme.colors.primary
+            ),
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+            textStyle = LocalTextStyle.current.copy(textAlign = TextAlign.Center)
+        )
     }
 }
 
@@ -208,4 +277,12 @@ fun colorTile(
         color = bcColor,
         elevation = if (isPicked) 6.dp else 0.dp
     ) {}
+}
+
+@Preview(showBackground = true)
+@Composable
+fun InputOptionPreview(){
+    KotobaCustomTheme(colorScheme = ColorScheme.PH.colors) {
+        InputOption(currentValue = 10, description = "уфффффф", action = { })
+    }
 }

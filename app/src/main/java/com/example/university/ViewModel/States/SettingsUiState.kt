@@ -10,4 +10,5 @@ data class SettingsUiState(
     val haveErrorMessage: Boolean = false, // Флаг наличия сообщения об ошибке
     val colorScheme: Colors = ColorScheme.PH.colors, // Цветовая схемы
     val isRememberPresent: Boolean = false, // Настройка: предлагается ли пользователю повторить слова
+    val studyQuantityPerDay: Int = 10, // Количество изучаемыз слов в день
 )

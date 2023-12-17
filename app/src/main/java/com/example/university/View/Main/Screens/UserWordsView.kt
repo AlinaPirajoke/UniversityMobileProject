@@ -1,5 +1,6 @@
 package com.example.university.View.Main.Screens
 
+import android.util.Log
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -10,10 +11,15 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.AlertDialog
 import androidx.compose.material.Card
+import androidx.compose.material.FloatingActionButton
+import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
+import androidx.compose.material.Scaffold
 import androidx.compose.material.Text
 import androidx.compose.material.TextButton
 import androidx.compose.runtime.Composable
@@ -21,13 +27,16 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.example.university.R
 import com.example.university.UsefullStuff.Word
+import com.example.university.View.Main.MainScreens
 import com.example.university.ViewModel.UserWordsViewModel
 import com.example.university.theme.UXConstants
 import org.koin.androidx.compose.koinViewModel
@@ -48,7 +57,11 @@ fun UserWordsScreen(
         pickedWordNo = uiState.pickedWordNo,
         onPick = vm::pickElement,
         onEdit = { /*TODO*/ },
-        onDelete = vm::deleteWord
+        onDelete = vm::deleteWord,
+        onExit = {
+            Log.i(TAG, "Перенаправление на главный экран")
+            navController.navigate(MainScreens.Main.route)
+        },
     )
 }
 
@@ -58,34 +71,45 @@ fun UserWordsView(
     pickedWordNo: Int,
     onPick: (Int) -> Unit,
     onEdit: () -> Unit,
-    onDelete: () -> Unit
+    onDelete: () -> Unit,
+    onExit: () -> Unit
 ) {
-    Column(
-        Modifier
-            .fillMaxSize()
-            .padding(
-                top = UXConstants.VERTICAL_PADDING,
-                start = UXConstants.HORIZONTAL_PADDING,
-                end = UXConstants.HORIZONTAL_PADDING
-            )
-    ) {
-        Text(
-            text = "Все изучаемые слова:",
-            Modifier.fillMaxWidth(),
-            textAlign = TextAlign.Center,
-            style = MaterialTheme.typography.h5
-        )
-        LazyColumn(
+    Scaffold(
+        Modifier.padding(
+            top = UXConstants.VERTICAL_PADDING,
+            start = UXConstants.HORIZONTAL_PADDING,
+            end = UXConstants.HORIZONTAL_PADDING
+        ),
+        backgroundColor = MaterialTheme.colors.background,
+        floatingActionButton = {
+            ExitFloatingActionButton(onExit = onExit)
+        }
+    )
+    { innerPading ->
+
+        Column(
             Modifier
-                .fillMaxWidth()
-                .padding(top = UXConstants.VERTICAL_PADDING),
+                .fillMaxSize()
+                .padding(innerPading)
         ) {
-            words.forEachIndexed() { i, word ->
-                item {
-                    if (i == pickedWordNo)
-                        ActiveListTile(word = word, onDelete = onDelete, onEdit = onEdit)
-                    else
-                        InactiveListTile(word = word, onClick = { onPick(i) })
+            Text(
+                text = "Все изучаемые слова:",
+                Modifier.fillMaxWidth(),
+                textAlign = TextAlign.Left,
+                style = MaterialTheme.typography.h5
+            )
+            LazyColumn(
+                Modifier
+                    .fillMaxWidth()
+                    .padding(top = UXConstants.VERTICAL_PADDING),
+            ) {
+                words.forEachIndexed() { i, word ->
+                    item {
+                        if (i == pickedWordNo)
+                            ActiveListTile(word = word, onDelete = onDelete, onEdit = onEdit)
+                        else
+                            InactiveListTile(word = word, onClick = { onPick(i) })
+                    }
                 }
             }
         }
@@ -173,13 +197,15 @@ fun ActiveListTile(
                     style = MaterialTheme.typography.body1,
                     textAlign = TextAlign.Start,
                 )
-                // Транскрипция
-                Text(
-                    text = word.transcription,
-                    style = MaterialTheme.typography.subtitle2,
-                    textAlign = TextAlign.Start,
-                    color = MaterialTheme.colors.secondaryVariant.copy(alpha = 0.8f)
-                )
+                if (word.transcription.isNotBlank()) {
+                    // Транскрипция
+                    Text(
+                        text = word.transcription,
+                        style = MaterialTheme.typography.subtitle2,
+                        textAlign = TextAlign.Start,
+                        color = MaterialTheme.colors.secondaryVariant.copy(alpha = 0.8f)
+                    )
+                }
                 // Перевод
                 Text(
                     text = word.translationsToString(),
@@ -230,6 +256,36 @@ fun WordDeleteConfirm(onConfirm: () -> Unit, onReject: () -> Unit) {
     )
 }
 
+@Composable
+fun ExitFloatingActionButton(
+    onExit: () -> Unit
+){
+    FloatingActionButton(
+        onClick = onExit,
+        Modifier
+            .width(100.dp)
+            .height(50.dp),
+        backgroundColor = MaterialTheme.colors.primary,
+        contentColor = MaterialTheme.colors.onPrimary,
+        shape = MaterialTheme.shapes.small
+    ) {
+        Row(
+            Modifier.fillMaxSize(),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceEvenly
+        ) {
+            Icon(
+                modifier = Modifier.size(20.dp),
+                imageVector = ImageVector.vectorResource(R.drawable.bad),
+                contentDescription = "exit",
+                tint = MaterialTheme.colors.onPrimary
+            )
+            Text(text = "Выйти")
+        }
+
+    }
+}
+
 @Preview(showBackground = true)
 @Composable
 fun UserWordsPreview() {
@@ -246,6 +302,7 @@ fun UserWordsPreview() {
         onPick = { },
         onDelete = { },
         onEdit = { },
-        pickedWordNo = 1
+        pickedWordNo = 1,
+        onExit = { }
     )
 }

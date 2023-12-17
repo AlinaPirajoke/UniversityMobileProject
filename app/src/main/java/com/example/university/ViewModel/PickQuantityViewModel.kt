@@ -38,13 +38,12 @@ class PickQuantityViewModel(val db: AppDbManager, val msp: MySharedPreferences) 
         }
     }
 
-    fun setPickedQuantity(newQuantity: Int) {
+    fun setPickedQuantity(newQuantity: Float) {
         _uiState.update { state ->
-            if (newQuantity > state.wordsQuantity) {
-                state.copy(pickedQuantity = state.wordsQuantity)
-                return
-            }
-            state.copy(pickedQuantity = newQuantity)
+            if (newQuantity >= state.wordsQuantity.toFloat())
+                state.copy(pickedQuantity = state.wordsQuantity.toFloat())
+            else
+                state.copy(pickedQuantity = newQuantity)
         }
         setPickedWords()
 //        Log.i(TAG, "Установленно количество: ${uiState.value.pickedQuantity}")
@@ -53,9 +52,11 @@ class PickQuantityViewModel(val db: AppDbManager, val msp: MySharedPreferences) 
     fun setDate(targetDate: String) {
         date = targetDate
         viewModelScope.launch {
-            words = db.getWordsFromDate(date, msp.user)
-            setWordsQuantity(words.size)
-            setPickedWords()
+            withContext(Dispatchers.IO) {
+                words = db.getWordsFromDate(date, msp.user)
+                setWordsQuantity(words.size)
+                setPickedWords()
+            }
         }
     }
 
@@ -63,14 +64,14 @@ class PickQuantityViewModel(val db: AppDbManager, val msp: MySharedPreferences) 
         _uiState.update { state ->
             state.copy(
                 pickedWords = words.joinToString(
-                    limit = state.pickedQuantity,
+                    limit = state.pickedQuantity.toInt(),
                     postfix = ""
-                ) { it.word })
+                ) { it.word }.removeSuffix(", ..."))
         }
     }
 
     // createList() (оба) возвращают номер списка слов для прохождения
     fun createList(): Int {
-        return db.createList(words = words, date = date, user = msp.user)
+        return db.createList(words = words.subList(0, uiState.value.pickedQuantity.toInt()), date = date, user = msp.user)
     }
 }

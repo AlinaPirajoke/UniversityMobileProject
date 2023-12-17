@@ -7,11 +7,13 @@ import com.example.university.Model.MySharedPreferences
 import com.example.university.UsefullStuff.getDaysBeforeToday
 import com.example.university.UsefullStuff.getTodayDate
 import com.example.university.ViewModel.States.MainUiState
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class MainViewModel(val db: AppDbManager, val msp: MySharedPreferences) : ViewModel() {
     val TAG = "MainViewModel"
@@ -22,9 +24,11 @@ class MainViewModel(val db: AppDbManager, val msp: MySharedPreferences) : ViewMo
 
     init {
         viewModelScope.launch {
-            db.logAllWords()
-            getStatistic()
-            checkTodayWords()
+            withContext(Dispatchers.IO) {
+                db.logAllWords()
+                getStatistic()
+                checkTodayWords()
+            }
         }
     }
 
@@ -62,12 +66,13 @@ class MainViewModel(val db: AppDbManager, val msp: MySharedPreferences) : ViewMo
 
     suspend fun checkTodayWords() {
         viewModelScope.launch {
-
-            setTest(db.getQuantityFromDate(getTodayDate(), user)!!)
-            var learnQuantity = msp.studyQuantityPerDay - msp.todayStudiedQuantity
-            if (learnQuantity < 0)
-                learnQuantity = 0
-            setLearn(learnQuantity)
+            withContext(Dispatchers.IO) {
+                setTest(db.getQuantityFromDate(getTodayDate(), user)!!)
+                var learnQuantity = msp.studyQuantityPerDay - msp.todayStudiedQuantity
+                if (learnQuantity < 0)
+                    learnQuantity = 0
+                setLearn(learnQuantity)
+            }
         }
     }
 

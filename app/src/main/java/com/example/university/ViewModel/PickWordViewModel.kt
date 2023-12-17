@@ -54,13 +54,17 @@ class PickWordViewModel(
         }
 
         var text = ""
-        val rightForm = when (remain % 10) {
-            1 -> "слово"
-            in 2..4 -> "слова"
-            else -> "слов"
-        }
-        if (uiState.value.pickedWords.size > 0)
+        if (uiState.value.pickedWords.size > 0) {
+            var rightForm = ""
+            if (remain % 10 == 1)
+                rightForm = "слово"
+            else if (remain % 10 <= 4)
+                rightForm = "слова"
+            else
+                rightForm = "слов"
             text = "Выберите ещё $remain $rightForm"
+        }
+
         else
             text = "Выберите слова для изучения"
         _uiState.update { state ->

@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.Card
 import androidx.compose.material.MaterialTheme
+import androidx.compose.material.Scaffold
 import androidx.compose.material.Text
 import androidx.compose.material.TextButton
 import androidx.compose.runtime.Composable
@@ -50,7 +51,11 @@ fun PickWordScreen(
         onPick = vm::pickWord,
         onUnpick = vm::unpickWord,
         onConfirm = vm::confirm,
-        topText = uiState.topText
+        topText = uiState.topText,
+        onExit = {
+            Log.i(TAG, "Перенаправление на главный экран")
+            navController.navigate(MainScreens.Main.route)
+        }
     )
 }
 
@@ -63,39 +68,49 @@ fun PickWordView(
     onUnpick: (Int) -> Unit,
     onConfirm: () -> Unit,
     topText: String,
+    onExit: () -> Unit,
 ) {
-    Column(
-        Modifier
-            .fillMaxSize()
-            .padding(
-                top = UXConstants.VERTICAL_PADDING,
-                start = UXConstants.HORIZONTAL_PADDING,
-                end = UXConstants.HORIZONTAL_PADDING
-            )
-    ) {
-        Text(
-            text = topText,
-            Modifier.fillMaxWidth(),
-            textAlign = TextAlign.Center,
-            style = MaterialTheme.typography.h5
-        )
-        LazyColumn(
+    Scaffold(
+        Modifier.padding(
+            top = UXConstants.VERTICAL_PADDING,
+            start = UXConstants.HORIZONTAL_PADDING,
+            end = UXConstants.HORIZONTAL_PADDING
+        ),
+        backgroundColor = MaterialTheme.colors.background,
+        floatingActionButton = {
+            ExitFloatingActionButton(onExit = onExit)
+        }
+    )
+    { innerPading ->
+        Column(
             Modifier
-                .fillMaxWidth()
-                .padding(top = UXConstants.VERTICAL_PADDING),
+                .fillMaxSize()
+                .padding(innerPading)
         ) {
-            item() {
-                ConfirmTile(
-                    onConfirm = onConfirm,
-                    text = if (pickedWords.size > 0) "Подтвердить выбор ${pickedWords.size} слов" else "Выберите хотя бы одно слово"
-                )
-            }
-            words.forEachIndexed() { i, word ->
-                item {
-                    if (i in pickedWords)
-                        ListTile(word = word, onClick = { onUnpick(i) }, isPicked = true)
-                    else
-                        ListTile(word = word, onClick = { onPick(i) }, isPicked = false)
+            Text(
+                text = topText,
+                Modifier.fillMaxWidth(),
+                textAlign = TextAlign.Center,
+                style = MaterialTheme.typography.h5
+            )
+            LazyColumn(
+                Modifier
+                    .fillMaxWidth()
+                    .padding(top = UXConstants.VERTICAL_PADDING),
+            ) {
+                item() {
+                    ConfirmTile(
+                        onConfirm = onConfirm,
+                        text = if (pickedWords.size > 0) "Подтвердить выбор ${pickedWords.size} слов" else "Выберите хотя бы одно слово"
+                    )
+                }
+                words.forEachIndexed() { i, word ->
+                    item {
+                        if (i in pickedWords)
+                            ListTile(word = word, onClick = { onUnpick(i) }, isPicked = true)
+                        else
+                            ListTile(word = word, onClick = { onPick(i) }, isPicked = false)
+                    }
                 }
             }
         }
@@ -220,6 +235,7 @@ fun PickWordPreview() {
         onPick = { },
         onConfirm = { },
         onUnpick = { },
-        topText = "pdfjo"
+        topText = "pdfjo",
+        onExit = { }
     )
 }

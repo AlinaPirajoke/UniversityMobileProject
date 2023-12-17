@@ -26,7 +26,8 @@ class SettingsViewModel(val db: AppDbManager, val msp: MySharedPreferences) : Vi
             state.copy(
                 isPasswordNeeded = msp.isPasswordNeeded,
                 currentColorScheme = msp.currentColorSchemeId,
-                isRememberPresent = msp.isRememberPresent
+                isRememberPresent = msp.isRememberPresent,
+                studyQuantityPerDay = msp.studyQuantityPerDay
             )
         }
     }
@@ -75,5 +76,17 @@ class SettingsViewModel(val db: AppDbManager, val msp: MySharedPreferences) : Vi
             state.copy(isRememberPresent = condition)
         }
         msp.isRememberPresent = condition
+    }
+
+    fun setStudyQuantityPerDay(quantity: Int){
+        if(quantity in 0..100) {
+            _uiState.update { state ->
+                if(state.studyQuantityPerDay == 0)
+                    state.copy(studyQuantityPerDay = quantity/10)
+                else
+                    state.copy(studyQuantityPerDay = quantity)
+            }
+            msp.studyQuantityPerDay = quantity
+        }
     }
 }

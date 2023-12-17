@@ -78,9 +78,9 @@ fun PickQuantityScreen(
 
 @Composable
 fun PickQuantityView(
-    pickedQuantity: Int,
+    pickedQuantity: Float,
     wordsQuantity: Int,
-    onValueChange: (Int) -> Unit,
+    onValueChange: (Float) -> Unit,
     onGoingToTest: () -> Unit,
     onGoingToMain: () -> Unit,
     isRememberPresent: Boolean,
@@ -116,15 +116,16 @@ fun PickQuantityView(
                     )
 
                     Text(
-                        text = "$pickedQuantity из $wordsQuantity",
+                        text = "${pickedQuantity.toInt()} из $wordsQuantity",
                         fontSize = 30.sp,
                         color = MaterialTheme.colors.onPrimary,
                     )
                     Slider(
-                        value = pickedQuantity?.toFloat()!!, onValueChange = {
-                            onValueChange(it.toInt())
+                        value = pickedQuantity.toFloat(), onValueChange = {
+                            onValueChange(it)
+                            Log.i(TAG, "$it")
                         },
-                        valueRange = 0f..wordsQuantity?.toFloat()!!,
+                        valueRange = 1f..wordsQuantity.toFloat(),
                         colors = SliderDefaults.colors(
                             thumbColor = MaterialTheme.colors.primaryVariant,
                             activeTrackColor = MaterialTheme.colors.onPrimary,
@@ -139,19 +140,19 @@ fun PickQuantityView(
 
                         Text(
                             text = "Выбрать 5",
-                            Modifier.clickable { onValueChange(5) },
+                            Modifier.clickable { onValueChange(5f) },
                             color = MaterialTheme.colors.onPrimary,
                             fontSize = 20.sp,
                         )
                         Text(
-                            text = "Выбрать 10",
-                            Modifier.clickable { onValueChange(10) },
+                            text = "Выбрать 15",
+                            Modifier.clickable { onValueChange(10f) },
                             color = MaterialTheme.colors.onPrimary,
                             fontSize = 20.sp
                         )
                         Text(
-                            text = "Выбрать 15",
-                            Modifier.clickable { onValueChange(15) },
+                            text = "Выбрать всё",
+                            Modifier.clickable { onValueChange(1000f) },
                             color = MaterialTheme.colors.onPrimary,
                             fontSize = 20.sp
                         )
@@ -242,7 +243,7 @@ fun PickQuantityView(
 fun PickQuantityPreview() {
     KotobaCustomTheme(colorScheme = ColorScheme.pink.colors) {
         PickQuantityView(
-            pickedQuantity = 10,
+            pickedQuantity = 10f,
             wordsQuantity = 20,
             onValueChange = { },
             onGoingToTest = { },

@@ -28,6 +28,7 @@ class MainActivityViewModel(
     val uiState: StateFlow<MainActivityUiState> = _uiState.asStateFlow()
 
     init {
+
         var session = msp.session
         val needPass = msp.isPasswordNeeded
 
@@ -36,12 +37,13 @@ class MainActivityViewModel(
         if (!session)
             sendToLogin()
         //onFirstAccess()
+        Log.e(TAG, "${msp.lastOpenedAppDate}, ${getTodayDate()}")
         if (msp.lastOpenedAppDate < getTodayDate())
             dailyUpdates()
     }
 
     private fun dailyUpdates() {
-        Log.i(TAG, "Проводится ежедневное обновление")
+        Log.e(TAG, "Проводится ежедневное обновление")
 
         msp.todayStudiedQuantity = 0
         adb.dailyDateUpdate()

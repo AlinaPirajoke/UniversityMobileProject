@@ -215,7 +215,7 @@ fun OtherBlock(
     Text(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(top = 50.dp),
+            .padding(top = 20.dp),
         text = "Другие действия",
         fontSize = 15.sp,
         color = MaterialTheme.colors.secondaryVariant,
