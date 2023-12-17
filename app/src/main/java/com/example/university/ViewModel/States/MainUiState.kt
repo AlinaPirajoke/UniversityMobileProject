@@ -8,6 +8,6 @@ data class MainUiState(
     val todayLearn: Int = 0, // оставшееся количество слов для изучения на сегодня
     val statLearned: Int = 0,  // количество изученных слов
     val statLearning: Int = 0, // количество изучающихся слов
-    val statAverage: Double = 0.0, // Среднее количество изучаемых слов в день
+    val statAverage: String = "0.0", // Среднее количество изучаемых слов в день
     val colorScheme: Colors = ColorScheme.PH.colors // Цветовая тема
 )

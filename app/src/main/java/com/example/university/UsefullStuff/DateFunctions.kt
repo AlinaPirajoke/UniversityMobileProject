@@ -38,7 +38,7 @@ fun formatDate(date: LocalDate): String{
 }
 
 fun getDaysBeforeToday(startDate: String): Int {
-    val firstDate = LocalDate.parse(startDate, DateTimeFormatter.ofPattern("yyyy-MM-dd"))
+    val firstDate = LocalDate.parse(startDate, stdFormatter)
     val period = ChronoUnit.DAYS.between(firstDate, LocalDate.now())
     return period.toInt()
 }

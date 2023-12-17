@@ -2,15 +2,19 @@ package com.example.university.ViewModel
 
 import android.util.Log
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.example.university.Model.AppDB.AppDbManager
 import com.example.university.Model.MySharedPreferences
 import com.example.university.Model.WordsDB.WordsDbManager
 import com.example.university.UsefullStuff.getTodayDate
 import com.example.university.ViewModel.States.MainActivityUiState
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class MainActivityViewModel(
     val adb: AppDbManager,
@@ -38,17 +42,20 @@ class MainActivityViewModel(
 
     private fun dailyUpdates() {
         Log.i(TAG, "Проводится ежедневное обновление")
-        if (msp.firstAppAccessDate.isBlank())
-            onFirstAccess()
 
         msp.todayStudiedQuantity = 0
         adb.dailyDateUpdate()
         msp.lastOpenedAppDate = getTodayDate()
     }
 
-    private fun onFirstAccess() {
+    fun onFirstAccess() {
         msp.firstAppAccessDate = getTodayDate()
-        adb.fillWordsLibrary(wdb.getAllWords())
+        viewModelScope.launch{
+            withContext(Dispatchers.IO) {
+                adb.fillWordsLibrary(wdb.getAllWords())
+            }
+        }
+
     }
 
     fun sendToLogin(condition: Boolean = true) {

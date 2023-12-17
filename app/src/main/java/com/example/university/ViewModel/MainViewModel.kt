@@ -42,7 +42,7 @@ class MainViewModel(val db: AppDbManager, val msp: MySharedPreferences) : ViewMo
 
     suspend fun setStatAverage(number: Int) {
         val period = getDaysBeforeToday(msp.firstAppAccessDate) + 1
-        val quantity = String.format("%.2f", number.toDouble().div(period)).toDouble()
+        val quantity = String.format("%.2f", number.toDouble().div(period))
         _uiState.update { state ->
             state.copy(statAverage = quantity)
         }

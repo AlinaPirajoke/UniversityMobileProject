@@ -10,6 +10,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.graphics.toArgb
 import androidx.navigation.compose.rememberNavController
+import com.example.university.Model.MySharedPreferences
 import com.example.university.UsefullStuff.showToast
 import com.example.university.View.Auth.AuthActivity
 import com.example.university.ViewModel.MainActivityViewModel
@@ -22,6 +23,7 @@ class MainActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         Log.d(TAG, "Инициализация...")
+        checkIsThisFirstAcces()
         super.onCreate(savedInstanceState)
 
         setContent {
@@ -38,6 +40,12 @@ class MainActivity : AppCompatActivity() {
                 )
             }
         }
+    }
+
+    fun checkIsThisFirstAcces(){
+        val msp = MySharedPreferences(this)
+        if (msp.firstAppAccessDate.isBlank())
+            vm.onFirstAccess()
     }
 
     fun updateColorScheme() {

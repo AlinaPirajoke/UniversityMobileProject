@@ -36,9 +36,9 @@ class MySharedPreferences(context: Context) {
             Log.i(TAG, "user: $id")
         }
 
-    var isPasswordNeeded: Boolean = true
+    var isPasswordNeeded: Boolean = false
         get() {
-            val v = sp.getBoolean("isPasswordNeeded", true)
+            val v = sp.getBoolean("isPasswordNeeded", false)
             Log.i(TAG, "isPasswordNeeded: $v")
             return v
         }
