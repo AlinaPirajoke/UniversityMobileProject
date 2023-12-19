@@ -11,6 +11,7 @@
     <string name="S_color_scheme">Цветовая схема приложения</string>
     <string name="S_base_options">Основные настройки</string>
     <string name="S_is_pass_needed">Вход через пароль</string>
+    <string name="S_is_animations_long">Долгие анимации загрузки</string>
     <string name="S_is_remember_present">Предлогать повторить пройденные\nслова</string>
     <string name="S_study_quantity_per_day">Дневная норма слов</string>
     <string name="S_signature">Разработано Рузмановым Владиславом</string>

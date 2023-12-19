@@ -6,6 +6,7 @@ import com.example.university.Model.AppDB.AppDbManager
 import com.example.university.Model.MySharedPreferences
 import com.example.university.ViewModel.States.PickWordUiState
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -26,7 +27,9 @@ class PickWordViewModel(
     init {
         viewModelScope.launch {
             withContext(Dispatchers.IO) {
-                //delay(500)
+                if (msp.isAnimationsLong)
+                    delay(3500)
+
                 _uiState.update { state ->
                     state.copy(words = db.getUnlernedLibraryWords(user = msp.user))
                 }

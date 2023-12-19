@@ -19,7 +19,7 @@ android {
         minSdk = 27
         targetSdk = 34
         versionCode = 1
-        versionName = "1.0"
+        versionName = "1.1 Ferris"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 

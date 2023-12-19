@@ -119,6 +119,18 @@ class MySharedPreferences(context: Context) {
             Log.i(TAG, "firstAppAccessDate: $date")
         }
 
+    var isAnimationsLong: Boolean = false
+        get() {
+            val v = sp.getBoolean("isAnimationsLong", false)
+            Log.i(TAG, "isAnimationsLong: $v")
+            return v
+        }
+        set(condition: Boolean){
+            field = condition
+            sp.edit().putBoolean("isAnimationsLong", condition).apply()
+            Log.i(TAG, "isAnimationsLong: $condition")
+        }
+
     fun getColorScheme(): Colors {
         val v = sp.getInt("currentColorSchemeId", 0)
         Log.i(TAG, "currentColorSchemeId: $v")

@@ -62,7 +62,6 @@ fun MainScreen(
             }
         },
         toPickWords = {
-            vm.setIsLoading(true)
             scope.launch {
                 Log.i(TAG, "Перенаправление на экран выбора слов")
                 navController.navigate(MainScreens.PickWord.route)
@@ -85,6 +84,7 @@ fun MainScreen(
             Log.i(TAG, "Перенаправление на экран пользовательского словаря")
             navController.navigate(MainScreens.UserWords.route)
         },
+        canLogout = uiState.isPasswordNeeded,
     )
 }
 
@@ -102,6 +102,7 @@ fun MainView(
     toSettings: () -> Unit,
     toAnotherDates: () -> Unit,
     toUserWords: () -> Unit,
+    canLogout: Boolean
 ) {
     val scrollState = rememberScrollState()
     Column(
@@ -127,7 +128,8 @@ fun MainView(
             onGoingToAddNew = toAddNew,
             onGoingToLogin = toLogin,
             onGoingToDictionary = toUserWords,
-            onGoingToLibrary = toPickWords
+            onGoingToLibrary = toPickWords,
+            canLogout = canLogout
         )
     }
 }
@@ -227,7 +229,8 @@ fun OtherBlock(
     onGoingToAddNew: () -> (Unit),
     onGoingToLogin: () -> (Unit),
     onGoingToDictionary: () -> Unit,
-    onGoingToLibrary: () -> Unit
+    onGoingToLibrary: () -> Unit,
+    canLogout: Boolean
 ) {
     Text(
         modifier = Modifier
@@ -257,7 +260,8 @@ fun OtherBlock(
                 horizontalArrangement = Arrangement.spacedBy(15.dp),) {}*/
             ImgCard(imgId = R.drawable.setings, descr = "Настройки", onGoingToSettings)
             ImgCard(imgId = R.drawable.add, descr = "Добавить слово", onGoingToAddNew)
-            ImgCard(imgId = R.drawable.logout, descr = "Разлогиниться", onGoingToLogin)
+            if (canLogout)
+                ImgCard(imgId = R.drawable.logout, descr = "Разлогиниться", onGoingToLogin)
             ImgCard(imgId = R.drawable.dictionary, descr = "Мой словарь", onGoingToDictionary)
             ImgCard(imgId = R.drawable.library, descr = "Стандартная библиотека", onGoingToLibrary)
         }
@@ -295,10 +299,10 @@ fun TodayAction(text: String, action: () -> Unit) {
     Card(
         Modifier
             .fillMaxWidth()
-            .padding(top = 15.dp)
+            .padding(top = 12.dp)
             .clickable { action() },
-        shape = RoundedCornerShape(7.dp),
-        elevation = 4.dp,
+        shape = MaterialTheme.shapes.medium,
+        elevation = UXConstants.ELEVATION,
     ) {
         Text(
             modifier = Modifier.padding(15.dp, 20.dp),

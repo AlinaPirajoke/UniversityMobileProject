@@ -78,6 +78,13 @@ class SettingsViewModel(val db: AppDbManager, val msp: MySharedPreferences) : Vi
         msp.isRememberPresent = condition
     }
 
+    fun setIsAnimationsLong(condition: Boolean){
+        _uiState.update { state ->
+            state.copy(isAnimationsLong = condition)
+        }
+        msp.isAnimationsLong = condition
+    }
+
     fun setStudyQuantityPerDay(quantity: Int){
         if(quantity in 0..100) {
             _uiState.update { state ->

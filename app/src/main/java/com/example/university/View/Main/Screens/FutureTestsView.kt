@@ -118,9 +118,7 @@ fun CreateListCard(
         //.padding(padding)
         onClick = onClick
     ) {
-
         Box(Modifier.padding(20.dp)) {
-
             Column(
                 Modifier.fillMaxSize(), verticalArrangement = Arrangement.SpaceBetween
             ) {

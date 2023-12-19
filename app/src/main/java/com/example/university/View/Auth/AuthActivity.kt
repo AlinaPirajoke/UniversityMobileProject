@@ -1,12 +1,16 @@
 package com.example.university.View.Auth
 
 import android.content.Intent
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
 import androidx.activity.compose.setContent
+import androidx.appcompat.app.AppCompatActivity
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.ExperimentalMaterialApi
+import androidx.compose.material.MaterialTheme
+import androidx.compose.material.Surface
 import androidx.compose.ui.ExperimentalComposeUiApi
+import androidx.compose.ui.Modifier
 import androidx.navigation.compose.rememberNavController
 import com.example.university.Model.MySharedPreferences
 import com.example.university.UsefullStuff.showToast
@@ -23,12 +27,17 @@ class AuthActivity : AppCompatActivity() {
         val msp = MySharedPreferences(this)
         setContent {
             KotobaCustomTheme(colorScheme = msp.getColorScheme()) {
-                val navController = rememberNavController()
-                AuthNavGraph(
-                    navController = navController,
-                    showErrorMessage = ::showErrorMassage,
-                    onGoingToMain = ::toMain
-                )
+                Surface(
+                    Modifier.fillMaxSize(),
+                    color = MaterialTheme.colors.background
+                ) {
+                    val navController = rememberNavController()
+                    AuthNavGraph(
+                        navController = navController,
+                        showErrorMessage = ::showErrorMassage,
+                        onGoingToMain = ::toMain
+                    )
+                }
             }
         }
     }

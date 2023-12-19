@@ -19,7 +19,7 @@ class MainViewModel(val db: AppDbManager, val msp: MySharedPreferences) : ViewMo
     val TAG = "MainViewModel"
     val user = msp.user
 
-    private val _uiState = MutableStateFlow(MainUiState(colorScheme = msp.getColorScheme()))
+    private val _uiState = MutableStateFlow(MainUiState(colorScheme = msp.getColorScheme(), isPasswordNeeded = msp.isPasswordNeeded))
     val uiState: StateFlow<MainUiState> = _uiState.asStateFlow()
 
     init {
@@ -61,12 +61,6 @@ class MainViewModel(val db: AppDbManager, val msp: MySharedPreferences) : ViewMo
     fun setLearn(count: Int) {
         _uiState.update { state ->
             state.copy(todayLearn = count)
-        }
-    }
-
-    fun setIsLoading(condition: Boolean = true) {
-        _uiState.update { state ->
-            state.copy(isLoading = condition)
         }
     }
 

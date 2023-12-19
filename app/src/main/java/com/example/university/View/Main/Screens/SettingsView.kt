@@ -84,7 +84,9 @@ fun SettingsScreen(
             navController.navigate(MainScreens.Main.route)
         },
         studyQuantityPerDay = uiState.studyQuantityPerDay,
-        onStudyQuantityChange = vm::setStudyQuantityPerDay
+        onStudyQuantityChange = vm::setStudyQuantityPerDay,
+        isAnimationsLong = uiState.isAnimationsLong,
+        onIsAnimationsLongChange = vm::setIsAnimationsLong
     )
 }
 
@@ -99,6 +101,8 @@ fun SettingsView(
     onGoingToMain: () -> Unit,
     studyQuantityPerDay: Int,
     onStudyQuantityChange: (Int) -> Unit,
+    isAnimationsLong: Boolean,
+    onIsAnimationsLongChange: (Boolean) -> Unit,
 ) {
     Column(
         Modifier
@@ -116,7 +120,6 @@ fun SettingsView(
             item {
                 Text(
                     text = stringResource(id = R.string.S_options),
-                    Modifier.padding(bottom = UXConstants.VERTICAL_PADDING),
                     style = MaterialTheme.typography.h5
                 )
             }
@@ -126,7 +129,7 @@ fun SettingsView(
                     Modifier
                         .fillMaxWidth()
                         .padding(
-                            top = UXConstants.VERTICAL_PADDING / 2,
+                            top = 40.dp,
                             bottom = UXConstants.VERTICAL_PADDING
                         ),
                     textAlign = TextAlign.Left,
@@ -148,6 +151,13 @@ fun SettingsView(
                 )
             }
             item {
+                SwitchOption(
+                    currentState = isAnimationsLong,
+                    description = stringResource(id = R.string.S_is_animations_long),
+                    action = onIsAnimationsLongChange
+                )
+            }
+            item {
                 InputOption(currentValue = studyQuantityPerDay,
                     description = stringResource(id = R.string.S_study_quantity_per_day),
                     action = {
@@ -163,7 +173,7 @@ fun SettingsView(
                     text = stringResource(id = R.string.S_color_scheme),
                     Modifier
                         .fillMaxWidth()
-                        .padding(top = 20.dp),
+                        .padding(top = 40.dp),
                     textAlign = TextAlign.Left,
                     style = MaterialTheme.typography.h6
                 )
@@ -200,7 +210,7 @@ fun SettingsView(
                 Row(
                     Modifier
                         .fillMaxWidth()
-                        .padding(top = 48.dp),
+                        .padding(top = 68.dp),
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.spacedBy(UXConstants.HORIZONTAL_PADDING)
                 ) {
@@ -356,6 +366,9 @@ fun SettingsPreview() {
             onColorSchemeChange = { },
             onGoingToMain = { /*TODO*/ },
             studyQuantityPerDay = 69,
-            onStudyQuantityChange = { })
+            onStudyQuantityChange = { },
+            isAnimationsLong = false,
+            onIsAnimationsLongChange = {}
+        )
     }
 }

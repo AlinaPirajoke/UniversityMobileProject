@@ -10,5 +10,5 @@ data class MainUiState(
     val statLearning: Int = 0, // количество изучающихся слов
     val statAverage: String = "0.0", // cреднее количество изучаемых слов в день
     val colorScheme: Colors = ColorScheme.PH.colors, // wветовая тема
-    val isLoading: Boolean = false // показывается ли анимация загрузки
+    val isPasswordNeeded: Boolean = false // нужен ли пароль при входе
 )
