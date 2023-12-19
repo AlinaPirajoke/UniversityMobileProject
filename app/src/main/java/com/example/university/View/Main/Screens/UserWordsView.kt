@@ -11,13 +11,9 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.AlertDialog
 import androidx.compose.material.Card
-import androidx.compose.material.FloatingActionButton
-import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Scaffold
 import androidx.compose.material.Text
@@ -38,6 +34,8 @@ import com.example.university.R
 import com.example.university.UsefullStuff.Word
 import com.example.university.View.Main.MainScreens
 import com.example.university.ViewModel.UserWordsViewModel
+import com.example.university.theme.ColorScheme
+import com.example.university.theme.KotobaCustomTheme
 import com.example.university.theme.UXConstants
 import org.koin.androidx.compose.koinViewModel
 
@@ -75,25 +73,30 @@ fun UserWordsView(
     onExit: () -> Unit
 ) {
     Scaffold(
-        Modifier.padding(
-            top = UXConstants.VERTICAL_PADDING,
-            start = UXConstants.HORIZONTAL_PADDING,
-            end = UXConstants.HORIZONTAL_PADDING
-        ),
+        Modifier.padding(0.dp),
         backgroundColor = MaterialTheme.colors.background,
         floatingActionButton = {
-            ExitFloatingActionButton(onExit = onExit)
+            ExitConfirmFloatingActionButtonPart(
+                onClick = onExit,
+                text = stringResource(id = R.string.exit),
+                img = ImageVector.vectorResource(R.drawable.bad),
+            )
         }
     )
-    { innerPading ->
+    { innerPadding ->
+        println(innerPadding.toString())
 
         Column(
             Modifier
                 .fillMaxSize()
-                .padding(innerPading)
+                .padding(
+                    top = UXConstants.VERTICAL_PADDING,
+                    start = UXConstants.HORIZONTAL_PADDING,
+                    end = UXConstants.HORIZONTAL_PADDING
+                )
         ) {
             Text(
-                text = "Все изучаемые слова:",
+                text = "Все изучаемые слова (${words.size}):",
                 Modifier.fillMaxWidth(),
                 textAlign = TextAlign.Left,
                 style = MaterialTheme.typography.h5
@@ -130,33 +133,7 @@ fun InactiveListTile(
         elevation = UXConstants.ELEVATION.div(2),
         shape = MaterialTheme.shapes.small,
     ) {
-        Column(
-            Modifier
-                .fillMaxWidth()
-                .padding(start = 10.dp, bottom = 3.dp),
-            verticalArrangement = Arrangement.SpaceEvenly,
-            horizontalAlignment = Alignment.Start
-        ) {
-            // Слово
-            Text(
-                text = word.word,
-                style = MaterialTheme.typography.body1,
-                textAlign = TextAlign.Start,
-            )
-            // Транскрипция
-            Text(
-                text = word.transcription,
-                style = MaterialTheme.typography.subtitle2,
-                textAlign = TextAlign.Start,
-                color = MaterialTheme.colors.secondaryVariant.copy(alpha = 0.8f)
-            )
-            // Перевод
-            Text(
-                text = word.translationsToString(),
-                style = MaterialTheme.typography.body1,
-                textAlign = TextAlign.Start,
-            )
-        }
+        WordDescriptionColumn(word = word)
     }
 }
 
@@ -184,35 +161,7 @@ fun ActiveListTile(
                 .fillMaxWidth(),
             verticalAlignment = Alignment.CenterVertically,
         ) {
-            Column(
-                Modifier
-                    .padding(start = 10.dp, bottom = 3.dp)
-                    .fillMaxHeight(),
-                verticalArrangement = Arrangement.SpaceEvenly,
-                horizontalAlignment = Alignment.Start
-            ) {
-                // Слово
-                Text(
-                    text = word.word,
-                    style = MaterialTheme.typography.body1,
-                    textAlign = TextAlign.Start,
-                )
-                if (word.transcription.isNotBlank()) {
-                    // Транскрипция
-                    Text(
-                        text = word.transcription,
-                        style = MaterialTheme.typography.subtitle2,
-                        textAlign = TextAlign.Start,
-                        color = MaterialTheme.colors.secondaryVariant.copy(alpha = 0.8f)
-                    )
-                }
-                // Перевод
-                Text(
-                    text = word.translationsToString(),
-                    style = MaterialTheme.typography.body1,
-                    textAlign = TextAlign.Start,
-                )
-            }
+            WordDescriptionColumn(word = word)
             Row(
                 Modifier
                     .padding(0.dp)
@@ -222,17 +171,65 @@ fun ActiveListTile(
             ) {
                 TextButton(onClick = onDelete) {
                     Text(
-                        text = stringResource(id = R.string.UW_delete),
+                        text = stringResource(id = R.string.delete),
                         Modifier.padding(end = UXConstants.HORIZONTAL_PADDING)
                     )
                 }
 //                TextButton(onClick = onEdit) {
-//                    Text(text = stringResource(id = R.string.UW_edit))
+//                    Text(text = stringResource(id = R.string.edit))
 //                }
             }
         }
     }
 }
+
+@Composable
+fun WordDescriptionColumn(word: Word) {
+    Row {
+        Column(
+            Modifier
+                .padding(start = 10.dp, bottom = 3.dp)
+                .fillMaxHeight(),
+            verticalArrangement = Arrangement.SpaceEvenly,
+            horizontalAlignment = Alignment.Start
+        ) {
+            // Слово
+            Text(
+                text = word.word,
+                style = MaterialTheme.typography.body2,
+                textAlign = TextAlign.Start,
+            )
+            if (word.transcription.isNotBlank()) {
+                // Транскрипция
+                Text(
+                    text = word.transcription,
+                    style = MaterialTheme.typography.subtitle2,
+                    textAlign = TextAlign.Start,
+                    color = MaterialTheme.colors.secondaryVariant.copy(alpha = 0.8f)
+                )
+            }
+            // Перевод
+            Text(
+                text = word.translationsToString(),
+                style = MaterialTheme.typography.body1,
+                textAlign = TextAlign.Start,
+            )
+        }
+
+//        Column(
+//            Modifier
+//                .padding(start = 10.dp, bottom = 3.dp)
+//                .fillMaxHeight(),
+//            verticalArrangement = Arrangement.SpaceEvenly,
+//            horizontalAlignment = Alignment.Start
+//        ) {
+//            Text(text = "")
+//            Text(text = stringResource(id = R.string.UW_lvl_description) + " " + word.lvl.toString())
+//            Text(text = stringResource(id = R.string.UW_date_description) + " " + word.comming)
+//        }
+    }
+}
+
 
 @Composable
 fun WordDeleteConfirm(onConfirm: () -> Unit, onReject: () -> Unit) {
@@ -256,8 +253,8 @@ fun WordDeleteConfirm(onConfirm: () -> Unit, onReject: () -> Unit) {
     )
 }
 
-@Composable
-fun ExitFloatingActionButton(
+/*@Composable
+fun EFloatingActionButton(
     onExit: () -> Unit
 ){
     FloatingActionButton(
@@ -280,11 +277,11 @@ fun ExitFloatingActionButton(
                 contentDescription = "exit",
                 tint = MaterialTheme.colors.onPrimary
             )
-            Text(text = "Выйти")
+            Text(text = "Выйти", style = MaterialTheme.typography.body2,)
         }
 
     }
-}
+}*/
 
 @Preview(showBackground = true)
 @Composable
@@ -297,12 +294,14 @@ fun UserWordsPreview() {
         lvl = 1,
     )
     val words = arrayListOf(word, word, word)
-    UserWordsView(
-        words = words,
-        onPick = { },
-        onDelete = { },
-        onEdit = { },
-        pickedWordNo = 1,
-        onExit = { }
-    )
+    KotobaCustomTheme(colorScheme = ColorScheme.mint.colors) {
+        UserWordsView(
+            words = words,
+            onPick = { },
+            onDelete = { },
+            onEdit = { },
+            pickedWordNo = 1,
+            onExit = { }
+        )
+    }
 }

@@ -126,7 +126,7 @@ class MySharedPreferences(context: Context) {
         return when (v) {
             0 -> ColorScheme.PH.colors
             1 -> ColorScheme.pink.colors
-            2 -> ColorScheme.green.colors
+            2 -> ColorScheme.mint.colors
             else -> ColorScheme.PH.colors
         }
     }

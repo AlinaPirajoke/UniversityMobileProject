@@ -29,8 +29,8 @@ class FutureTestsViewModel(val db: AppDbManager, val msp: MySharedPreferences) :
     }
 
     suspend fun getDateQuantityList(): List<Pair<String, Int>> {
-        val quality = db.getListsSizeAndDays(length = BLOCK_QUANTITY, user = msp.user)
-        Log.i(TAG, "Даты и кол-во слов для повторения: $quality")
-        return quality
+        val quantity = db.getListsSizeAndDays(length = BLOCK_QUANTITY, user = msp.user)
+        Log.i(TAG, "Даты и кол-во слов для повторения: $quantity")
+        return quantity
     }
 }

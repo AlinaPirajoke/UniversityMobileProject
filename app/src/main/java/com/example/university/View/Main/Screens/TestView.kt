@@ -40,6 +40,7 @@ import androidx.navigation.NavHostController
 import com.example.university.R
 import com.example.university.View.Main.MainScreens
 import com.example.university.ViewModel.TestViewModel
+import com.example.university.theme.Cocon
 import com.example.university.theme.ColorScheme
 import com.example.university.theme.KotobaCustomTheme
 import com.example.university.theme.UXConstants
@@ -199,7 +200,8 @@ fun WordBanner(word: String = "", transcr: String = "", transl: String = "") {
                     text = transcr,
                     style = MaterialTheme.typography.subtitle1,
                     textAlign = TextAlign.Center,
-                    color = MaterialTheme.colors.secondaryVariant.copy(alpha = 0.8f)
+                    color = MaterialTheme.colors.secondaryVariant.copy(alpha = 0.8f),
+                    fontFamily = Cocon
                 )
             if (transl.isNotBlank())
             // Перевод
@@ -277,7 +279,7 @@ fun ShowTestFinishAlert(
     result: Double,
     isRememberPresent: Boolean
 ) {
-    var text = "Вы прошли тест с результатом $result%."
+    var text = "${String.format("%.2f", result)}% слов теста вы помните!"
     if (isRememberPresent)
         text += "\nХотите ли вы ещё раз повторить слова?"
     AlertDialog(

@@ -5,20 +5,21 @@ import androidx.compose.material.lightColors
 import androidx.compose.ui.graphics.Color
 
 val PH = Color(0xFFFF9A00)
-val PHLight = Color(0xFFFFAF36)
+val PHLight = Color(0xFFFFBB53)
 val PHDark = Color(0xFFCC7C00)
 
 val pink = Color(0xFFFF7BCE)
 val pinkLight = Color(0xFFFD9FDB)
 val pinkDark = Color(0xFFC93B94)
 
-val mint = Color(0xFF25AFA3)
-val mintLight = Color(0xFF8EDFD7)
+val mint = Color(0xFF29C2B5)
+val mintLight = Color(0xFF8CECE4)
 val mintDark = Color(0xFF4DB6AC)
 
 val error = Color(0xFFFF715E)
 val gray = Color(0xFF494949)
-val mediumGray = Color(0xFF2B2B2B)
+val lightGray = Color(0xFF707070)
+val mediumGray = Color(0xFF1B1B1B)
 val darkGray = Color(0xFF303030)
 val whiteGray = Color(0xFFFEFAFD)
 
@@ -31,7 +32,9 @@ val PHColors = lightColors(
     onSecondary = Color.White,
     error = error,
     background = whiteGray,
-    onBackground = mediumGray
+    onSurface = mediumGray,
+    onBackground = mediumGray,
+    onError = lightGray // onError всё равно нигде не используется, я им пользуюсь как вспомогательным полем
 )
 val pinkColors = lightColors(
     primary = pink,
@@ -42,7 +45,9 @@ val pinkColors = lightColors(
     onSecondary = Color.White,
     error = error,
     background = whiteGray,
-    onBackground = mediumGray
+    onSurface = mediumGray,
+    onBackground = mediumGray,
+    onError = lightGray
 )
 val greenColors = lightColors(
     primary = mint,
@@ -53,10 +58,12 @@ val greenColors = lightColors(
     onSecondary = Color.White,
     error = error,
     background = whiteGray,
-    onBackground = mediumGray
+    onSurface = mediumGray,
+    onBackground = mediumGray,
+    onError = lightGray
 )
 
 
 enum class ColorScheme(val colors: Colors) {
-    PH(PHColors), pink(pinkColors), green(greenColors)
+    PH(PHColors), pink(pinkColors), mint(greenColors)
 }

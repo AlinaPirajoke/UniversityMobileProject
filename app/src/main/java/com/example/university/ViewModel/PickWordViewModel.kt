@@ -5,11 +5,13 @@ import androidx.lifecycle.viewModelScope
 import com.example.university.Model.AppDB.AppDbManager
 import com.example.university.Model.MySharedPreferences
 import com.example.university.ViewModel.States.PickWordUiState
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class PickWordViewModel(
     val db: AppDbManager,
@@ -23,10 +25,13 @@ class PickWordViewModel(
 
     init {
         viewModelScope.launch {
-            _uiState.update { state ->
-                state.copy(words = db.getUnlernedLibraryWords(user = msp.user))
+            withContext(Dispatchers.IO) {
+                //delay(500)
+                _uiState.update { state ->
+                    state.copy(words = db.getUnlernedLibraryWords(user = msp.user))
+                }
+                setRemain()
             }
-            setRemain()
         }
     }
 
@@ -63,9 +68,7 @@ class PickWordViewModel(
             else
                 rightForm = "слов"
             text = "Выберите ещё $remain $rightForm"
-        }
-
-        else
+        } else
             text = "Выберите слова для изучения"
         _uiState.update { state ->
             state.copy(topText = text)

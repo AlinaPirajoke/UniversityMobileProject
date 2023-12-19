@@ -25,7 +25,7 @@ class MainViewModel(val db: AppDbManager, val msp: MySharedPreferences) : ViewMo
     init {
         viewModelScope.launch {
             withContext(Dispatchers.IO) {
-                db.logAllWords()
+                //db.logAllWords()
                 getStatistic()
                 checkTodayWords()
             }
@@ -61,6 +61,12 @@ class MainViewModel(val db: AppDbManager, val msp: MySharedPreferences) : ViewMo
     fun setLearn(count: Int) {
         _uiState.update { state ->
             state.copy(todayLearn = count)
+        }
+    }
+
+    fun setIsLoading(condition: Boolean = true) {
+        _uiState.update { state ->
+            state.copy(isLoading = condition)
         }
     }
 

@@ -6,11 +6,10 @@ import android.database.sqlite.SQLiteDatabase
 import android.util.Log
 import com.example.university.Model.MySharedPreferences
 import com.example.university.UsefullStuff.Word
-import com.example.university.UsefullStuff.formatDate
 import com.example.university.UsefullStuff.getDateNDaysLater
 import com.example.university.UsefullStuff.getDaysFromToday
 import com.example.university.UsefullStuff.getTodayDate
-import com.example.university.UsefullStuff.simpleFormatter
+import com.example.university.UsefullStuff.stdFormatter
 
 class AppDbManager(val context: Context) { // оставь надежду всяк сюда входящий
     val TAG = "DBManager"
@@ -141,8 +140,8 @@ class AppDbManager(val context: Context) { // оставь надежду вся
         val datesCount = ArrayList<Pair<String, Int>>()
         val dates = getDaysFromToday(length)
         for (date in dates) {
-            val sDate = date.format(simpleFormatter)
-            val quantity = getQuantityFromDate(formatDate(date), user)!!
+            val sDate = date.format(stdFormatter)
+            val quantity = getQuantityFromDate(sDate, user)!!
             datesCount.add(sDate to quantity)
         }
         return datesCount
@@ -407,14 +406,16 @@ class AppDbManager(val context: Context) { // оставь надежду вся
             val date = cursor.getString(4).toString()
             val transl = getTranslationsFromWord(id)
 
+            val tempWord = Word(
+                id = id,
+                word = word,
+                transcription = transcr,
+                translations = transl,
+                lvl = lvl
+            )
+            tempWord.comming = date
             words.add(
-                Word(
-                    id = id,
-                    word = word,
-                    transcription = transcr,
-                    translations = transl,
-                    lvl = lvl
-                )
+                tempWord
             )
         }
         cursor.close()

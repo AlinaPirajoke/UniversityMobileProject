@@ -1,6 +1,27 @@
 <resources>
     <string name="app_name">kotoba</string>
 
-    <string name="UW_delete">Удалить</string>
-    <string name="UW_edit">Изменить</string>
+    <string name="exit">Выход</string>
+    <string name="add">Добавить</string>
+    <string name="confirm">Подтвердить</string>
+    <string name="delete">Удалить</string>
+    <string name="edit">Изменить</string>
+
+    <string name="S_options">Настройки</string>
+    <string name="S_color_scheme">Цветовая схема приложения</string>
+    <string name="S_base_options">Основные настройки</string>
+    <string name="S_is_pass_needed">Вход через пароль</string>
+    <string name="S_is_remember_present">Предлогать повторить пройденные\nслова</string>
+    <string name="S_study_quantity_per_day">Дневная норма слов</string>
+    <string name="S_signature">Разработано Рузмановым Владиславом</string>
+    <string name="S_signature_crop">Разработано\nРузмановым Владиславом</string>
+
+    <string name="UW_lvl_description">Период появления: </string>
+    <string name="UW_date_description">Ближайшее появление: </string>
+
+    <string name="PH_color_name">Оранжевая</string>
+    <string name="pink_color_name">Розовая</string>
+    <string name="mint_color_name">Мятная</string>
+
+
 </resources>

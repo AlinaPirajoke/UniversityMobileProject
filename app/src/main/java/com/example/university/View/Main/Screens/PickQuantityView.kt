@@ -23,6 +23,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -31,6 +32,7 @@ import com.example.university.View.Main.MainScreens
 import com.example.university.ViewModel.PickQuantityViewModel
 import com.example.university.theme.ColorScheme
 import com.example.university.theme.KotobaCustomTheme
+import com.example.university.theme.UXConstants
 import org.koin.androidx.compose.koinViewModel
 
 private const val TAG = "PickQuantityView"
@@ -111,13 +113,15 @@ fun PickQuantityView(
 
                     Text(
                         text = "Выберите количество слов, которое хотите повторить",
+                        Modifier.padding(bottom = UXConstants.VERTICAL_PADDING),
                         color = MaterialTheme.colors.onPrimary,
                         style = MaterialTheme.typography.h5,
                     )
 
                     Text(
                         text = "${pickedQuantity.toInt()} из $wordsQuantity",
-                        fontSize = 30.sp,
+                        fontWeight = FontWeight.W600,
+                        fontSize = 20.sp,
                         color = MaterialTheme.colors.onPrimary,
                     )
                     Slider(

@@ -14,6 +14,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.Card
+import androidx.compose.material.Divider
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
@@ -21,6 +22,7 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -34,6 +36,7 @@ import com.example.university.UsefullStuff.getTodayDate
 import com.example.university.View.Main.MainScreens
 import com.example.university.ViewModel.MainViewModel
 import com.example.university.theme.UXConstants
+import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
 
 private const val TAG = "MainView"
@@ -45,21 +48,25 @@ fun MainScreen(
     vm: MainViewModel = koinViewModel()
 ) {
     val uiState by vm.uiState.collectAsState()
+    val scope = rememberCoroutineScope()
     MainView(
         statLearned = uiState.statLearned,
         statLearning = uiState.statLearning,
         statAverage = uiState.statAverage,
         todayTest = uiState.todayTest,
         todayLearn = uiState.todayLearn,
-        onGoingToPickQuantity = {
+        toPickQuantity = {
             if (uiState.todayTest > 0) {
                 Log.i(TAG, "Перенаправление на экран выбора количества слов для тестирования")
                 navController.navigate("${MainScreens.PickQuantity.route}/${getTodayDate()}")
             }
         },
-        onGoingToPickWords = {
-            Log.i(TAG, "Перенаправление на экран выбора слов")
-            navController.navigate(MainScreens.PickWord.route)
+        toPickWords = {
+            vm.setIsLoading(true)
+            scope.launch {
+                Log.i(TAG, "Перенаправление на экран выбора слов")
+                navController.navigate(MainScreens.PickWord.route)
+            }
         },
         toAddNew = {
             Log.i(TAG, "Перенаправление на экран добавления слов")
@@ -77,7 +84,7 @@ fun MainScreen(
         toUserWords = {
             Log.i(TAG, "Перенаправление на экран пользовательского словаря")
             navController.navigate(MainScreens.UserWords.route)
-        }
+        },
     )
 }
 
@@ -88,13 +95,13 @@ fun MainView(
     statAverage: String,
     todayTest: Int,
     todayLearn: Int,
-    onGoingToPickQuantity: () -> Unit,
-    onGoingToPickWords: () -> Unit,
+    toPickQuantity: () -> Unit,
+    toPickWords: () -> Unit,
     toAddNew: () -> Unit,
     toLogin: () -> Unit,
     toSettings: () -> Unit,
     toAnotherDates: () -> Unit,
-    toUserWords: () -> Unit
+    toUserWords: () -> Unit,
 ) {
     val scrollState = rememberScrollState()
     Column(
@@ -111,15 +118,16 @@ fun MainView(
         TodayBlock(
             todayTest = todayTest,
             todayLearn = todayLearn,
-            onGoingToPickCount = onGoingToPickQuantity,
-            onGoingToPickWords = onGoingToPickWords,
+            onGoingToPickCount = toPickQuantity,
+            onGoingToPickWords = toPickWords,
             toAnotherDates = toAnotherDates,
         )
         OtherBlock(
             onGoingToSettings = toSettings,
             onGoingToAddNew = toAddNew,
             onGoingToLogin = toLogin,
-            onGoingToDictionary = toUserWords
+            onGoingToDictionary = toUserWords,
+            onGoingToLibrary = toPickWords
         )
     }
 }
@@ -136,7 +144,7 @@ fun StatisticBlock(
                 .fillMaxWidth()
                 .padding(top = 20.dp),
             text = "Статистика изучения",
-            fontSize = 15.sp,
+            style = MaterialTheme.typography.subtitle1,
             color = MaterialTheme.colors.secondaryVariant,
             textAlign = TextAlign.Center
         )
@@ -144,13 +152,11 @@ fun StatisticBlock(
             Modifier
                 .fillMaxWidth()
                 .padding(
-                    UXConstants.HORIZONTAL_PADDING,
-                    20.dp,
-                    UXConstants.HORIZONTAL_PADDING,
-                    UXConstants.HORIZONTAL_PADDING
+                    horizontal = UXConstants.HORIZONTAL_PADDING,
+                    vertical = UXConstants.VERTICAL_PADDING
                 ),
-            shape = RoundedCornerShape(10.dp),
-            elevation = 4.dp,
+            shape = MaterialTheme.shapes.medium,
+            /*elevation = 4.dp,*/
         ) {
             Column(
                 Modifier
@@ -159,7 +165,17 @@ fun StatisticBlock(
                 Arrangement.SpaceBetween,
             ) {
                 StatisticLine(text = "Всего слов изучено", value = learned)
+                Divider(
+                    Modifier
+                        .fillMaxWidth()
+                        .padding(top = 3.dp)
+                        .alpha(0.8f))
                 StatisticLine(text = "Слов изучается", value = learning)
+                Divider(
+                    Modifier
+                        .fillMaxWidth()
+                        .padding(top = 3.dp)
+                        .alpha(0.8f))
                 StatisticLine(text = "Среднее изучаемое в день", value = average)
             }
         }
@@ -186,7 +202,7 @@ fun TodayBlock(
                 .fillMaxWidth()
                 .padding(top = 20.dp),
             text = "План на сегодня",
-            fontSize = 15.sp,
+            style = MaterialTheme.typography.subtitle1,
             color = MaterialTheme.colors.secondaryVariant,
             textAlign = TextAlign.Center
         )
@@ -198,8 +214,8 @@ fun TodayBlock(
                 .padding(top = 20.dp)
                 .clickable { toAnotherDates() },
             text = "Посмотреть другие даты",
-            fontSize = 15.sp,
             color = MaterialTheme.colors.primary,
+            style = MaterialTheme.typography.subtitle1,
             textAlign = TextAlign.Right
         )
     }
@@ -210,16 +226,17 @@ fun OtherBlock(
     onGoingToSettings: () -> (Unit),
     onGoingToAddNew: () -> (Unit),
     onGoingToLogin: () -> (Unit),
-    onGoingToDictionary: () -> Unit
+    onGoingToDictionary: () -> Unit,
+    onGoingToLibrary: () -> Unit
 ) {
     Text(
         modifier = Modifier
             .fillMaxWidth()
             .padding(top = 20.dp),
         text = "Другие действия",
-        fontSize = 15.sp,
         color = MaterialTheme.colors.secondaryVariant,
-        textAlign = TextAlign.Center
+        textAlign = TextAlign.Center,
+        style = MaterialTheme.typography.subtitle1
     )
     Card(
         modifier = Modifier
@@ -242,6 +259,7 @@ fun OtherBlock(
             ImgCard(imgId = R.drawable.add, descr = "Добавить слово", onGoingToAddNew)
             ImgCard(imgId = R.drawable.logout, descr = "Разлогиниться", onGoingToLogin)
             ImgCard(imgId = R.drawable.dictionary, descr = "Мой словарь", onGoingToDictionary)
+            ImgCard(imgId = R.drawable.library, descr = "Стандартная библиотека", onGoingToLibrary)
         }
     }
 }
@@ -254,8 +272,8 @@ fun StatisticLine(text: String, value: Int) {
             .padding(top = 5.dp, bottom = 5.dp),
         Arrangement.SpaceBetween,
     ) {
-        Text(modifier = Modifier.alpha(0.8f), text = text, fontSize = 20.sp)
-        Text(modifier = Modifier.alpha(0.9f), text = value.toString(), fontSize = 20.sp)
+        Text(text = text, fontSize = 20.sp)
+        Text(text = value.toString(), fontSize = 20.sp)
     }
 }
 
@@ -267,8 +285,8 @@ fun StatisticLine(text: String, value: String) {
             .padding(top = 5.dp, bottom = 5.dp),
         Arrangement.SpaceBetween,
     ) {
-        Text(modifier = Modifier.alpha(0.8f), text = text, fontSize = 20.sp)
-        Text(modifier = Modifier.alpha(0.9f), text = value, fontSize = 20.sp)
+        Text(text = text, fontSize = 20.sp)
+        Text(text = value, fontSize = 20.sp)
     }
 }
 

@@ -43,3 +43,8 @@ fun getDaysBeforeToday(startDate: String): Int {
     return period.toInt()
 }
 
+fun simplifyDate(date: String): String{
+    val localDate = LocalDate.parse(date, stdFormatter)
+    return localDate.format(simpleFormatter)
+}
+
