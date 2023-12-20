@@ -4,26 +4,31 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.university.Model.AppDB.AppDbManager
 import com.example.university.Model.MySharedPreferences
+import com.example.university.UsefullStuff.getDaysBeforeToday
 import com.example.university.UsefullStuff.getTodayDate
 import com.example.university.ViewModel.States.MainUiState
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class MainViewModel(val db: AppDbManager, val msp: MySharedPreferences) : ViewModel() {
     val TAG = "MainViewModel"
     val user = msp.user
 
-    private val _uiState = MutableStateFlow(MainUiState(colorScheme = msp.getColorScheme()))
+    private val _uiState = MutableStateFlow(MainUiState(colorScheme = msp.getColorScheme(), isPasswordNeeded = msp.isPasswordNeeded))
     val uiState: StateFlow<MainUiState> = _uiState.asStateFlow()
 
     init {
         viewModelScope.launch {
-            db.logAllWords()
-            getStatistic()
-            checkTodayWords()
+            withContext(Dispatchers.IO) {
+                //db.logAllWords()
+                getStatistic()
+                checkTodayWords()
+            }
         }
     }
 
@@ -39,9 +44,11 @@ class MainViewModel(val db: AppDbManager, val msp: MySharedPreferences) : ViewMo
         }
     }
 
-    fun setStatAverage(count: Int) {
+    suspend fun setStatAverage(number: Int) {
+        val period = getDaysBeforeToday(msp.firstAppAccessDate) + 1
+        val quantity = String.format("%.2f", number.toDouble().div(period))
         _uiState.update { state ->
-            state.copy(statAverage = count)
+            state.copy(statAverage = quantity)
         }
     }
 
@@ -59,15 +66,13 @@ class MainViewModel(val db: AppDbManager, val msp: MySharedPreferences) : ViewMo
 
     suspend fun checkTodayWords() {
         viewModelScope.launch {
-            if (msp.lastOpenedAppDate <= getTodayDate())
-                db.dailyDateUpdate()
-
-            setTest(db.getQuantityFromDate(getTodayDate(), user)!!)
-            var learnCount = db.getTodayLearnedCount(getTodayDate(), user)!!
-            learnCount = msp.studyQuantityPerDay - learnCount
-            if (learnCount < 0)
-                learnCount = 0
-            setLearn(learnCount)
+            withContext(Dispatchers.IO) {
+                setTest(db.getQuantityFromDate(getTodayDate(), user)!!)
+                var learnQuantity = msp.studyQuantityPerDay - msp.todayStudiedQuantity
+                if (learnQuantity < 0)
+                    learnQuantity = 0
+                setLearn(learnQuantity)
+            }
         }
     }
 
@@ -75,7 +80,7 @@ class MainViewModel(val db: AppDbManager, val msp: MySharedPreferences) : ViewMo
         viewModelScope.launch {
             setStatLearned(db.getLearnedCount())
             setStatLearning(db.getLearningCount())
-            setStatAverage(db.getAverage())
+            setStatAverage(db.getAllWordsQuantity())
         }
     }
 

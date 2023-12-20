@@ -4,7 +4,7 @@ import android.util.Log
 import androidx.core.text.isDigitsOnly
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.university.Model.API.ApiManager
+import com.example.university.Model.API.TranslateUseCase
 import com.example.university.Model.AppDB.AppDbManager
 import com.example.university.Model.MySharedPreferences
 import com.example.university.ViewModel.States.AddUiState
@@ -123,8 +123,8 @@ class AddViewModel(val db: AppDbManager, val msp: MySharedPreferences) : ViewMod
             setTranslationError(false)
             try {
                 setTranslating(true)
-                val api = ApiManager()
-                val translation = api.translateText(uiState.value.wordValue)
+                val translator = TranslateUseCase()
+                val translation = translator.invoke(text = uiState.value.wordValue)
                 editTranslationValue(translation.text, 0)
             }
             catch (e: Exception){

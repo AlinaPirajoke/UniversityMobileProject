@@ -2,14 +2,19 @@ package com.example.university.ViewModel.DI
 
 import com.example.university.Model.AppDB.AppDbManager
 import com.example.university.Model.MySharedPreferences
-import com.example.university.ViewModel.MainActivityViewModel
+import com.example.university.Model.WordsDB.WordsDbManager
 import com.example.university.ViewModel.AddViewModel
+import com.example.university.ViewModel.FutureTestsViewModel
 import com.example.university.ViewModel.LoginViewModel
+import com.example.university.ViewModel.MainActivityViewModel
 import com.example.university.ViewModel.MainViewModel
 import com.example.university.ViewModel.PickQuantityViewModel
+import com.example.university.ViewModel.PickWordViewModel
 import com.example.university.ViewModel.RegistrationViewModel
+import com.example.university.ViewModel.RememberViewModel
 import com.example.university.ViewModel.SettingsViewModel
 import com.example.university.ViewModel.TestViewModel
+import com.example.university.ViewModel.UserWordsViewModel
 import org.koin.androidx.viewmodel.dsl.viewModel
 import org.koin.core.module.Module
 import org.koin.dsl.module
@@ -19,19 +24,23 @@ val dataModule = module {
     presentation()
 }
 
-private fun Module.data(){
-    single<AppDbManager>{
+private fun Module.data() {
+    single<AppDbManager> {
         AppDbManager(context = get())
     }
-    single<MySharedPreferences>{
+    single<MySharedPreferences> {
         MySharedPreferences(context = get())
+    }
+    single<WordsDbManager> {
+        WordsDbManager(context = get())
     }
 }
 
-private fun Module.presentation(){
+private fun Module.presentation() {
     viewModel<MainActivityViewModel> {
         MainActivityViewModel(
-            db = get(),
+            adb = get(),
+            wdb = get(),
             msp = get()
         )
     }
@@ -47,32 +56,56 @@ private fun Module.presentation(){
             msp = get()
         )
     }
-    viewModel<AddViewModel>{
+    viewModel<AddViewModel> {
         AddViewModel(
             db = get(),
             msp = get()
         )
     }
-    viewModel<LoginViewModel>{
+    viewModel<LoginViewModel> {
         LoginViewModel(
             db = get(),
             msp = get()
         )
     }
-    viewModel<RegistrationViewModel>{
+    viewModel<RegistrationViewModel> {
         RegistrationViewModel(
             db = get(),
             msp = get()
         )
     }
-    viewModel<PickQuantityViewModel>{
+    viewModel<PickQuantityViewModel> {
         PickQuantityViewModel(
             db = get(),
             msp = get()
         )
     }
-    viewModel<TestViewModel>{
+    viewModel<TestViewModel> {
         TestViewModel(
+            db = get(),
+            msp = get()
+        )
+    }
+    viewModel<PickWordViewModel> {
+        PickWordViewModel(
+            db = get(),
+            msp = get(),
+        )
+    }
+    viewModel<FutureTestsViewModel> {
+        FutureTestsViewModel(
+            db = get(),
+            msp = get()
+        )
+    }
+    viewModel<UserWordsViewModel> {
+        UserWordsViewModel(
+            db = get(),
+            msp = get()
+        )
+    }
+    viewModel<RememberViewModel> {
+        RememberViewModel(
             db = get(),
             msp = get()
         )

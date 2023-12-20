@@ -1,15 +1,19 @@
 package com.example.university.View.Main
 
 import android.content.Intent
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
 import androidx.activity.compose.setContent
+import androidx.appcompat.app.AppCompatActivity
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.MaterialTheme
+import androidx.compose.material.Surface
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.toArgb
 import androidx.navigation.compose.rememberNavController
+import com.example.university.Model.MySharedPreferences
 import com.example.university.UsefullStuff.showToast
 import com.example.university.View.Auth.AuthActivity
 import com.example.university.ViewModel.MainActivityViewModel
@@ -22,22 +26,34 @@ class MainActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         Log.d(TAG, "Инициализация...")
+        checkIsThisFirstAcces()
         super.onCreate(savedInstanceState)
 
         setContent {
             val uiState by vm.uiState.collectAsState()
             if (uiState.isGoingToLogin) this.toLogin()
             KotobaCustomTheme(colorScheme = uiState.colorScheme) {
-                window.statusBarColor = MaterialTheme.colors.primary.toArgb()
-                val navController = rememberNavController()
-                MainNavGraph(
-                    navController = navController,
-                    onGoingToLogin = ::toLogin,
-                    onChangeColorScheme = ::updateColorScheme,
-                    showErrorMessage = ::showErrorMassage,
-                )
+                Surface(
+                    Modifier.fillMaxSize(),
+                    color = MaterialTheme.colors.background
+                ) {
+                    window.statusBarColor = MaterialTheme.colors.primary.toArgb()
+                    val navController = rememberNavController()
+                    MainNavGraph(
+                        navController = navController,
+                        onGoingToLogin = ::toLogin,
+                        onChangeColorScheme = ::updateColorScheme,
+                        showErrorMessage = ::showErrorMassage,
+                    )
+                }
             }
         }
+    }
+
+    fun checkIsThisFirstAcces() {
+        val msp = MySharedPreferences(this)
+        if (msp.firstAppAccessDate.isBlank())
+            vm.onFirstAccess()
     }
 
     fun updateColorScheme() {

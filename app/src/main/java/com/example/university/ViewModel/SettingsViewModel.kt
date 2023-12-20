@@ -1,7 +1,6 @@
 package com.example.university.ViewModel
 
 import android.util.Log
-import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.university.Model.AppDB.AppDbManager
@@ -26,9 +25,9 @@ class SettingsViewModel(val db: AppDbManager, val msp: MySharedPreferences) : Vi
         _uiState.update { state ->
             state.copy(
                 isPasswordNeeded = msp.isPasswordNeeded,
-                currentColorScheme = msp.currentColorSchemeId
-                /*isPasswordNeeded = sp.getBoolean("isPasswordNeeded", false),
-                currentColorScheme = sp.getInt("currentColorScheme", 0),*/
+                currentColorScheme = msp.currentColorSchemeId,
+                isRememberPresent = msp.isRememberPresent,
+                studyQuantityPerDay = msp.studyQuantityPerDay
             )
         }
     }
@@ -69,6 +68,32 @@ class SettingsViewModel(val db: AppDbManager, val msp: MySharedPreferences) : Vi
                 currentColorScheme = id,
                 colorScheme = msp.getColorScheme()
             )
+        }
+    }
+
+    fun setIsRememberPresent(condition: Boolean){
+        _uiState.update { state ->
+            state.copy(isRememberPresent = condition)
+        }
+        msp.isRememberPresent = condition
+    }
+
+    fun setIsAnimationsLong(condition: Boolean){
+        _uiState.update { state ->
+            state.copy(isAnimationsLong = condition)
+        }
+        msp.isAnimationsLong = condition
+    }
+
+    fun setStudyQuantityPerDay(quantity: Int){
+        if(quantity in 0..100) {
+            _uiState.update { state ->
+                if(state.studyQuantityPerDay == 0)
+                    state.copy(studyQuantityPerDay = quantity/10)
+                else
+                    state.copy(studyQuantityPerDay = quantity)
+            }
+            msp.studyQuantityPerDay = quantity
         }
     }
 }

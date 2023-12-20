@@ -19,13 +19,12 @@ class TestViewModel(val db: AppDbManager, val msp: MySharedPreferences) : ViewMo
     private val TAG = "TestViewModel"
     private var listId: Int = -1
     private var wordList = ArrayList<Word>()
+    private var resultCounter = 0
     private lateinit var currentWord: Word
     private lateinit var iterator: ListIterator<Word>
 
     private val _uiState = MutableStateFlow(
-        TestUiState(
-            colorScheme = msp.getColorScheme(),
-        )
+        TestUiState()
     )
     val uiState: StateFlow<TestUiState> = _uiState.asStateFlow()
 
@@ -49,6 +48,14 @@ class TestViewModel(val db: AppDbManager, val msp: MySharedPreferences) : ViewMo
         _uiState.update { state ->
             state.copy(
                 isFinishAlertDialogShowing = true,
+            )
+        }
+    }
+
+    fun hideFinishAlertDialog() {
+        _uiState.update { state ->
+            state.copy(
+                isFinishAlertDialogShowing = false,
             )
         }
     }
@@ -99,6 +106,8 @@ class TestViewModel(val db: AppDbManager, val msp: MySharedPreferences) : ViewMo
     // -_- в этих методах различается ровно одна цифра, но логически, это разные случаи
     // Может быть я говнокодер?
     fun goodResultProcessing() {
+        resultCounter += 1
+        Log.d(TAG, "Результат в баллах: $resultCounter")
         currentWord.result = 1
         viewModelScope.launch {
             saveWordResult()
@@ -171,12 +180,10 @@ class TestViewModel(val db: AppDbManager, val msp: MySharedPreferences) : ViewMo
     }
 
     fun getResult(): Double {
-        var sum = 0
-        wordList.forEach {
-            sum += it.result
-        }
-        return (sum / wordList.size).toDouble() * 100
+        return resultCounter.toDouble() / wordList.size * 100
     }
+
+    fun getListId(): Int = listId
 
     fun onExit() {
         showExitAlertDialog()

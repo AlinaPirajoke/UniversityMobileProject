@@ -6,7 +6,6 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -26,6 +25,7 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.material.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -38,15 +38,18 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import com.example.university.R
-import com.example.university.theme.ColorScheme
-import com.example.university.theme.KotobaCustomTheme
 import com.example.university.View.Main.MainScreens
 import com.example.university.ViewModel.TestViewModel
+import com.example.university.theme.Cocon
+import com.example.university.theme.ColorScheme
+import com.example.university.theme.KotobaCustomTheme
 import com.example.university.theme.UXConstants
 import org.koin.androidx.compose.koinViewModel
 
 private const val TAG = "TestView"
 
+// TestInit нужен только для того, чтоб запускать vm.testStart,
+// чтоб когда uiState обновлялся тест не перезапускался
 @SuppressLint("CoroutineCreationDuringComposition")
 @Composable
 fun TestInit(
@@ -54,8 +57,9 @@ fun TestInit(
     listId: Int,
     vm: TestViewModel = koinViewModel(),
 ) {
-    vm.testStart(listId)
-
+    LaunchedEffect(key1 = listId) {
+        vm.testStart(listId)
+    }
     TestScreen(navController = navController, vm = vm)
 }
 
@@ -66,7 +70,7 @@ fun TestScreen(
 ) {
     val uiState by vm.uiState.collectAsState()
     if (uiState.isExitAlertDialogShowing)
-        ShowExitConfirm(
+        ShowExitConfirmAlert(
             onConfirm = {
                 vm.hideExitAlertDialog()
                 Log.i("LoginView", "Перенаправление на главный экран")
@@ -74,11 +78,14 @@ fun TestScreen(
             },
             onReject = vm::hideExitAlertDialog
         )
-    if (uiState.isFinishAlertDialogShowing)
-        ShowFinishConfirm(
-            toRemember = { /*TODO*/ },
+    else if (uiState.isFinishAlertDialogShowing)
+        ShowTestFinishAlert(
+            toRemember = {
+                Log.i(TAG, "Перенаправление на экран повторения")
+                navController.navigate("${MainScreens.Remember.route}/${vm.getListId()}")
+            },
             onReject = {
-                vm.hideExitAlertDialog()
+                vm.hideFinishAlertDialog()
                 Log.i("LoginView", "Перенаправление на главный экран")
                 navController.navigate(MainScreens.Main.route)
             },
@@ -104,9 +111,6 @@ fun TestScreen(
         )
 }
 
-// На этом экране есть две фазы, меняющиеся циклично.
-// Логика в них не очень сложная, так что я решил просто менять из в зависимости от currentStage в uiState
-// Колхоз? Тема?
 @Composable()
 fun TestFirstStageView(
     word: String,
@@ -196,7 +200,8 @@ fun WordBanner(word: String = "", transcr: String = "", transl: String = "") {
                     text = transcr,
                     style = MaterialTheme.typography.subtitle1,
                     textAlign = TextAlign.Center,
-                    color = MaterialTheme.colors.secondaryVariant.copy(alpha = 0.8f)
+                    color = MaterialTheme.colors.secondaryVariant.copy(alpha = 0.8f),
+                    fontFamily = Cocon
                 )
             if (transl.isNotBlank())
             // Перевод
@@ -246,10 +251,10 @@ fun OptionsButtons(
 }
 
 @Composable
-fun ShowExitConfirm(onConfirm: () -> Unit, onReject: () -> Unit) {
+fun ShowExitConfirmAlert(onConfirm: () -> Unit, onReject: () -> Unit) {
     AlertDialog(
         onDismissRequest = onReject,
-        text = { Text("Вы действительно хотите закончить тестирование (его можно будеть продолжить позже)") },
+        text = { Text("Вы действительно хотите закончить тестирование? (его можно будеть продолжить позже)") },
         confirmButton = {
             TextButton(
                 onClick = onConfirm
@@ -268,15 +273,15 @@ fun ShowExitConfirm(onConfirm: () -> Unit, onReject: () -> Unit) {
 }
 
 @Composable
-fun ShowFinishConfirm(
+fun ShowTestFinishAlert(
     toRemember: () -> Unit,
     onReject: () -> Unit,
     result: Double,
     isRememberPresent: Boolean
 ) {
-    var text = "Вы прошли тест с результатом $result%."
+    var text = "${String.format("%.2f", result)}% слов теста вы помните!"
     if (isRememberPresent)
-        text += "\nХотите ли вы ещё раз пройтись по этим словам?"
+        text += "\nХотите ли вы ещё раз повторить слова?"
     AlertDialog(
         onDismissRequest = onReject,
         text = { Text(text = text) },

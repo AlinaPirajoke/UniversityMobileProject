@@ -1,7 +1,5 @@
 package com.example.university.UsefullStuff
 
-import androidx.compose.ui.res.stringArrayResource
-
 class Word(
     val id: Int,
     var word: String,
@@ -9,6 +7,8 @@ class Word(
     val translations: List<String>,
     var lvl: Int,
 ) {
+    var comming: String = ""
+
     var result: Int = 0
         set(value) {
             field = value
@@ -17,6 +17,15 @@ class Word(
                 1 -> lvl = lvl * 2 + 1
             }
         }
+
+    init {
+        if (transcription.isNotBlank()) {
+            transcription = transcription.removeSuffix("]")
+            transcription = transcription.removePrefix("[")
+            transcription = "[ $transcription ]"
+        }
+    }
+
     fun translationsToString(): String{
         /*var string = ""
         val iter = translations.listIterator()

@@ -5,7 +5,6 @@ import android.content.SharedPreferences
 import android.preference.PreferenceManager
 import android.util.Log
 import androidx.compose.material.Colors
-import com.example.university.UsefullStuff.getTodayDate
 import com.example.university.theme.ColorScheme
 
 class MySharedPreferences(context: Context) {
@@ -21,6 +20,7 @@ class MySharedPreferences(context: Context) {
         set(condition: Boolean){
             field = condition
             sp.edit().putBoolean("session", condition).apply()
+            Log.i(TAG, "session: $condition")
         }
 
     var user: Int = 0
@@ -32,17 +32,19 @@ class MySharedPreferences(context: Context) {
         set(id: Int){
             field = id
             sp.edit().putInt("user", id).apply()
+            Log.i(TAG, "user: $id")
         }
 
-    var isPasswordNeeded: Boolean = true
+    var isPasswordNeeded: Boolean = false
         get() {
-            val v = sp.getBoolean("isPasswordNeeded", true)
+            val v = sp.getBoolean("isPasswordNeeded", false)
             Log.i(TAG, "isPasswordNeeded: $v")
             return v
         }
         set(condition: Boolean){
             field = condition
             sp.edit().putBoolean("isPasswordNeeded", condition).apply()
+            Log.i(TAG, "isPasswordNeeded: $condition")
         }
 
     var currentColorSchemeId: Int = 0
@@ -54,6 +56,7 @@ class MySharedPreferences(context: Context) {
         set(id: Int) {
             field = id
             sp.edit().putInt("currentColorSchemeId", id).apply()
+            Log.i(TAG, "currentColorSchemeId: $id")
         }
 
     var studyQuantityPerDay: Int = 999
@@ -62,9 +65,10 @@ class MySharedPreferences(context: Context) {
             Log.i(TAG, "studyQuantityPerDay: $v")
             return v
         }
-        set(count: Int) {
-            field = count
-            sp.edit().putInt("studyQuantityPerDay", count).apply()
+        set(quantity: Int) {
+            field = quantity
+            sp.edit().putInt("studyQuantityPerDay", quantity).apply()
+            Log.i(TAG, "studyQuantityPerDay: $quantity")
         }
 
     var isRememberPresent: Boolean = false
@@ -76,26 +80,65 @@ class MySharedPreferences(context: Context) {
         set(condition: Boolean){
             field = condition
             sp.edit().putBoolean("isRememberPresent", condition).apply()
+            Log.i(TAG, "isRememberPresent: $condition")
         }
 
     var lastOpenedAppDate: String = "1970-01-01"
         get() {
-            val v = sp.getString("lastOpenedAppDate", getTodayDate())
+            val v = sp.getString("lastOpenedAppDate", "1970-01-01")
             Log.i(TAG, "lastOpenedAppDate: $v")
             return v.toString()
         }
         set(date: String){
             field = date
             sp.edit().putString("lastOpenedAppDate", date).apply()
+            Log.i(TAG, "lastOpenedAppDate: $date")
         }
 
+    var todayStudiedQuantity: Int = 999
+        get() {
+            val v = sp.getInt("todayStudiedQuantity", 0)
+            Log.i(TAG, "todayStudiedQuantity: $v")
+            return v
+        }
+        set(quantity: Int) {
+            field = quantity
+            sp.edit().putInt("todayStudiedQuantity", quantity).apply()
+            Log.i(TAG, "todayStudiedQuantity: $quantity")
+        }
+
+    var firstAppAccessDate: String = ""
+        get() {
+            val v = sp.getString("firstAppAccessDate", "")
+            Log.i(TAG, "firstAppAccessDate: $v")
+            return v.toString()
+        }
+        set(date: String){
+            field = date
+            sp.edit().putString("firstAppAccessDate", date).apply()
+            Log.i(TAG, "firstAppAccessDate: $date")
+        }
+
+    var isAnimationsLong: Boolean = false
+        get() {
+            val v = sp.getBoolean("isAnimationsLong", false)
+            Log.i(TAG, "isAnimationsLong: $v")
+            return v
+        }
+        set(condition: Boolean){
+            field = condition
+            sp.edit().putBoolean("isAnimationsLong", condition).apply()
+            Log.i(TAG, "isAnimationsLong: $condition")
+        }
 
     fun getColorScheme(): Colors {
         val v = sp.getInt("currentColorSchemeId", 0)
         Log.i(TAG, "currentColorSchemeId: $v")
+//        return ColorScheme.values()[v].colors
         return when (v) {
             0 -> ColorScheme.PH.colors
             1 -> ColorScheme.pink.colors
+            2 -> ColorScheme.mint.colors
             else -> ColorScheme.PH.colors
         }
     }
