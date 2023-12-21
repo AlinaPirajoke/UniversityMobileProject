@@ -3,8 +3,8 @@ package com.example.university.viewModel
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.university.model.appDB.AppDbManager
 import com.example.university.model.MySharedPreferences
+import com.example.university.model.appDB.AppDbManager
 import com.example.university.usefullStuff.Word
 import com.example.university.viewModel.states.TestUiState
 import kotlinx.coroutines.Dispatchers
@@ -66,8 +66,17 @@ class TestViewModel(val db: AppDbManager, val msp: MySharedPreferences) : ViewMo
                 listId = pickedListId
                 wordList = db.getWordsFromList(listId)
                 iterator = wordList.listIterator()
+                setTotalWords()
                 nextWord()
             }
+        }
+    }
+
+    fun setTotalWords(){
+        _uiState.update { state ->
+            state.copy(
+                totalWords = wordList.size
+            )
         }
     }
 
@@ -82,6 +91,7 @@ class TestViewModel(val db: AppDbManager, val msp: MySharedPreferences) : ViewMo
             return
         }
 
+        updateWordIndex()
         currentWord = iterator.next()
         Log.d(TAG, "Следующее слово: ${currentWord.word}")
         cleanAllLabels()
@@ -184,6 +194,14 @@ class TestViewModel(val db: AppDbManager, val msp: MySharedPreferences) : ViewMo
     }
 
     fun getListId(): Int = listId
+
+    fun updateWordIndex(){
+        _uiState.update { state ->
+            state.copy(
+                wordIndex = iterator.nextIndex() + 1
+            )
+        }
+    }
 
     fun onExit() {
         showExitAlertDialog()

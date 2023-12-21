@@ -13,11 +13,12 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.navigation.NavHostController
 import com.example.university.R
+import com.example.university.theme.UXConstants
 import com.example.university.view.main.MainScreens
 import com.example.university.viewModel.RememberViewModel
-import com.example.university.theme.UXConstants
 import org.koin.androidx.compose.koinViewModel
 
 private const val TAG = "RememberView"
@@ -61,17 +62,21 @@ fun RememberScreen(
         isShowTranscriptionPresent = true,
         onShowTranscription = vm::showKana,
         onGoingToExit = vm::onExit,
-        buttonText = "Продолжить"
+        buttonText = "Продолжить",
+        totalWords = uiState.totalWords,
+        wordIndex = uiState.wordIndex
     )
     else if (uiState.currentStage == 2) RememberViewSkeleton(
         word = uiState.currentWord.word,
         transcr = uiState.currentWord.transcription,
         transl = uiState.currentWord.translationsToString(),
-        onGoingToNext = if(uiState.isItLastWord) vm::testFinish else vm::toFirstStage,
+        onGoingToNext = if (uiState.isItLastWord) vm::testFinish else vm::toFirstStage,
         isShowTranscriptionPresent = false,
         onShowTranscription = { },
         onGoingToExit = vm::onExit,
-        buttonText = if(uiState.isItLastWord) "Закончить" else "Следующее слово"
+        buttonText = if (uiState.isItLastWord) "Закончить" else "Следующее слово",
+        totalWords = uiState.totalWords,
+        wordIndex = uiState.wordIndex
     )
 }
 
@@ -84,7 +89,9 @@ fun RememberViewSkeleton(
     isShowTranscriptionPresent: Boolean,
     onShowTranscription: () -> Unit,
     onGoingToNext: () -> Unit,
-    onGoingToExit: () -> Unit
+    onGoingToExit: () -> Unit,
+    wordIndex: Int,
+    totalWords: Int
 ) {
     Column(
         Modifier
@@ -92,7 +99,13 @@ fun RememberViewSkeleton(
             .padding(UXConstants.HORIZONTAL_PADDING, UXConstants.VERTICAL_PADDING),
         verticalArrangement = Arrangement.SpaceBetween,
     ) {
-        WordBanner(word = word, transcr = transcr, transl = transl)
+        WordBanner(
+            word = word,
+            transcr = transcr,
+            transl = transl,
+            index = wordIndex,
+            total = totalWords
+        )
         if (isShowTranscriptionPresent) OptionsButtons(
             onExitButtonAction = onGoingToExit,
             secondButtonLabel = "Показать транскрипцию",
@@ -122,7 +135,7 @@ fun ShowRememberFinishAlert(
             TextButton(
                 onClick = onConfirm
             ) {
-                Text("Выйти")
+                Text(stringResource(id = R.string.exit))
             }
         },
     )

@@ -336,7 +336,7 @@ class AppDbManager(val context: Context, val msp: MySharedPreferences, val dbHel
         )
         Log.i(
             TAG,
-            "Резильтат слова ${word.word} записан как ${AppDbNames.L_RESULT} = ${word.result}, ${AppDbNames.L_IS_FINISHED} = 1"
+            "Результат слова ${word.word} записан как ${AppDbNames.L_RESULT} = ${word.result}, ${AppDbNames.L_IS_FINISHED} = 1"
         )
         updateWordDate(word)
     }
@@ -416,5 +416,21 @@ class AppDbManager(val context: Context, val msp: MySharedPreferences, val dbHel
 
     fun deleteWord(id: Int) {
         db?.execSQL("DELETE FROM ${AppDbNames.WORD} WHERE ${AppDbNames.W_ID} = $id")
+    }
+
+    fun editWord(modifiedWordId: Int, wordValue: String, transcrValue: String, translValues: List<String>) {
+        db?.execSQL(
+            "UPDATE ${AppDbNames.WORD} SET ${AppDbNames.W_WORD} = $wordValue, ${AppDbNames.W_SOUND} = $transcrValue WHERE ${AppDbNames.W_ID} = $modifiedWordId"
+        )
+        editTranslation(modifiedWordId, translValues)
+        Log.i(TAG, "Слово изменено")
+    }
+
+    fun editTranslation(wordId: Int, translValues: List<String>) {
+        db?.execSQL(
+            "DELETE FROM ${AppDbNames.TRANSLATION} WHERE ${AppDbNames.T_WORD} = $wordId"
+        )
+        addNewTranslations(wordId, translValues)
+        Log.i(TAG, "Переводы добавленны")
     }
 }

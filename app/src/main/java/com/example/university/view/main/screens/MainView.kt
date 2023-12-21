@@ -28,14 +28,17 @@ import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import com.example.university.R
+import com.example.university.theme.ColorScheme
+import com.example.university.theme.KotobaCustomTheme
+import com.example.university.theme.UXConstants
 import com.example.university.usefullStuff.getTodayDate
 import com.example.university.view.main.MainScreens
 import com.example.university.viewModel.MainViewModel
-import com.example.university.theme.UXConstants
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
 
@@ -171,13 +174,15 @@ fun StatisticBlock(
                     Modifier
                         .fillMaxWidth()
                         .padding(top = 3.dp)
-                        .alpha(0.8f))
+                        .alpha(0.8f)
+                )
                 StatisticLine(text = "Слов изучается", value = learning)
                 Divider(
                     Modifier
                         .fillMaxWidth()
                         .padding(top = 3.dp)
-                        .alpha(0.8f))
+                        .alpha(0.8f)
+                )
                 StatisticLine(text = "Среднее изучаемое в день", value = average)
             }
         }
@@ -255,18 +260,29 @@ fun OtherBlock(
                 .padding(UXConstants.HORIZONTAL_PADDING, 20.dp),
             verticalArrangement = Arrangement.spacedBy(15.dp),
         ) {
-            /*Row(
-                Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(15.dp),) {}*/
-            ImgCard(imgId = R.drawable.setings, descr = "Настройки", onGoingToSettings)
+//            Row(
+//                Modifier.fillMaxWidth().height(100.dp),
+//                horizontalArrangement = Arrangement.spacedBy(UXConstants.HORIZONTAL_PADDING),
+//            ) {
+//                Column(Modifier.fillMaxWidth(1f).weight(1f)) {
+            ImgCard(
+                imgId = R.drawable.dictionary, descr = "Мой словарь", onGoingToDictionary
+            )
+//                }
+//                Column(Modifier.fillMaxWidth(1f).weight(1f)) {
+            ImgCard(
+                imgId = R.drawable.settings_rounded, descr = "Настройки", onGoingToSettings
+            )
+//                }
+//            }
             ImgCard(imgId = R.drawable.add, descr = "Добавить слово", onGoingToAddNew)
+            ImgCard(imgId = R.drawable.library, descr = "Библиотека слов", onGoingToLibrary)
             if (canLogout)
                 ImgCard(imgId = R.drawable.logout, descr = "Разлогиниться", onGoingToLogin)
-            ImgCard(imgId = R.drawable.dictionary, descr = "Мой словарь", onGoingToDictionary)
-            ImgCard(imgId = R.drawable.library, descr = "Стандартная библиотека", onGoingToLibrary)
         }
     }
 }
+
 
 @Composable
 fun StatisticLine(text: String, value: Int) {
@@ -323,12 +339,6 @@ fun ImgCard(imgId: Int, descr: String, action: () -> Unit) {
             Column(
                 Modifier.fillMaxSize(), verticalArrangement = Arrangement.SpaceBetween
             ) {
-
-                /*Image(
-                    painter = painterResource(id = imgId),
-                    contentDescription = descr,
-                    modifier = Modifier.size(40.dp),
-                )*/
                 Icon(
                     modifier = Modifier.size(30.dp),
                     imageVector = ImageVector.vectorResource(imgId),
@@ -346,5 +356,27 @@ fun ImgCard(imgId: Int, descr: String, action: () -> Unit) {
                 )
             }
         }
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun MainPreview() {
+    KotobaCustomTheme(colorScheme = ColorScheme.pink.colors) {
+        MainView(
+            statLearned = 4,
+            statLearning = 5,
+            statAverage = "1.4",
+            todayTest = 6,
+            todayLearn = 6,
+            toPickQuantity = { /*TODO*/ },
+            toPickWords = { /*TODO*/ },
+            toAddNew = { /*TODO*/ },
+            toLogin = { /*TODO*/ },
+            toSettings = { /*TODO*/ },
+            toAnotherDates = { /*TODO*/ },
+            toUserWords = { /*TODO*/ },
+            canLogout = true
+        )
     }
 }

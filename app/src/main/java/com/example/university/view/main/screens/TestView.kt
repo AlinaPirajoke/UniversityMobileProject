@@ -31,6 +31,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
@@ -38,12 +39,12 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import com.example.university.R
-import com.example.university.view.main.MainScreens
-import com.example.university.viewModel.TestViewModel
 import com.example.university.theme.Cocon
 import com.example.university.theme.ColorScheme
 import com.example.university.theme.KotobaCustomTheme
 import com.example.university.theme.UXConstants
+import com.example.university.view.main.MainScreens
+import com.example.university.viewModel.TestViewModel
 import org.koin.androidx.compose.koinViewModel
 
 private const val TAG = "TestView"
@@ -69,46 +70,41 @@ fun TestScreen(
     vm: TestViewModel,
 ) {
     val uiState by vm.uiState.collectAsState()
-    if (uiState.isExitAlertDialogShowing)
-        ShowExitConfirmAlert(
-            onConfirm = {
-                vm.hideExitAlertDialog()
-                Log.i("LoginView", "Перенаправление на главный экран")
-                navController.navigate(MainScreens.Main.route)
-            },
-            onReject = vm::hideExitAlertDialog
-        )
-    else if (uiState.isFinishAlertDialogShowing)
-        ShowTestFinishAlert(
-            toRemember = {
-                Log.i(TAG, "Перенаправление на экран повторения")
-                navController.navigate("${MainScreens.Remember.route}/${vm.getListId()}")
-            },
-            onReject = {
-                vm.hideFinishAlertDialog()
-                Log.i("LoginView", "Перенаправление на главный экран")
-                navController.navigate(MainScreens.Main.route)
-            },
-            result = vm.getResult(),
-            isRememberPresent = vm.msp.isRememberPresent
-        )
-    if (uiState.currentStage == 1)
-        TestFirstStageView(
-            word = uiState.wordLabel,
-            transcr = uiState.transcrLabel,
-            onNext = { vm.toSecondStage() },
-            onShowTranscription = { vm.showKana() },
-            onExit = vm::onExit,
-        )
-    else if (uiState.currentStage == 2)
-        TestSecondStageView(
-            word = uiState.wordLabel,
-            transcr = uiState.transcrLabel,
-            transl = uiState.translLabel,
-            onGood = { vm.goodResultProcessing() },
-            onBad = { vm.badResultProcessing() },
-            onExit = vm::onExit,
-        )
+    if (uiState.isExitAlertDialogShowing) ShowExitConfirmAlert(
+        onConfirm = {
+            vm.hideExitAlertDialog()
+            Log.i("LoginView", "Перенаправление на главный экран")
+            navController.navigate(MainScreens.Main.route)
+        }, onReject = vm::hideExitAlertDialog
+    )
+    else if (uiState.isFinishAlertDialogShowing) ShowTestFinishAlert(toRemember = {
+        Log.i(TAG, "Перенаправление на экран повторения")
+        navController.navigate("${MainScreens.Remember.route}/${vm.getListId()}")
+    }, onReject = {
+        vm.hideFinishAlertDialog()
+        Log.i("LoginView", "Перенаправление на главный экран")
+        navController.navigate(MainScreens.Main.route)
+    }, result = vm.getResult(), isRememberPresent = vm.msp.isRememberPresent
+    )
+    if (uiState.currentStage == 1) TestFirstStageView(
+        word = uiState.wordLabel,
+        transcr = uiState.transcrLabel,
+        onNext = { vm.toSecondStage() },
+        onShowTranscription = { vm.showKana() },
+        onExit = vm::onExit,
+        totalWords = uiState.totalWords,
+        wordIndex = uiState.wordIndex
+    )
+    else if (uiState.currentStage == 2) TestSecondStageView(
+        word = uiState.wordLabel,
+        transcr = uiState.transcrLabel,
+        transl = uiState.translLabel,
+        onGood = { vm.goodResultProcessing() },
+        onBad = { vm.badResultProcessing() },
+        onExit = vm::onExit,
+        totalWords = uiState.totalWords,
+        wordIndex = uiState.wordIndex
+    )
 }
 
 @Composable()
@@ -118,6 +114,8 @@ fun TestFirstStageView(
     onNext: () -> Unit,
     onShowTranscription: () -> Unit,
     onExit: () -> Unit,
+    wordIndex: Int,
+    totalWords: Int
 ) {
     Column(
         Modifier
@@ -126,7 +124,9 @@ fun TestFirstStageView(
         verticalArrangement = Arrangement.SpaceBetween,
     ) {
 
-        WordBanner(word = word, transcr = transcr)
+        WordBanner(
+            word = word, transcr = transcr, index = wordIndex, total = totalWords
+        )
         OptionsButtons(
             onExitButtonAction = onExit,
             secondButtonLabel = "Показать транскрипцию",
@@ -148,6 +148,8 @@ fun TestSecondStageView(
     onGood: () -> Unit,
     onBad: () -> Unit,
     onExit: () -> Unit,
+    wordIndex: Int,
+    totalWords: Int
 ) {
 
     Column(
@@ -157,7 +159,9 @@ fun TestSecondStageView(
         verticalArrangement = Arrangement.SpaceBetween,
     ) {
 
-        WordBanner(word = word, transcr = transcr, transl = transl)
+        WordBanner(
+            word = word, transcr = transcr, transl = transl, index = wordIndex, total = totalWords
+        )
         OptionsButtons(
             onExitButtonAction = onExit,
         )
@@ -173,7 +177,9 @@ fun TestSecondStageView(
 }
 
 @Composable
-fun WordBanner(word: String = "", transcr: String = "", transl: String = "") {
+fun WordBanner(
+    word: String = "", transcr: String = "", transl: String = "", index: Int, total: Int
+) {
     Card(
         Modifier
             .fillMaxWidth()
@@ -181,6 +187,12 @@ fun WordBanner(word: String = "", transcr: String = "", transl: String = "") {
         elevation = UXConstants.ELEVATION,
         shape = MaterialTheme.shapes.medium
     ) {
+        Text(
+            text = "$index / $total",
+            Modifier.padding(horizontal = 10.dp, vertical = 5.dp),
+            color = MaterialTheme.colors.secondaryVariant.copy(alpha = 0.7f),
+            fontFamily = Cocon,
+        )
         Column(
             Modifier
                 .fillMaxWidth()
@@ -198,9 +210,9 @@ fun WordBanner(word: String = "", transcr: String = "", transl: String = "") {
             // Транскрипция
                 Text(
                     text = transcr,
-                    style = MaterialTheme.typography.subtitle1,
+                    style = MaterialTheme.typography.body1,
                     textAlign = TextAlign.Center,
-                    color = MaterialTheme.colors.secondaryVariant.copy(alpha = 0.8f),
+                    color = MaterialTheme.colors.secondaryVariant.copy(alpha = 0.7f),
                     fontFamily = Cocon
                 )
             if (transl.isNotBlank())
@@ -235,25 +247,23 @@ fun OptionsButtons(
                 contentColor = MaterialTheme.colors.primary
             )
         ) {
-            Text(text = "Выход")
+            Text(text = stringResource(id = R.string.exit))
         }
-        if (secondButtonLabel.isNotBlank())
-            Button(
-                onClick = secondButtonAction,
-                Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 50.dp)
-                    .height(50.dp),
-            ) {
-                Text(text = secondButtonLabel)
-            }
+        if (secondButtonLabel.isNotBlank()) Button(
+            onClick = secondButtonAction,
+            Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 50.dp)
+                .height(50.dp),
+        ) {
+            Text(text = secondButtonLabel)
+        }
     }
 }
 
 @Composable
 fun ShowExitConfirmAlert(onConfirm: () -> Unit, onReject: () -> Unit) {
-    AlertDialog(
-        onDismissRequest = onReject,
+    AlertDialog(onDismissRequest = onReject,
         text = { Text("Вы действительно хотите закончить тестирование? (его можно будеть продолжить позже)") },
         confirmButton = {
             TextButton(
@@ -268,39 +278,28 @@ fun ShowExitConfirmAlert(onConfirm: () -> Unit, onReject: () -> Unit) {
             ) {
                 Text("Остаться")
             }
-        }
-    )
+        })
 }
 
 @Composable
 fun ShowTestFinishAlert(
-    toRemember: () -> Unit,
-    onReject: () -> Unit,
-    result: Double,
-    isRememberPresent: Boolean
+    toRemember: () -> Unit, onReject: () -> Unit, result: Double, isRememberPresent: Boolean
 ) {
     var text = "${String.format("%.2f", result)}% слов теста вы помните!"
-    if (isRememberPresent)
-        text += "\nХотите ли вы ещё раз повторить слова?"
-    AlertDialog(
-        onDismissRequest = onReject,
-        text = { Text(text = text) },
-        confirmButton = {
-            TextButton(
-                onClick = onReject
-            ) {
-                Text("Выйти")
-            }
-        },
-        dismissButton = {
-            if (isRememberPresent)
-                TextButton(
-                    onClick = toRemember
-                ) {
-                    Text("Остаться")
-                }
+    if (isRememberPresent) text += "\nХотите ли вы ещё раз повторить слова?"
+    AlertDialog(onDismissRequest = onReject, text = { Text(text = text) }, confirmButton = {
+        TextButton(
+            onClick = onReject
+        ) {
+            Text("Выйти")
         }
-    )
+    }, dismissButton = {
+        if (isRememberPresent) TextButton(
+            onClick = toRemember
+        ) {
+            Text("Остаться")
+        }
+    })
 }
 
 @Composable
@@ -318,15 +317,15 @@ fun BottomGrid(content: LazyGridScope.() -> Unit) {
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun ImgTile(imgId: Int, descr: String, action: () -> Unit) {
-    Card(
-        shape = MaterialTheme.shapes.small,
+    Card(shape = MaterialTheme.shapes.small,
         elevation = UXConstants.ELEVATION - 1.dp,
         onClick = { action() }) {
 
         Box(Modifier.padding(20.dp)) {
 
             Column(
-                Modifier.fillMaxSize(), verticalArrangement = Arrangement.Center,
+                Modifier.fillMaxSize(),
+                verticalArrangement = Arrangement.Center,
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Icon(
@@ -338,8 +337,7 @@ fun ImgTile(imgId: Int, descr: String, action: () -> Unit) {
 
                 Text(
                     text = descr,
-                    Modifier
-                        .padding(top = 5.dp, bottom = 0.dp),
+                    Modifier.padding(top = 5.dp, bottom = 0.dp),
                     fontSize = 20.sp,
                     color = MaterialTheme.colors.secondaryVariant
                 )
@@ -352,12 +350,15 @@ fun ImgTile(imgId: Int, descr: String, action: () -> Unit) {
 @Composable
 fun FirstStagePreview() {
     KotobaCustomTheme(colorScheme = ColorScheme.pink.colors) {
-        TestFirstStageView(
-            word = "sample",
+        TestFirstStageView(word = "sample",
             transcr = "sample",
             onNext = { },
             onExit = { },
-            onShowTranscription = { })
+            onShowTranscription = { },
+            totalWords = 9,
+            wordIndex = 3
+        )
+
     }
 }
 
@@ -372,6 +373,8 @@ fun SecondStagePreview() {
             onExit = { },
             onBad = { },
             onGood = { },
+            totalWords = 26,
+            wordIndex = 26
         )
     }
 }

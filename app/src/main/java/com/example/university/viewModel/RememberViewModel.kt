@@ -3,8 +3,8 @@ package com.example.university.viewModel
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.university.model.appDB.AppDbManager
 import com.example.university.model.MySharedPreferences
+import com.example.university.model.appDB.AppDbManager
 import com.example.university.usefullStuff.Word
 import com.example.university.viewModel.states.RememberUiState
 import kotlinx.coroutines.Dispatchers
@@ -26,6 +26,22 @@ class RememberViewModel(val db: AppDbManager, val msp: MySharedPreferences) : Vi
         RememberUiState()
     )
     val uiState: StateFlow<RememberUiState> = _uiState.asStateFlow()
+
+    fun updateWordIndex(){
+        _uiState.update { state ->
+            state.copy(
+                wordIndex = iterator.nextIndex() + 1
+            )
+        }
+    }
+
+    fun setTotalWords(){
+        _uiState.update { state ->
+            state.copy(
+                totalWords = wordList.size
+            )
+        }
+    }
 
     fun showExitAlertDialog() {
         _uiState.update { state ->
@@ -65,6 +81,7 @@ class RememberViewModel(val db: AppDbManager, val msp: MySharedPreferences) : Vi
                 listId = pickedListId
                 wordList = db.getWordsFromList(listId)
                 iterator = wordList.listIterator()
+                setTotalWords()
                 toFirstStage()
             }
         }
@@ -82,6 +99,7 @@ class RememberViewModel(val db: AppDbManager, val msp: MySharedPreferences) : Vi
         }
 
         showTranscrLabel(false)
+        updateWordIndex()
         currentWord = iterator.next()
         setCurrentWord()
         Log.d(TAG, "Следующее слово: ${currentWord.word}")

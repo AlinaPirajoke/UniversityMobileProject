@@ -7,4 +7,6 @@ data class TestUiState(
     val currentStage: Int = 1,
     val isExitAlertDialogShowing: Boolean = false,
     val isFinishAlertDialogShowing: Boolean = false,
+    val wordIndex: Int = 1,
+    val totalWords: Int = 1
 )

@@ -30,11 +30,11 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import com.example.university.R
-import com.example.university.view.main.MainScreens
-import com.example.university.viewModel.PickQuantityViewModel
 import com.example.university.theme.ColorScheme
 import com.example.university.theme.KotobaCustomTheme
 import com.example.university.theme.UXConstants
+import com.example.university.view.main.MainScreens
+import com.example.university.viewModel.PickQuantityViewModel
 import org.koin.androidx.compose.koinViewModel
 
 private const val TAG = "PickQuantityView"
@@ -150,18 +150,21 @@ fun PickQuantityView(
                             text = "Выбрать 5",
                             Modifier.clickable { onValueChange(5f) },
                             color = MaterialTheme.colors.onPrimary,
+                            fontWeight = FontWeight.W600,
                             fontSize = 20.sp,
                         )
                         Text(
                             text = "Выбрать 15",
-                            Modifier.clickable { onValueChange(10f) },
+                            Modifier.clickable { onValueChange(15f) },
                             color = MaterialTheme.colors.onPrimary,
+                            fontWeight = FontWeight.W600,
                             fontSize = 20.sp
                         )
                         Text(
                             text = "Выбрать всё",
                             Modifier.clickable { onValueChange(1000f) },
                             color = MaterialTheme.colors.onPrimary,
+                            fontWeight = FontWeight.W600,
                             fontSize = 20.sp
                         )
                     }
@@ -227,7 +230,7 @@ fun PickQuantityView(
         Row(
             Modifier
                 .fillMaxWidth()
-                .padding(bottom = 20.dp),
+                .padding(bottom = UXConstants.VERTICAL_PADDING.times(1.5f)),
         ) {
             Button(
                 onClick = onGoingToMain,

@@ -9,4 +9,6 @@ data class RememberUiState(
     val isExitAlertDialogShowing: Boolean = false,
     val isFinishAlertDialogShowing: Boolean = false,
     val isItLastWord: Boolean = false,
+    val wordIndex: Int = 1,
+    val totalWords: Int = 1
 )

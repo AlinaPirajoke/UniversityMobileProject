@@ -42,8 +42,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.example.university.R
-import com.example.university.view.main.MainScreens
-import com.example.university.viewModel.SettingsViewModel
 import com.example.university.theme.Cocon
 import com.example.university.theme.ColorScheme
 import com.example.university.theme.KotobaCustomTheme
@@ -51,6 +49,8 @@ import com.example.university.theme.PH
 import com.example.university.theme.UXConstants
 import com.example.university.theme.mint
 import com.example.university.theme.pink
+import com.example.university.view.main.MainScreens
+import com.example.university.viewModel.SettingsViewModel
 import org.koin.androidx.compose.koinViewModel
 
 private val TAG = "SettingsView"
@@ -235,9 +235,9 @@ fun SettingsView(
         Button(
             onClick = onGoingToMain,
             modifier = Modifier
+                .padding(vertical = UXConstants.VERTICAL_PADDING/2, horizontal = UXConstants.VERTICAL_PADDING)
                 .fillMaxWidth()
-                .height(50.dp)
-                .padding(bottom = UXConstants.VERTICAL_PADDING),
+                .height(50.dp),
             colors = ButtonDefaults.buttonColors(
                 backgroundColor = MaterialTheme.colors.primary,
                 contentColor = MaterialTheme.colors.onPrimary

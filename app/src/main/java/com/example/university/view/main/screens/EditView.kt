@@ -1,3 +1,4 @@
+/*
 package com.example.university.view.main.screens
 
 import android.util.Log
@@ -38,14 +39,24 @@ import com.example.university.theme.KotobaCustomTheme
 import com.example.university.theme.UXConstants
 import com.example.university.view.main.MainScreens
 import com.example.university.viewModel.AddViewModel
+import com.example.university.viewModel.EditViewModel
 import org.koin.androidx.compose.koinViewModel
 
 private val TAG = "AddView"
 
 @Composable
-fun AddScreen(
+fun EditInit(
     navController: NavHostController,
-    vm: AddViewModel = koinViewModel()
+    vm: EditViewModel = koinViewModel(),
+    wordId: Int,
+) {
+    vm.modifiedWordId = wordId
+}
+
+@Composable
+fun EditScreen(
+    navController: NavHostController,
+    vm: EditViewModel = koinViewModel()
 ) {
     val uiState by vm.uiState.collectAsState()
     if (uiState.isGoingToMain) {
@@ -54,7 +65,7 @@ fun AddScreen(
         navController.navigate(MainScreens.Main.route)
     }
 
-    AddView(
+    EditView(
         word = uiState.wordValue,
         onWordChanged = vm::editWordValue,
         transcription = uiState.transcrValue,
@@ -87,7 +98,7 @@ fun AddScreen(
 
 @OptIn(ExperimentalComposeUiApi::class, ExperimentalMaterialApi::class)
 @Composable
-fun AddView(
+fun EditView(
     word: String,
     onWordChanged: (String) -> Unit,
     transcription: String,
@@ -277,7 +288,11 @@ fun AddView(
         Button(
             onClick = {
                 onGoingToMain()
-            }, modifier = Modifier.fillMaxWidth().padding(top = 10.dp), colors = ButtonDefaults.buttonColors(
+            },
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(top = 10.dp),
+            colors = ButtonDefaults.buttonColors(
                 backgroundColor = MaterialTheme.colors.onPrimary,
                 contentColor = MaterialTheme.colors.primary
             )
@@ -296,9 +311,9 @@ fun AddView(
 
 @Preview(showBackground = true)
 @Composable
-fun AddViewPreview() {
+fun EditViewPreview() {
     KotobaCustomTheme(colorScheme = ColorScheme.pink.colors) {
-        AddView(
+        EditView(
             word = "Example",
             onWordChanged = { },
             transcription = "Example",
@@ -320,4 +335,4 @@ fun AddViewPreview() {
             onGoingToPickWord = {}
         )
     }
-}
+}*/
