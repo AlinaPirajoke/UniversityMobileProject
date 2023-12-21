@@ -6,8 +6,6 @@ plugins {
     id("org.jetbrains.kotlin.android")
     id("kotlin-kapt")
     id("org.jetbrains.kotlin.plugin.serialization") version "1.8.10"
-    //id("com.google.devtools.ksp")
-    //id ("com.google.dagger.hilt.android")
 }
 
 android {
@@ -22,7 +20,6 @@ android {
         versionName = "1.1 Ferris"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
-
     }
 
     buildTypes {
@@ -48,10 +45,6 @@ android {
 
     composeOptions {
         kotlinCompilerExtensionVersion = "1.4.8"
-    }
-
-    defaultConfig {
-        buildConfigField("String", "Y_TRANS_API_KEY", "Api-Key AQVN3ks68mmMXJtkP6JL8trXKqDgYpNOfWeJ9K7Q")
     }
 }
 
@@ -111,3 +104,4 @@ dependencies {
     androidTestImplementation("androidx.test.ext:junit:1.1.5")
     androidTestImplementation("androidx.test.espresso:espresso-core:3.5.1")
 }
+

@@ -14,10 +14,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.toArgb
 import androidx.navigation.compose.rememberNavController
 import com.example.university.model.MySharedPreferences
+import com.example.university.theme.KotobaCustomTheme
 import com.example.university.usefullStuff.showToast
 import com.example.university.view.auth.AuthActivity
 import com.example.university.viewModel.MainActivityViewModel
-import com.example.university.theme.KotobaCustomTheme
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class MainActivity : AppCompatActivity() {
@@ -28,7 +28,6 @@ class MainActivity : AppCompatActivity() {
         Log.d(TAG, "Инициализация...")
         checkIsThisFirstAcces()
         super.onCreate(savedInstanceState)
-
         setContent {
             val uiState by vm.uiState.collectAsState()
             if (uiState.isGoingToLogin) this.toLogin()

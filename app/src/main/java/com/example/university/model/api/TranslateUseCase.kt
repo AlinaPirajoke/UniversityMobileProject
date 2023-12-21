@@ -1,16 +1,15 @@
 package com.example.university.model.api
 
-import android.provider.Settings.Global.getString
-import com.example.university.model.api.translation.TranslationResponse
+import android.content.Context
+import com.example.university.R
 import com.example.university.model.api.translation.TranslationRequest
+import com.example.university.model.api.translation.TranslationResponse
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
-import org.koin.androidx.compose.inject
-import org.koin.java.KoinJavaComponent.inject
 
-class TranslateUseCase {
+class TranslateUseCase(context: Context) {
 //    val Y_TRANS_API_KEY = "Api-Key AQVN3ks68mmMXJtkP6JL8trXKqDgYpNOfWeJ9K7Q"
-    val Y_TRANS_API_KEY = BuildConfig.Y_TRANS_API_KEY
+    val Y_TRANS_API_KEY = context.applicationContext.resources.getString(R.string.Y_TRANS_API_KEY)
     val Y_TRANS_API_BASE_URL = "https://translate.api.cloud.yandex.net"
     val retrofitAdapter = RetrofitAdapter(getClient(), Y_TRANS_API_BASE_URL)
     val yApi = YandexApiService.invoke(retrofitAdapter)

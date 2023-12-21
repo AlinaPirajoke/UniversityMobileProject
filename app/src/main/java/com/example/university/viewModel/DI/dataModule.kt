@@ -1,8 +1,9 @@
 package com.example.university.viewModel.DI
 
-import com.example.university.model.appDB.AppDbManager
 import com.example.university.model.MySharedPreferences
+import com.example.university.model.api.TranslateUseCase
 import com.example.university.model.appDB.AppDbHelper
+import com.example.university.model.appDB.AppDbManager
 import com.example.university.model.wordsDB.WordsDbHelper
 import com.example.university.model.wordsDB.WordsDbManager
 import com.example.university.viewModel.AddViewModel
@@ -17,8 +18,6 @@ import com.example.university.viewModel.RememberViewModel
 import com.example.university.viewModel.SettingsViewModel
 import com.example.university.viewModel.TestViewModel
 import com.example.university.viewModel.UserWordsViewModel
-import okhttp3.OkHttpClient
-import okhttp3.logging.HttpLoggingInterceptor
 import org.koin.androidx.viewmodel.dsl.viewModel
 import org.koin.core.module.Module
 import org.koin.dsl.module
@@ -44,13 +43,8 @@ private fun Module.data() {
     single<WordsDbManager> {
         WordsDbManager(context = get(), dbHelper = get())
     }
-    single<OkHttpClient>{
-        val interceptor = HttpLoggingInterceptor()
-        interceptor.level = HttpLoggingInterceptor.Level.BODY
-        val client = OkHttpClient.Builder()
-            .addInterceptor(interceptor)
-            .build()
-        return@single client
+    single<TranslateUseCase>{
+        TranslateUseCase(context = get())
     }
 }
 
@@ -77,7 +71,8 @@ private fun Module.presentation() {
     viewModel<AddViewModel> {
         AddViewModel(
             db = get(),
-            msp = get()
+            msp = get(),
+            translator = get()
         )
     }
     viewModel<LoginViewModel> {

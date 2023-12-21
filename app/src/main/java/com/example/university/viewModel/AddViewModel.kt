@@ -4,9 +4,9 @@ import android.util.Log
 import androidx.core.text.isDigitsOnly
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.university.model.MySharedPreferences
 import com.example.university.model.api.TranslateUseCase
 import com.example.university.model.appDB.AppDbManager
-import com.example.university.model.MySharedPreferences
 import com.example.university.viewModel.states.AddUiState
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -16,9 +16,8 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
-class AddViewModel(val db: AppDbManager, val msp: MySharedPreferences) : ViewModel() {
+class AddViewModel(val db: AppDbManager, val msp: MySharedPreferences, val translator: TranslateUseCase) : ViewModel() {
     val TAG = "LoginViewModel"
-    val translator = TranslateUseCase()
 
     private val _uiState = MutableStateFlow(AddUiState(colorScheme = msp.getColorScheme()))
     val uiState: StateFlow<AddUiState> = _uiState.asStateFlow()
