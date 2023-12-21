@@ -1,7 +1,7 @@
 <resources>
     <string name="app_name">kotoba</string>
 
-    <string name="exit">Выход</string>
+    <string name="exit">Выйти</string>
     <string name="add">Добавить</string>
     <string name="confirm">Подтвердить</string>
     <string name="delete">Удалить</string>

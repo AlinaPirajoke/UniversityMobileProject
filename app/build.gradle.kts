@@ -49,6 +49,10 @@ android {
     composeOptions {
         kotlinCompilerExtensionVersion = "1.4.8"
     }
+
+    defaultConfig {
+        buildConfigField("String", "Y_TRANS_API_KEY", "Api-Key AQVN3ks68mmMXJtkP6JL8trXKqDgYpNOfWeJ9K7Q")
+    }
 }
 
 dependencies {
