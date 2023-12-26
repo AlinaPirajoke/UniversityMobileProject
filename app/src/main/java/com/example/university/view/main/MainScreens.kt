@@ -10,4 +10,5 @@ sealed class MainScreens(val route: String) {
     object FutureTests : MainScreens("future_tests_screen")
     object UserWords : MainScreens("user_words_screen")
     object Remember : MainScreens("remember_screen")
+    object Edit : MainScreens("edit_screen")
 }

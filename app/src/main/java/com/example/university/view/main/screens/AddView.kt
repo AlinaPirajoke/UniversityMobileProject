@@ -27,12 +27,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusDirection
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
+import com.example.university.R
 import com.example.university.theme.ColorScheme
 import com.example.university.theme.KotobaCustomTheme
 import com.example.university.theme.UXConstants
@@ -221,7 +223,7 @@ fun AddView(
         Text(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(top = 5.dp)
+                .padding(top = 5.dp/*, end = 15.dp*/)
                 .clickable { onAddTranstation() },
             text = "Добавить перевод",
             color = MaterialTheme.colors.secondary,
@@ -282,7 +284,7 @@ fun AddView(
                 contentColor = MaterialTheme.colors.primary
             )
         ) {
-            Text(text = "Выйти")
+            Text(text = stringResource(id = R.string.exit))
         }
 
         TextButton(

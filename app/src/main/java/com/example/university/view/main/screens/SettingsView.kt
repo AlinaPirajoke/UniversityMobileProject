@@ -1,5 +1,7 @@
 package com.example.university.view.main.screens
 
+//import androidx.compose.material.Switch
+//import androidx.compose.material.SwitchDefaults
 import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
@@ -279,7 +281,7 @@ private fun SwitchOption(
                 checkedThumbColor = MaterialTheme.colors.primary,
                 checkedTrackColor = MaterialTheme.colors.primaryVariant,
                 uncheckedThumbColor = MaterialTheme.colors.onError,
-                uncheckedTrackColor = MaterialTheme.colors.onError.copy(alpha = 0.5f),
+                uncheckedTrackColor = MaterialTheme.colors.onError.copy(alpha = 0.45f),
             ),
             //modifier = Modifier.padding(top = 10.dp)
         )

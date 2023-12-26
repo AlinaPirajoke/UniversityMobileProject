@@ -1,7 +1,8 @@
 <resources>
     <string name="app_name">kotoba</string>
 
-    <string name="exit">Выйти</string>
+    <string name="exit">Назад</string>
+    <string name="pass_test">Выйти на главную</string>
     <string name="add">Добавить</string>
     <string name="confirm">Подтвердить</string>
     <string name="delete">Удалить</string>
@@ -17,8 +18,12 @@
     <string name="S_signature">Разработано Рузмановым Владиславом</string>
     <string name="S_signature_crop">Разработано\nРузмановым Владиславом</string>
 
+    <string name="PW_already_learned">Отметить как изученное</string>
+
     <string name="UW_lvl_description">Период появления: </string>
     <string name="UW_date_description">Ближайшее появление: </string>
+    <string name="UW_find_tile">Найти слово </string>
+    <string name="UW_find_placeholder">Искомое слово</string>
 
     <string name="PH_color_name">Оранжевая</string>
     <string name="pink_color_name">Розовая</string>

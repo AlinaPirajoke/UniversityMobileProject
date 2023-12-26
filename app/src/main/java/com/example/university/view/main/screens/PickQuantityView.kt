@@ -128,6 +128,7 @@ fun PickQuantityView(
                         fontSize = 20.sp,
                         color = MaterialTheme.colors.onPrimary,
                     )
+
                     Slider(
                         value = pickedQuantitySlider, onValueChange = {
                             onValueChange(it)
@@ -138,9 +139,10 @@ fun PickQuantityView(
                             thumbColor = MaterialTheme.colors.primaryVariant,
                             activeTrackColor = MaterialTheme.colors.onPrimary,
                             inactiveTrackColor = MaterialTheme.colors.secondary,
-                            inactiveTickColor = MaterialTheme.colors.onPrimary,
+                            inactiveTickColor = MaterialTheme.colors.secondary,
                             activeTickColor = MaterialTheme.colors.onPrimary,
-                        )
+                        ),
+                        steps = wordsQuantity
                     )
                     Row(
                         Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween
@@ -196,7 +198,8 @@ fun PickQuantityView(
                             .height(120.dp)
                             .padding(12.dp),
                         style = MaterialTheme.typography.body1,
-                        color = MaterialTheme.colors.secondary
+                        fontSize = 18.sp
+                        //color = MaterialTheme.colors.secondary
                     )
                 }
             }

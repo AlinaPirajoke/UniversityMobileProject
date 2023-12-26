@@ -26,7 +26,7 @@ class MySharedPreferences(context: Context) {
 
     var user: Int = 0
         get() {
-            val v = sp.getInt("user", 0)
+            val v = sp.getInt("user", 1)
             Log.i(TAG, "user: $v")
             return v
         }

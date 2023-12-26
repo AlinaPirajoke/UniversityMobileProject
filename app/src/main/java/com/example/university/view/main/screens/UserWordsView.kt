@@ -11,13 +11,19 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.AlertDialog
 import androidx.compose.material.Card
+import androidx.compose.material.Icon
+import androidx.compose.material.LocalTextStyle
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Scaffold
 import androidx.compose.material.Text
 import androidx.compose.material.TextButton
+import androidx.compose.material.TextField
+import androidx.compose.material.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -26,17 +32,19 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import com.example.university.R
-import com.example.university.usefullStuff.Word
-import com.example.university.view.main.MainScreens
-import com.example.university.viewModel.UserWordsViewModel
 import com.example.university.theme.ColorScheme
 import com.example.university.theme.KotobaCustomTheme
 import com.example.university.theme.UXConstants
+import com.example.university.usefullStuff.Word
+import com.example.university.view.main.MainScreens
+import com.example.university.viewModel.UserWordsViewModel
 import org.koin.androidx.compose.koinViewModel
 
 private const val TAG = "UserWordsView"
@@ -54,12 +62,19 @@ fun UserWordsScreen(
         words = uiState.words,
         pickedWordNo = uiState.pickedWordNo,
         onPick = vm::pickElement,
-        onEdit = { /*TODO*/ },
+        onEdit = { id ->
+            Log.i(TAG, "Перенаправление на экран редактирования слов")
+            navController.navigate("${MainScreens.Edit.route}/${id}")
+        },
         onDelete = vm::deleteWord,
         onExit = {
             Log.i(TAG, "Перенаправление на главный экран")
             navController.navigate(MainScreens.Main.route)
         },
+        onStartFinding = vm::openFinder,
+        isFinding = uiState.isFinderActive,
+        onUpdateFilter = vm::setFilter,
+        filter = uiState.filter
     )
 }
 
@@ -68,9 +83,13 @@ fun UserWordsView(
     words: ArrayList<Word>,
     pickedWordNo: Int,
     onPick: (Int) -> Unit,
-    onEdit: () -> Unit,
+    onEdit: (Int) -> Unit,
     onDelete: () -> Unit,
-    onExit: () -> Unit
+    onExit: () -> Unit,
+    onStartFinding: () -> Unit,
+    isFinding: Boolean,
+    onUpdateFilter: (String) -> Unit,
+    filter: String
 ) {
     Scaffold(
         Modifier.padding(0.dp),
@@ -106,6 +125,12 @@ fun UserWordsView(
                     .fillMaxWidth()
                     .padding(top = UXConstants.VERTICAL_PADDING),
             ) {
+                item {
+                    if (!isFinding)
+                        InactiveWordsFilterTile(onConfirm = onStartFinding)
+                    else
+                        ActiveWordsFilterTile(onUpdateFilter = onUpdateFilter, filter = filter)
+                }
                 words.forEachIndexed() { i, word ->
                     item {
                         if (i == pickedWordNo)
@@ -140,7 +165,7 @@ fun InactiveListTile(
 @Composable
 fun ActiveListTile(
     word: Word,
-    onEdit: () -> Unit,
+    onEdit: (Int) -> Unit,
     onDelete: () -> Unit
 ) {
     Card(
@@ -169,15 +194,18 @@ fun ActiveListTile(
                     .weight(1f),
                 Arrangement.End
             ) {
+                TextButton(onClick = { onEdit(word.id) }) {
+                    Text(
+                        text = stringResource(id = R.string.edit),
+                        Modifier.padding(horizontal = UXConstants.HORIZONTAL_PADDING - 10.dp)
+                    )
+                }
                 TextButton(onClick = onDelete) {
                     Text(
                         text = stringResource(id = R.string.delete),
                         Modifier.padding(end = UXConstants.HORIZONTAL_PADDING)
                     )
                 }
-//                TextButton(onClick = onEdit) {
-//                    Text(text = stringResource(id = R.string.edit))
-//                }
             }
         }
     }
@@ -230,6 +258,97 @@ fun WordDescriptionColumn(word: Word) {
     }
 }
 
+@Composable
+fun InactiveWordsFilterTile(
+    onConfirm: () -> Unit
+) {
+    Card(
+        Modifier
+            .padding(vertical = UXConstants.VERTICAL_PADDING / 2)
+            .height(70.dp)
+            .fillMaxWidth()
+            .clickable { onConfirm() },
+        elevation = UXConstants.ELEVATION / 2,
+        shape = MaterialTheme.shapes.small
+    ) {
+        Row(
+            Modifier
+                .fillMaxSize()
+                .padding(start = 10.dp, bottom = 3.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.Center,
+        ) {
+            Icon(
+                modifier = Modifier.size(30.dp),
+                imageVector = ImageVector.vectorResource(R.drawable.search),
+                contentDescription = "finder",
+                tint = MaterialTheme.colors.primary,
+            )
+            Text(
+                text = stringResource(id = R.string.UW_find_tile),
+                Modifier.padding(start = UXConstants.HORIZONTAL_PADDING),
+                style = MaterialTheme.typography.body1.copy(
+                    fontSize = 20.sp,
+                    fontWeight = FontWeight.W500
+                ),
+                color = MaterialTheme.colors.primary
+            )
+        }
+    }
+}
+
+@Composable
+fun ActiveWordsFilterTile(
+    onUpdateFilter: (String) -> Unit,
+    filter: String
+) {
+    Card(
+        Modifier
+            .padding(vertical = UXConstants.VERTICAL_PADDING / 2)
+            .height(70.dp)
+            .fillMaxWidth(),
+        elevation = UXConstants.ELEVATION / 2,
+        shape = MaterialTheme.shapes.small
+    ) {
+        Row(
+            Modifier
+                .fillMaxSize()
+                .padding(start = 10.dp, bottom = 3.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.Center,
+        ) {
+            TextField(
+                value = filter,
+                singleLine = true,
+
+                onValueChange = onUpdateFilter,
+                colors = TextFieldDefaults.textFieldColors(
+                    backgroundColor = MaterialTheme.colors.surface,
+                    unfocusedIndicatorColor = MaterialTheme.colors.primary,
+                    focusedIndicatorColor = MaterialTheme.colors.primary,
+                    cursorColor = MaterialTheme.colors.primary
+                ),
+                placeholder = {
+                    Text(
+                        text = stringResource(id = R.string.UW_find_placeholder),
+                        Modifier.width(250.dp),
+                        textAlign = TextAlign.Center
+                    )
+                },
+                textStyle = LocalTextStyle.current.copy(
+                    textAlign = TextAlign.Center,
+                    fontWeight = FontWeight.W500
+                )
+            )
+//            Icon(
+//                modifier = Modifier.size(30.dp),
+//                imageVector = ImageVector.vectorResource(R.drawable.search),
+//                contentDescription = "finder",
+//                tint = MaterialTheme.colors.primary,
+//            )
+        }
+    }
+}
 
 @Composable
 fun WordDeleteConfirm(onConfirm: () -> Unit, onReject: () -> Unit) {
@@ -271,7 +390,29 @@ fun UserWordsPreview() {
             onDelete = { },
             onEdit = { },
             pickedWordNo = 1,
-            onExit = { }
+            onExit = { },
+            onStartFinding = { },
+            onUpdateFilter = { str -> },
+            isFinding = false,
+            filter = ""
         )
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun InactiveFinderPreview() {
+    KotobaCustomTheme(colorScheme = ColorScheme.mint.colors) {
+        InactiveWordsFilterTile {
+
+        }
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun ActiveFinderPreview() {
+    KotobaCustomTheme(colorScheme = ColorScheme.mint.colors) {
+        ActiveWordsFilterTile(onUpdateFilter = {}, filter = "xaxax")
     }
 }

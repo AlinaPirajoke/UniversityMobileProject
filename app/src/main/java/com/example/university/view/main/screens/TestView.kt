@@ -149,18 +149,20 @@ fun TestSecondStageView(
     onBad: () -> Unit,
     onExit: () -> Unit,
     wordIndex: Int,
-    totalWords: Int
+    totalWords: Int,
 ) {
-
     Column(
         Modifier
             .fillMaxSize()
             .padding(UXConstants.HORIZONTAL_PADDING, UXConstants.VERTICAL_PADDING),
         verticalArrangement = Arrangement.SpaceBetween,
     ) {
-
         WordBanner(
-            word = word, transcr = transcr, transl = transl, index = wordIndex, total = totalWords
+            word = word,
+            transcr = transcr,
+            transl = transl,
+            index = wordIndex,
+            total = totalWords
         )
         OptionsButtons(
             onExitButtonAction = onExit,
@@ -247,7 +249,7 @@ fun OptionsButtons(
                 contentColor = MaterialTheme.colors.primary
             )
         ) {
-            Text(text = stringResource(id = R.string.exit))
+            Text(text = stringResource(id = R.string.pass_test))
         }
         if (secondButtonLabel.isNotBlank()) Button(
             onClick = secondButtonAction,
@@ -350,7 +352,8 @@ fun ImgTile(imgId: Int, descr: String, action: () -> Unit) {
 @Composable
 fun FirstStagePreview() {
     KotobaCustomTheme(colorScheme = ColorScheme.pink.colors) {
-        TestFirstStageView(word = "sample",
+        TestFirstStageView(
+            word = "sample",
             transcr = "sample",
             onNext = { },
             onExit = { },

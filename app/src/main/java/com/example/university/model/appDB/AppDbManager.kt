@@ -11,7 +11,9 @@ import com.example.university.usefullStuff.getDaysFromToday
 import com.example.university.usefullStuff.getTodayDate
 import com.example.university.usefullStuff.stdFormatter
 
-class AppDbManager(val context: Context, val msp: MySharedPreferences, val dbHelper: AppDbHelper) { // оставь надежду всяк сюда входящий
+class AppDbManager(
+    val context: Context, val msp: MySharedPreferences, val dbHelper: AppDbHelper
+) { // оставь надежду всяк сюда входящий
     val TAG = "DBManager"
     var db: SQLiteDatabase? = null
 
@@ -32,8 +34,7 @@ class AppDbManager(val context: Context, val msp: MySharedPreferences, val dbHel
             }
             db!!.insert(AppDbNames.LIBRARY, null, values)
             val cursor = db!!.rawQuery(
-                "SELECT MAX(${AppDbNames.LI_WORD_ID}) FROM ${AppDbNames.LIBRARY}",
-                null
+                "SELECT MAX(${AppDbNames.LI_WORD_ID}) FROM ${AppDbNames.LIBRARY}", null
             )
             cursor?.moveToFirst()
             val word_id = cursor?.getInt(0)!!
@@ -101,6 +102,15 @@ class AppDbManager(val context: Context, val msp: MySharedPreferences, val dbHel
             db!!.insert(AppDbNames.LIBRARY_USER, null, values)
             Log.i(TAG, "Слово ${word.word} было отмечено как изучаемое")
         }
+    }
+
+    fun markWordsAsLearned(pickedId: Int, user: Int) {
+        val values = ContentValues().apply {
+            put(AppDbNames.LIU_WORD_ID, pickedId)
+            put(AppDbNames.LIU_USER, user)
+        }
+        db!!.insert(AppDbNames.LIBRARY_USER, null, values)
+        Log.i(TAG, "Слово ${pickedId} было отмечено как изучаемое")
     }
 
     fun insertPassword(pass: String) {
@@ -182,8 +192,7 @@ class AppDbManager(val context: Context, val msp: MySharedPreferences, val dbHel
 
     fun getAllWordsQuantity(): Int {
         val cursor = db!!.rawQuery(
-            "SELECT COUNT(${AppDbNames.W_DATE}) FROM ${AppDbNames.WORD}",
-            null
+            "SELECT COUNT(${AppDbNames.W_DATE}) FROM ${AppDbNames.WORD}", null
         )
         cursor.moveToFirst()
         val quantity = cursor?.getInt(0)!!
@@ -330,6 +339,26 @@ class AppDbManager(val context: Context, val msp: MySharedPreferences, val dbHel
         return words
     }
 
+    fun getWordFromId(wordId: Int): Word {
+        val cursor = db!!.rawQuery(
+            "SELECT ${AppDbNames.WORD}.${AppDbNames.W_ID}, ${AppDbNames.WORD}.${AppDbNames.W_WORD}, ${AppDbNames.WORD}.${AppDbNames.W_SOUND}, ${AppDbNames.WORD}.${AppDbNames.W_LVL} FROM ${AppDbNames.WORD} WHERE ${AppDbNames.WORD}.${AppDbNames.W_ID} = $wordId",
+            null
+        )
+
+        cursor.moveToFirst()
+        val id = cursor?.getInt(0)
+        val word = cursor?.getString(1).toString()
+        val transcr = cursor?.getString(2).toString()
+        val lvl = cursor?.getInt(3)!!
+        val transl = getTranslationsFromWord(id!!)
+        cursor.close()
+
+        return Word(
+            id = id, word = word, transcription = transcr, translations = transl, lvl = lvl
+        )
+    }
+
+
     fun saveWordResult(word: Word, listId: Int) {
         db!!.execSQL(
             "UPDATE ${AppDbNames.LIST} SET ${AppDbNames.L_RESULT} = ${word.result}, ${AppDbNames.L_IS_FINISHED} = 1 WHERE ${AppDbNames.L_WORD} = ${word.id} AND ${AppDbNames.L_ID} = $listId"
@@ -397,11 +426,7 @@ class AppDbManager(val context: Context, val msp: MySharedPreferences, val dbHel
             val transl = getTranslationsFromWord(id)
 
             val tempWord = Word(
-                id = id,
-                word = word,
-                transcription = transcr,
-                translations = transl,
-                lvl = lvl
+                id = id, word = word, transcription = transcr, translations = transl, lvl = lvl
             )
             tempWord.comming = date
             words.add(
@@ -418,10 +443,21 @@ class AppDbManager(val context: Context, val msp: MySharedPreferences, val dbHel
         db?.execSQL("DELETE FROM ${AppDbNames.WORD} WHERE ${AppDbNames.W_ID} = $id")
     }
 
-    fun editWord(modifiedWordId: Int, wordValue: String, transcrValue: String, translValues: List<String>) {
-        db?.execSQL(
+    fun editWord(
+        modifiedWordId: Int, wordValue: String, transcrValue: String, translValues: List<String>
+    ) {
+        Log.i(
+            TAG,
             "UPDATE ${AppDbNames.WORD} SET ${AppDbNames.W_WORD} = $wordValue, ${AppDbNames.W_SOUND} = $transcrValue WHERE ${AppDbNames.W_ID} = $modifiedWordId"
         )
+        db?.execSQL(
+            "UPDATE ${AppDbNames.WORD} SET ${AppDbNames.W_WORD} = \"$wordValue\", ${AppDbNames.W_SOUND} = \"${
+                transcrValue.removePrefix(
+                    "[ "
+                ).removeSuffix(" ]")
+            }\" WHERE ${AppDbNames.W_ID} = $modifiedWordId"
+        )
+
         editTranslation(modifiedWordId, translValues)
         Log.i(TAG, "Слово изменено")
     }

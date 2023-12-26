@@ -1,6 +1,7 @@
 package com.example.university.viewModel
 
 import android.util.Log
+import androidx.compose.runtime.mutableStateListOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.university.model.MySharedPreferences
@@ -19,6 +20,18 @@ class EditViewModel(val db: AppDbManager, val msp: MySharedPreferences) : ViewMo
     var modifiedWordId: Int = 0
         set(value) {
             field = value
+            val word = db.getWordFromId(field)
+            val transl = mutableStateListOf<String>()
+            word.translations.forEach {
+                transl.add(it)
+            }
+            _uiState.update { state ->
+                state.copy(
+                    wordValue = word.word,
+                    transcrValue = word.transcription,
+                    translValues = transl
+                )
+            }
         }
 
     private val _uiState = MutableStateFlow(EditUiState())
@@ -86,7 +99,7 @@ class EditViewModel(val db: AppDbManager, val msp: MySharedPreferences) : ViewMo
     }
 
     // Добавление нового слова
-    fun EditWord() {
+    fun editWord() {
         viewModelScope.launch {
             withContext(Dispatchers.IO) {
                 val values = uiState.value

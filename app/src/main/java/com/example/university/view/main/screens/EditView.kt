@@ -1,4 +1,3 @@
-/*
 package com.example.university.view.main.screens
 
 import android.util.Log
@@ -18,7 +17,6 @@ import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.OutlinedTextField
 import androidx.compose.material.Text
-import androidx.compose.material.TextButton
 import androidx.compose.material.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -28,21 +26,21 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusDirection
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
-import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
+import com.example.university.R
 import com.example.university.theme.ColorScheme
 import com.example.university.theme.KotobaCustomTheme
 import com.example.university.theme.UXConstants
 import com.example.university.view.main.MainScreens
-import com.example.university.viewModel.AddViewModel
 import com.example.university.viewModel.EditViewModel
 import org.koin.androidx.compose.koinViewModel
 
-private val TAG = "AddView"
+private const val TAG = "EditView"
 
 @Composable
 fun EditInit(
@@ -51,18 +49,19 @@ fun EditInit(
     wordId: Int,
 ) {
     vm.modifiedWordId = wordId
+    EditScreen(navController = navController, vm = vm)
 }
 
 @Composable
 fun EditScreen(
     navController: NavHostController,
-    vm: EditViewModel = koinViewModel()
+    vm: EditViewModel
 ) {
     val uiState by vm.uiState.collectAsState()
-    if (uiState.isGoingToMain) {
-        vm.sendToMain(false)
-        Log.i(TAG, "Перенаправление на главный экран")
-        navController.navigate(MainScreens.Main.route)
+    if (uiState.isGoingToExit) {
+        vm.sendToExit(false)
+        Log.i(TAG, "Перенаправление на экран словаря пользователя")
+        navController.navigate(MainScreens.UserWords.route)
     }
 
     EditView(
@@ -73,26 +72,14 @@ fun EditScreen(
         translations = uiState.translValues,
         onTranslChanged = vm::editTranslationValue,
         onAddTranstation = vm::addTranslation,
-        lvl = uiState.lvlValue,
-        onLvlChanged = vm::editLvlValue,
-        onConfirm = {
-            vm.addWord()
-        },
+        onConfirm = vm::editWord,
         isWordFieldWrong = uiState.isWordFieldWrong,
         isTranslFieldWrong = uiState.isTranslFieldWrong,
-        isLvlFieldWrong = uiState.isLvlFieldWrong,
         errorMessage = uiState.errorMessage,
-        onGoingToMain = {
-            Log.i(TAG, "Перенаправление на главный экран")
-            navController.navigate(MainScreens.Main.route)
+        onGoingToExit = {
+            Log.i(TAG, "Перенаправление на экран словаря пользователя")
+            navController.navigate(MainScreens.UserWords.route)
         },
-        isTranslating = uiState.isTranslating,
-        isTranslationError = uiState.isTranslationError,
-        onAutoTranslate = vm::autoTranslate,
-        onGoingToPickWord = {
-            Log.i(TAG, "Перенаправление на экран библиотеки")
-            navController.navigate(MainScreens.PickWord.route)
-        }
     )
 }
 
@@ -106,18 +93,11 @@ fun EditView(
     translations: List<String>,
     onTranslChanged: (String, Int) -> Unit,
     onAddTranstation: () -> Unit,
-    lvl: String,
-    onLvlChanged: (String) -> Unit,
     onConfirm: () -> Unit,
     isWordFieldWrong: Boolean,
     isTranslFieldWrong: Boolean,
-    isLvlFieldWrong: Boolean,
     errorMessage: String,
-    onGoingToMain: () -> Unit,
-    isTranslating: Boolean,
-    isTranslationError: Boolean,
-    onAutoTranslate: () -> Unit,
-    onGoingToPickWord: () -> Unit
+    onGoingToExit: () -> Unit,
 ) {
     val keyboardController = LocalSoftwareKeyboardController.current
     val focusManager = LocalFocusManager.current
@@ -130,13 +110,14 @@ fun EditView(
         verticalArrangement = Arrangement.Center,
     ) {
         Text(
-            text = "Добавьте новое слово",
+            text = "Отредактируйте слово",
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(vertical = UXConstants.VERTICAL_PADDING),
             textAlign = TextAlign.Left,
             style = MaterialTheme.typography.h5
         )
+
         OutlinedTextField(
             value = word,
             onValueChange = { onWordChanged(it) },
@@ -163,21 +144,6 @@ fun EditView(
             )
         )
 
-        Text(
-            text =
-            if (isTranslating) "Переводим..."
-            else "Перевести автоматически",
-            Modifier
-                .fillMaxWidth()
-                .padding(top = 5.dp, start = 15.dp)
-                .clickable { onAutoTranslate() },
-            color =
-            if (isTranslationError) MaterialTheme.colors.error
-            else MaterialTheme.colors.secondary,
-            textAlign = TextAlign.Left,
-            style = MaterialTheme.typography.subtitle1
-        )
-
         OutlinedTextField(
             value = transcription,
             onValueChange = { onTranscrChanged(it) },
@@ -185,7 +151,7 @@ fun EditView(
             singleLine = true,
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(top = UXConstants.VERTICAL_PADDING - 10.dp),
+                .padding(top = UXConstants.VERTICAL_PADDING + 10.dp),
             keyboardOptions = KeyboardOptions(
                 imeAction = ImeAction.Next
             ),
@@ -218,7 +184,8 @@ fun EditView(
                     imeAction = ImeAction.Next
                 ),
                 keyboardActions = KeyboardActions(onNext = {
-                    focusManager.moveFocus(FocusDirection.Down)
+                    keyboardController?.hide()
+                    onConfirm()
                 }),
                 colors = TextFieldDefaults.outlinedTextFieldColors(
                     focusedBorderColor = MaterialTheme.colors.primary,
@@ -240,54 +207,22 @@ fun EditView(
             style = MaterialTheme.typography.subtitle1
         )
 
-        OutlinedTextField(
-            value = lvl,
-            onValueChange = { onLvlChanged(it) },
-            label = {
-                if (isLvlFieldWrong) Text(text = errorMessage)
-                else Text("Период показа")
-            },
-            isError = isLvlFieldWrong,
-            singleLine = true,
-            placeholder = {
-                Text("0")
-            },
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(top = UXConstants.VERTICAL_PADDING - 10.dp),
-            keyboardOptions = KeyboardOptions(
-                imeAction = ImeAction.Done, keyboardType = KeyboardType.Number
-            ),
-            keyboardActions = KeyboardActions(onDone = {
-                keyboardController?.hide()
-                onConfirm()
-            }),
-            colors = TextFieldDefaults.outlinedTextFieldColors(
-                focusedBorderColor = MaterialTheme.colors.primary,
-                unfocusedBorderColor = MaterialTheme.colors.primary,
-                cursorColor = MaterialTheme.colors.primary,
-                focusedLabelColor = MaterialTheme.colors.secondary,
-            )
-        )
-
         Button(
-            onClick = {
-                onConfirm()
-            },
+            onClick = onConfirm,
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(top = 36.dp),
+                .padding(top = 30.dp),
             colors = ButtonDefaults.buttonColors(
                 backgroundColor = MaterialTheme.colors.primary,
                 contentColor = MaterialTheme.colors.onPrimary
             )
         ) {
-            Text(text = "Добавить")
+            Text(text = stringResource(id = R.string.confirm))
         }
 
         Button(
             onClick = {
-                onGoingToMain()
+                onGoingToExit()
             },
             modifier = Modifier
                 .fillMaxWidth()
@@ -297,14 +232,7 @@ fun EditView(
                 contentColor = MaterialTheme.colors.primary
             )
         ) {
-            Text(text = "Выйти")
-        }
-
-        TextButton(
-            onClick = onGoingToPickWord,
-            modifier = Modifier.fillMaxWidth()
-        ) {
-            Text(text = "Или выберите слово из библиотеки")
+            Text(text = stringResource(id = R.string.exit))
         }
     }
 }
@@ -321,18 +249,11 @@ fun EditViewPreview() {
             translations = listOf("Example"),
             onTranslChanged = { str, int -> },
             onAddTranstation = { },
-            lvl = "13",
-            onLvlChanged = {},
             onConfirm = { },
             isWordFieldWrong = false,
             isTranslFieldWrong = false,
-            isLvlFieldWrong = false,
             errorMessage = "",
-            onGoingToMain = { },
-            isTranslating = false,
-            isTranslationError = false,
-            onAutoTranslate = { },
-            onGoingToPickWord = {}
+            onGoingToExit = { },
         )
     }
-}*/
+}

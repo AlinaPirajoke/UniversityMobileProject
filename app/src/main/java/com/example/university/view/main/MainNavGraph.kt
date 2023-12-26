@@ -6,6 +6,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import com.example.university.view.main.screens.AddScreen
+import com.example.university.view.main.screens.EditInit
 import com.example.university.view.main.screens.FutureTestsScreen
 import com.example.university.view.main.screens.MainScreen
 import com.example.university.view.main.screens.PickQuantityInit
@@ -80,6 +81,16 @@ fun MainNavGraph(
             RememberInit(
                 navController = navController,
                 listId = backStackEntry.arguments?.getString("listId")!!.toInt()
+            )
+        }
+        composable(route = MainScreens.Edit.route + "/{wordId}") { backStackEntry ->
+            Log.i(
+                TAG,
+                "Передаётся аргумент wordId = ${backStackEntry.arguments?.getString("wordId")}"
+            )
+            EditInit(
+                navController = navController,
+                wordId = backStackEntry.arguments?.getString("wordId")!!.toInt()
             )
         }
     }

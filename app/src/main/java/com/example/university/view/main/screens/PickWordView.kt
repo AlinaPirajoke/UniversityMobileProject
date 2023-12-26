@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.material.AlertDialog
 import androidx.compose.material.Card
 import androidx.compose.material.FloatingActionButton
 import androidx.compose.material.Icon
@@ -35,13 +36,13 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import com.example.university.R
+import com.example.university.theme.ColorScheme
+import com.example.university.theme.KotobaCustomTheme
+import com.example.university.theme.UXConstants
 import com.example.university.usefullStuff.DownloadAnimation
 import com.example.university.usefullStuff.Word
 import com.example.university.view.main.MainScreens
 import com.example.university.viewModel.PickWordViewModel
-import com.example.university.theme.ColorScheme
-import com.example.university.theme.KotobaCustomTheme
-import com.example.university.theme.UXConstants
 import org.koin.androidx.compose.koinViewModel
 
 private const val TAG = "PickWordView"
@@ -53,6 +54,9 @@ fun PickWordScreen(
 ) {
     val uiState by vm.uiState.collectAsState()
 
+    if (uiState.isAlertShowing) {
+        WordDeleteConfirm(onConfirm = vm::wordIsAlreadyLearned, onReject = { vm.deleteWordRequest(false) })
+    }
     if (uiState.isGoingToMain) {
         vm.sendToMain(false)
         Log.i(TAG, "Перенаправление на главный экран")
@@ -60,29 +64,29 @@ fun PickWordScreen(
     }
     PickWordView(
         words = uiState.words,
-        remain = uiState.remain,
         pickedWords = uiState.pickedWords,
         onPick = vm::pickWord,
         onUnpick = vm::unpickWord,
-        onConfirm = vm::confirm,
+        onConfirm = vm::confirmWordAdding,
         topText = uiState.topText,
         onExit = {
             Log.i(TAG, "Перенаправление на главный экран")
             navController.navigate(MainScreens.Main.route)
-        }
+        },
+        onAlreadyLearned = { i :Int -> vm.deleteWordRequest(true, i) }
     )
 }
 
 @Composable
 fun PickWordView(
     words: List<Word>,
-    remain: Int,
     pickedWords: List<Int>,
     onPick: (Int) -> Unit,
     onUnpick: (Int) -> Unit,
     onConfirm: () -> Unit,
     topText: String,
     onExit: () -> Unit,
+    onAlreadyLearned: (Int) -> Unit
 ) {
     Scaffold(
         Modifier.padding(0.dp),
@@ -111,19 +115,24 @@ fun PickWordView(
             )
             LazyColumn(
                 Modifier
-                    .fillMaxWidth()
-                    .padding(top = UXConstants.VERTICAL_PADDING),
+                    .padding(top = UXConstants.VERTICAL_PADDING)
+                    .fillMaxWidth(),
             ) {
-                item() {
-                    ConfirmTile(
-                        onConfirm = onConfirm,
-                        text = if (pickedWords.size > 0) "Подтвердить выбор ${pickedWords.size} ${if (pickedWords.size == 1) "слова" else "слов"}" else "Выберите хотя бы одно слово"
-                    )
-                }
+//                item() {
+//                    ConfirmTile(
+//                        onConfirm = onConfirm,
+//                        text = if (pickedWords.size > 0) "Подтвердить выбор ${pickedWords.size} ${if (pickedWords.size == 1) "слова" else "слов"}" else "Выберите хотя бы одно слово"
+//                    )
+//                }
                 words.forEachIndexed() { i, word ->
                     item {
                         if (i in pickedWords)
-                            ListTile(word = word, onClick = { onUnpick(i) }, isPicked = true)
+                            ListTile(
+                                word = word,
+                                onClick = { onUnpick(i) },
+                                isPicked = true,
+                                onAlreadyLearned = { onAlreadyLearned(i) },
+                            )
                         else
                             ListTile(word = word, onClick = { onPick(i) }, isPicked = false)
                     }
@@ -170,15 +179,17 @@ fun ConfirmTile(onConfirm: () -> Unit, text: String) {
 fun ListTile(
     word: Word,
     onClick: () -> Unit,
-    isPicked: Boolean
+    isPicked: Boolean,
+    onAlreadyLearned: (Int) -> Unit = { }
 ) {
     var modifier = Modifier
         .fillMaxWidth()
         .padding(bottom = UXConstants.VERTICAL_PADDING / 2)
         .height(80.dp)
         .clickable { onClick() }
+    var elevation = 2.dp
 
-    if (isPicked)
+    if (isPicked) {
         modifier = Modifier
             .fillMaxWidth()
             .padding(bottom = UXConstants.VERTICAL_PADDING / 2)
@@ -189,38 +200,37 @@ fun ListTile(
                 color = MaterialTheme.colors.primary,
                 shape = MaterialTheme.shapes.small
             )
+        elevation = 0.dp
+    }
 
     Card(
         modifier = modifier,
-        elevation = if (isPicked) 2.dp else UXConstants.ELEVATION,
+//        elevation = if (isPicked) 1.dp else 3.dp,
+        elevation = elevation,
         shape = MaterialTheme.shapes.small,
     ) {
-        Column(
+        Row(
             Modifier
-                .fillMaxWidth()
-                .padding(start = 10.dp, bottom = 3.dp),
-            verticalArrangement = Arrangement.SpaceEvenly,
-            horizontalAlignment = Alignment.Start
+                .fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically,
         ) {
-            // Слово
-            Text(
-                text = word.word,
-                style = MaterialTheme.typography.body2,
-                textAlign = TextAlign.Start,
-            )
-            // Транскрипция
-            Text(
-                text = word.transcription,
-                style = MaterialTheme.typography.subtitle2,
-                textAlign = TextAlign.Start,
-                color = MaterialTheme.colors.secondaryVariant.copy(alpha = 0.8f)
-            )
-            // Перевод
-            Text(
-                text = word.translationsToString(),
-                style = MaterialTheme.typography.body1,
-                textAlign = TextAlign.Start,
-            )
+            WordDescriptionColumn(word = word)
+            if (isPicked) {
+                Row(
+                    Modifier
+                        .padding(0.dp)
+                        .fillMaxWidth()
+                        .weight(1f),
+                    Arrangement.End
+                ) {
+                    TextButton(onClick = { onAlreadyLearned(word.id) }) {
+                        Text(
+                            text = stringResource(id = R.string.PW_already_learned),
+                            Modifier.padding(end = UXConstants.HORIZONTAL_PADDING)
+                        )
+                    }
+                }
+            }
         }
     }
 }
@@ -279,6 +289,28 @@ fun ExitConfirmFloatingActionButtonPart(text: String, img: ImageVector, onClick:
     }
 }
 
+@Composable
+fun WordAlreadyLearnedConfirm(onConfirm: () -> Unit, onReject: () -> Unit) {
+    AlertDialog(
+        onDismissRequest = onReject,
+        text = { Text("Вы действительно хорошоо знаете это слово и хотите исключить слово из библиотеки?") },
+        confirmButton = {
+            TextButton(
+                onClick = onConfirm
+            ) {
+                Text("Подтвердить")
+            }
+        },
+        dismissButton = {
+            TextButton(
+                onClick = onReject
+            ) {
+                Text("Отменить")
+            }
+        }
+    )
+}
+
 @Preview(showBackground = false)
 @Composable
 fun ListRowPreview() {
@@ -309,13 +341,13 @@ fun PickWordPreview() {
     KotobaCustomTheme(colorScheme = ColorScheme.mint.colors) {
         PickWordView(
             words = words,
-            remain = 3,
             pickedWords = listOf(1),
             onPick = { },
             onConfirm = { },
             onUnpick = { },
             topText = "pdfjosfdhsetws",
-            onExit = { }
+            onExit = { },
+            onAlreadyLearned = { }
         )
     }
 }

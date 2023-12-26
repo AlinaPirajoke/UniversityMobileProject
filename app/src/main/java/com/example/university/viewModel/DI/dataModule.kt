@@ -7,6 +7,7 @@ import com.example.university.model.appDB.AppDbManager
 import com.example.university.model.wordsDB.WordsDbHelper
 import com.example.university.model.wordsDB.WordsDbManager
 import com.example.university.viewModel.AddViewModel
+import com.example.university.viewModel.EditViewModel
 import com.example.university.viewModel.FutureTestsViewModel
 import com.example.university.viewModel.LoginViewModel
 import com.example.university.viewModel.MainActivityViewModel
@@ -119,6 +120,12 @@ private fun Module.presentation() {
     }
     viewModel<RememberViewModel> {
         RememberViewModel(
+            db = get(),
+            msp = get()
+        )
+    }
+    viewModel<EditViewModel> {
+        EditViewModel(
             db = get(),
             msp = get()
         )

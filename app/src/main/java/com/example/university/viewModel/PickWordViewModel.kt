@@ -2,8 +2,8 @@ package com.example.university.viewModel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.university.model.appDB.AppDbManager
 import com.example.university.model.MySharedPreferences
+import com.example.university.model.appDB.AppDbManager
 import com.example.university.viewModel.states.PickWordUiState
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
@@ -21,6 +21,7 @@ class PickWordViewModel(
     private val TAG = "PickQuantityViewModel"
     private var trueRemain: Int =
         msp.studyQuantityPerDay - msp.todayStudiedQuantity
+    private var learnedWordNo: Int = -1
     private val _uiState = MutableStateFlow(PickWordUiState())
     val uiState: StateFlow<PickWordUiState> = _uiState.asStateFlow()
 
@@ -55,10 +56,14 @@ class PickWordViewModel(
     fun updateTopText() {
         val remain = uiState.value.remain
         if (remain == 0) {
-            _uiState.update { state ->
-                state.copy(topText = "Выбрано достаточно")
-            }
-            return
+            if (uiState.value.pickedQuantity == 0)
+                _uiState.update { state ->
+                    state.copy(topText = "Дневной план уже выполнен")
+                }
+            else
+                _uiState.update { state ->
+                    state.copy(topText = "Выбрано достаточно")
+                }
         }
 
         var text = ""
@@ -106,16 +111,39 @@ class PickWordViewModel(
         updateTopText()
     }
 
-    fun confirm() {
-        if (uiState.value.pickedWords.size > 0) {
-            viewModelScope.launch {
-                val picked = uiState.value.words.filterIndexed { id, word ->
-                    id in uiState.value.pickedWords
-                }
-                db.markWordsAsLearned(picked = picked, user = msp.user)
-                db.addNewWords(picked, msp.user)
-                sendToMain()
+    fun wordIsAlreadyLearned() {
+        viewModelScope.launch {
+            withContext(Dispatchers.IO) {
+                db.markWordsAsLearned(
+                    pickedId = uiState.value.words[learnedWordNo].id,
+                    user = msp.user
+                )
+                uiState.value.pickedWords.remove(learnedWordNo)
+                uiState.value.words.removeAt(learnedWordNo)
+                deleteWordRequest(false, -1)
             }
         }
+    }
+
+    fun confirmWordAdding() {
+        if (uiState.value.pickedWords.size > 0) {
+            viewModelScope.launch {
+                withContext(Dispatchers.IO) {
+                    val picked = uiState.value.words.filterIndexed { id, word ->
+                        id in uiState.value.pickedWords
+                    }
+                    db.markWordsAsLearned(picked = picked, user = msp.user)
+                    db.addNewWords(picked, msp.user)
+                    sendToMain()
+                }
+            }
+        }
+    }
+
+    fun deleteWordRequest(b: Boolean, wordNo: Int = -1) {
+        _uiState.update { state ->
+            state.copy(isAlertShowing = b)
+        }
+        learnedWordNo = wordNo
     }
 }

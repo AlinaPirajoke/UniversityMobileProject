@@ -15,62 +15,82 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Card
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.MaterialTheme
+import androidx.compose.material.Scaffold
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
-import com.example.university.usefullStuff.simplifyDate
-import com.example.university.view.main.MainScreens
-import com.example.university.viewModel.FutureTestsViewModel
+import com.example.university.R
 import com.example.university.theme.KotobaCustomTheme
 import com.example.university.theme.PHColors
 import com.example.university.theme.UXConstants
+import com.example.university.usefullStuff.simplifyDate
+import com.example.university.view.main.MainScreens
+import com.example.university.viewModel.FutureTestsViewModel
 import org.koin.androidx.compose.koinViewModel
 
 private const val TAG = "FutureTestsView"
 
 @Composable
 fun FutureTestsScreen(
-    navController: NavHostController,
-    vm: FutureTestsViewModel = koinViewModel()
+    navController: NavHostController, vm: FutureTestsViewModel = koinViewModel()
 ) {
     val uiState by vm.uiState.collectAsState()
-    FutureTestsView(dateQuantityList = uiState.dateQuantity, onPick = { date, quantity ->
-        if (quantity > 0) {
-            Log.i(TAG, "Перенаправление на экран выбора количества слов для тестирования")
-            navController.navigate("${MainScreens.PickQuantity.route}/${date}")
+    FutureTestsView(
+        dateQuantityList = uiState.dateQuantity,
+        onPick = { date, quantity ->
+            if (quantity > 0) {
+                Log.i(TAG, "Перенаправление на экран выбора количества слов для тестирования")
+                navController.navigate("${MainScreens.PickQuantity.route}/${date}")
+            }
+        },
+        onExit = {
+            Log.i(TAG, "Перенаправление на главный экран")
+            navController.navigate(MainScreens.Main.route)
         }
-    })
+    )
 }
 
 @Composable
 fun FutureTestsView(
-    dateQuantityList: List<Pair<String, Int>>,
-    onPick: (String, Int) -> Unit,
+    dateQuantityList: List<Pair<String, Int>>, onPick: (String, Int) -> Unit, onExit: () -> Unit
 ) {
-    Column(
-        Modifier
-            .fillMaxSize()
-            .padding(
-                start = UXConstants.HORIZONTAL_PADDING,
-                top = UXConstants.VERTICAL_PADDING,
-                end = UXConstants.HORIZONTAL_PADDING,
+    Scaffold(Modifier.padding(0.dp),
+        backgroundColor = MaterialTheme.colors.background,
+        floatingActionButton = {
+            ExitConfirmFloatingActionButtonPart(
+                onClick = onExit,
+                text = stringResource(id = R.string.exit),
+                img = ImageVector.vectorResource(R.drawable.bad),
             )
-    ) {
-        Text(
-            text = "День и количество слов, которые нужно будет повторить",
-            style = MaterialTheme.typography.h5,
-            color = MaterialTheme.colors.secondaryVariant
-        )
-        CreateGrid(
-            dateQuantityList,
-            onPick
-        )
+        }) { innerPadding ->
+        println(innerPadding.toString())
+        Column(
+            Modifier
+                .fillMaxSize()
+                .padding(
+                    start = UXConstants.HORIZONTAL_PADDING,
+                    top = UXConstants.VERTICAL_PADDING,
+                    end = UXConstants.HORIZONTAL_PADDING,
+                )
+        ) {
+            Text(
+                text = "День и количество слов, которые нужно будет повторить",
+                style = MaterialTheme.typography.h5,
+                color = MaterialTheme.colors.secondaryVariant
+            )
+            CreateGrid(
+                dateQuantityList, onPick
+            )
+        }
     }
 }
 
@@ -87,10 +107,8 @@ fun CreateGrid(dateQuantity: List<Pair<String, Int>>, onClick: (String, Int) -> 
             if (index == 0) {
                 val text = simplifyDate(data.first) + " (сегодня)"
                 item(span = { GridItemSpan(maxLineSpan) }) {
-                    CreateListCard(
-                        dateQuantity = data.copy(first = text),
-                        onClick = { onClick(data.first, data.second) }
-                    )
+                    CreateListCard(dateQuantity = data.copy(first = text),
+                        onClick = { onClick(data.first, data.second) })
                 }
             } else item(span = { GridItemSpan(1) }) {
                 CreateListCard(
@@ -106,8 +124,7 @@ fun CreateGrid(dateQuantity: List<Pair<String, Int>>, onClick: (String, Int) -> 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun CreateListCard(
-    dateQuantity: Pair<String, Int>,
-    onClick: () -> Unit
+    dateQuantity: Pair<String, Int>, onClick: () -> Unit
 ) {
 
     Card(
@@ -134,8 +151,7 @@ fun CreateListCard(
                 )
                 Text(
                     text = dateQuantity.first,
-                    Modifier
-                        .padding(top = 5.dp, bottom = 0.dp),
+                    Modifier.padding(top = 5.dp, bottom = 0.dp),
                     fontSize = 20.sp,
                     color = MaterialTheme.colors.secondaryVariant.copy(alpha = 0.9f)
                 )
@@ -150,7 +166,8 @@ fun FutureTestsPreview() {
     KotobaCustomTheme(colorScheme = PHColors) {
         FutureTestsView(
             dateQuantityList = listOf("a" to 1, "b" to 2, "2023-12-12" to 5),
-            onPick = { i, d -> }
+            onPick = { i, d -> },
+            onExit = { }
         )
     }
 }

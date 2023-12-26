@@ -8,5 +8,6 @@ data class PickWordUiState (
     val words: ArrayList<Word> = arrayListOf(), // Список всех слов
     val pickedWords: MutableList<Int> = mutableListOf(), // Номера выбранных слов
     val topText: String = "Выберите слова для изучения", // Текст вверху (верхний (он на верху (выше остального) ) )
-    val isGoingToMain: Boolean = false // Отправление на главный
+    val isGoingToMain: Boolean = false, // Отправление на главный
+    val isAlertShowing: Boolean = false // Показывает предупреждающее сообщение
 )
