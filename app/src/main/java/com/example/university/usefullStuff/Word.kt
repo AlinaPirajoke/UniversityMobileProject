@@ -22,7 +22,7 @@ class Word(
         if (transcription.isNotBlank()) {
             transcription = transcription.removeSuffix("]")
             transcription = transcription.removePrefix("[")
-            transcription = "[$transcription]"
+            transcription = "[ $transcription ]"
         }
     }
 

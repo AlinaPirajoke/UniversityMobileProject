@@ -269,12 +269,12 @@ fun ExitConfirmFloatingActionButtonPart(text: String, img: ImageVector, onClick:
         Row(
             Modifier
                 .fillMaxSize()
-                .padding(10.dp),
+                .padding(5.dp),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
             Icon(
-                modifier = Modifier.size(20.dp),
+                modifier = Modifier.padding(start = 8.dp).size(20.dp),
                 imageVector = img,
                 contentDescription = text,
                 tint = MaterialTheme.colors.onPrimary

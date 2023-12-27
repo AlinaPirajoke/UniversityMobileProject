@@ -34,7 +34,6 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import com.example.university.R
 import com.example.university.view.auth.AuthScreens
@@ -109,8 +108,7 @@ fun LoginView(
                         .fillMaxWidth()
                         .padding(bottom = 20.dp),
                     textAlign = TextAlign.Center,
-                    //style = TextStyle(fontWeight = FontWeight.Bold),
-                    fontSize = 20.sp,
+                    style = MaterialTheme.typography.h5,
                 )
 
                 var isHidden by remember { mutableStateOf(true) }
@@ -137,7 +135,7 @@ fun LoginView(
                             Icon(imageVector = image, description)
                         }
                     },
-                    modifier = Modifier.padding(bottom = 20.dp),
+                    modifier = Modifier.padding(bottom = 30.dp),
                     isError = isError,
                     keyboardOptions = KeyboardOptions(
                         keyboardType = KeyboardType.Ascii,

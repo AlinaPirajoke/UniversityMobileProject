@@ -23,7 +23,7 @@
     <string name="UW_lvl_description">Период появления: </string>
     <string name="UW_date_description">Ближайшее появление: </string>
     <string name="UW_find_tile">Найти слово </string>
-    <string name="UW_find_placeholder">Искомое слово</string>
+    <string name="UW_find_placeholder">Текст для поиска</string>
 
     <string name="PH_color_name">Оранжевая</string>
     <string name="pink_color_name">Розовая</string>

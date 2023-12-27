@@ -182,7 +182,7 @@ class AppDbManager(
 
     fun getLearningCount(): Int {
         val cursor = db!!.rawQuery(
-            "SELECT COUNT(*) FROM ${AppDbNames.WORD} WHERE ${AppDbNames.W_LVL} >= 50", null
+            "SELECT COUNT(*) FROM ${AppDbNames.WORD} WHERE ${AppDbNames.W_LVL} <= 50", null
         )
         cursor?.moveToFirst()
         val size = cursor?.getInt(0)

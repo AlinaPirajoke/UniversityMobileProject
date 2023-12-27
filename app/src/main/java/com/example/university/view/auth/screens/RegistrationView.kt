@@ -35,7 +35,6 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import com.example.university.R
 import com.example.university.view.auth.AuthScreens
@@ -110,10 +109,9 @@ fun RegistrationView(
             text = "Создайте нового пользователя",
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(bottom = 20.dp),
+                .padding(bottom = 23.dp),
             textAlign = TextAlign.Center,
-            //style = TextStyle(fontWeight = FontWeight.Bold),
-            fontSize = 20.sp,
+            style = MaterialTheme.typography.h6,
         )
         var isHidden1 by remember { mutableStateOf(true) }
 
@@ -135,7 +133,7 @@ fun RegistrationView(
                     Icon(imageVector = image, description)
                 }
             },
-            modifier = Modifier.fillMaxWidth(),
+            modifier = Modifier.fillMaxWidth().padding(bottom = 5.dp),
             isError = isField1Error,
             keyboardOptions = KeyboardOptions(
                 keyboardType = KeyboardType.Ascii, imeAction = ImeAction.Next
@@ -172,7 +170,7 @@ fun RegistrationView(
             },
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(bottom = 20.dp),
+                .padding(bottom = 30.dp),
             isError = isField2Error,
             keyboardOptions = KeyboardOptions(
                 keyboardType = KeyboardType.Ascii, imeAction = ImeAction.Done

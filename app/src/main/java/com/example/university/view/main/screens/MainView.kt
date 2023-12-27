@@ -169,7 +169,7 @@ fun StatisticBlock(
                     .padding(10.dp),
                 Arrangement.SpaceBetween,
             ) {
-                StatisticLine(text = "Всего слов изучено", value = learned)
+                StatisticLine(text = "Всего слов в словаре", value = learned)
                 Divider(
                     Modifier
                         .fillMaxWidth()
@@ -213,8 +213,14 @@ fun TodayBlock(
             color = MaterialTheme.colors.secondaryVariant,
             textAlign = TextAlign.Center
         )
-        TodayAction(text = "$todayTest осталось повторить", onGoingToPickCount)
-        TodayAction(text = "$todayLearn слов осталось изучить", onGoingToPickWords)
+        TodayAction(
+            text = if (todayTest > 0) "$todayTest слов осталось повторить" else "Все слова повторены!",
+            onGoingToPickCount
+        )
+        TodayAction(
+            text = if (todayLearn > 0) "$todayLearn слов осталось изучить" else "План на изучение выполен!",
+            onGoingToPickWords
+        )
         Text(
             modifier = Modifier
                 .fillMaxWidth()

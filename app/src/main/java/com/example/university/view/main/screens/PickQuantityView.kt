@@ -138,8 +138,8 @@ fun PickQuantityView(
                         colors = SliderDefaults.colors(
                             thumbColor = MaterialTheme.colors.primaryVariant,
                             activeTrackColor = MaterialTheme.colors.onPrimary,
-                            inactiveTrackColor = MaterialTheme.colors.secondary,
-                            inactiveTickColor = MaterialTheme.colors.secondary,
+                            inactiveTrackColor = MaterialTheme.colors.secondaryVariant,
+                            inactiveTickColor = MaterialTheme.colors.secondaryVariant,
                             activeTickColor = MaterialTheme.colors.onPrimary,
                         ),
                         steps = wordsQuantity

@@ -115,7 +115,7 @@ fun UserWordsView(
                 )
         ) {
             Text(
-                text = "Все изучаемые слова (${words.size}):",
+                text = if (!isFinding) "Все изучаемые слова (${words.size}):" else "Все найденные слова (${words.size}):",
                 Modifier.fillMaxWidth(),
                 textAlign = TextAlign.Left,
                 style = MaterialTheme.typography.h5
@@ -313,39 +313,51 @@ fun ActiveWordsFilterTile(
         Row(
             Modifier
                 .fillMaxSize()
-                .padding(start = 10.dp, bottom = 3.dp),
+                .padding(start = 15.dp, bottom = 5.dp),
             verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.Center,
+            horizontalArrangement = Arrangement.Start,
         ) {
-            TextField(
-                value = filter,
-                singleLine = true,
-
-                onValueChange = onUpdateFilter,
-                colors = TextFieldDefaults.textFieldColors(
-                    backgroundColor = MaterialTheme.colors.surface,
-                    unfocusedIndicatorColor = MaterialTheme.colors.primary,
-                    focusedIndicatorColor = MaterialTheme.colors.primary,
-                    cursorColor = MaterialTheme.colors.primary
-                ),
-                placeholder = {
-                    Text(
-                        text = stringResource(id = R.string.UW_find_placeholder),
-                        Modifier.width(250.dp),
-                        textAlign = TextAlign.Center
+            Row(
+                Modifier.width(250.dp)
+            ) {
+                TextField(
+                    value = filter,
+                    singleLine = true,
+                    onValueChange = onUpdateFilter,
+                    colors = TextFieldDefaults.textFieldColors(
+                        backgroundColor = MaterialTheme.colors.surface,
+                        unfocusedIndicatorColor = MaterialTheme.colors.primary,
+                        focusedIndicatorColor = MaterialTheme.colors.primary,
+                        cursorColor = MaterialTheme.colors.primary
+                    ),
+                    placeholder = {
+                        Text(
+                            text = stringResource(id = R.string.UW_find_placeholder),
+                            Modifier.width(200.dp),
+                            textAlign = TextAlign.Left
+                        )
+                    },
+                    textStyle = LocalTextStyle.current.copy(
+                        textAlign = TextAlign.Left,
+                        fontWeight = FontWeight.W400
                     )
-                },
-                textStyle = LocalTextStyle.current.copy(
-                    textAlign = TextAlign.Center,
-                    fontWeight = FontWeight.W500
                 )
-            )
-//            Icon(
-//                modifier = Modifier.size(30.dp),
-//                imageVector = ImageVector.vectorResource(R.drawable.search),
-//                contentDescription = "finder",
-//                tint = MaterialTheme.colors.primary,
-//            )
+            }
+            Row(
+                Modifier
+                    .fillMaxWidth(1f)
+                    .padding(top = 5.dp),
+                horizontalArrangement = Arrangement.Center,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Icon(
+                    modifier = Modifier
+                        .size(30.dp),
+                    imageVector = ImageVector.vectorResource(R.drawable.search),
+                    contentDescription = "finder",
+                    tint = MaterialTheme.colors.primary,
+                )
+            }
         }
     }
 }
@@ -393,8 +405,8 @@ fun UserWordsPreview() {
             onExit = { },
             onStartFinding = { },
             onUpdateFilter = { str -> },
-            isFinding = false,
-            filter = ""
+            isFinding = true,
+            filter = "sample"
         )
     }
 }

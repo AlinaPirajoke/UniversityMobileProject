@@ -157,6 +157,7 @@ fun AddView(
         Text(
             text =
             if (isTranslating) "Переводим..."
+            else if (isTranslationError) "Ошибка"
             else "Перевести автоматически",
             Modifier
                 .fillMaxWidth()
